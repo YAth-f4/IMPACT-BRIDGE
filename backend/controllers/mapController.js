@@ -1,4 +1,9 @@
 const { searchNearbyNgos } = require('../services/overpassService');
+const {
+  getVerifiedHubs: fetchVerifiedHubsFromDb,
+  getFilterOptions,
+  getTotalVerifiedCount
+} = require('../models/verifiedHubModel');
 
 /**
  * Controller to handle GET /api/map/nearby-ngos
@@ -79,6 +84,49 @@ async function getNearbyNgos(req, res) {
   }
 }
 
+/**
+ * Controller to handle GET /api/map/verified-hubs
+ * Returns only admin-verified hubs from application database
+ *
+ * Query parameters:
+ * - city: string (optional)
+ * - status: string (optional)
+ * - category: string (optional)
+ * - search: string (optional)
+ */
+async function getVerifiedHubs(req, res) {
+  try {
+    const { city, status, category, search } = req.query;
+
+    const results = fetchVerifiedHubsFromDb({
+      city,
+      status,
+      category,
+      search
+    });
+
+    const totalVerified = getTotalVerifiedCount();
+    const filterOptions = getFilterOptions();
+
+    return res.status(200).json({
+      success: true,
+      count: results.length,
+      totalVerified,
+      filterOptions,
+      source: 'Impact Bridge',
+      results
+    });
+  } catch (error) {
+    console.error('[MapController] Error fetching verified hubs:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: 'An error occurred while retrieving verified hubs from application database.',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+}
+
 module.exports = {
-  getNearbyNgos
+  getNearbyNgos,
+  getVerifiedHubs
 };

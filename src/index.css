@@ -679,3 +679,453 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .leaflet-popup-tip-container {
   display: none !important;
 }
+
+/* ===================================================
+   AUTHENTICATION & LOGIN ANIMATIONS
+   =================================================== */
+@keyframes loginCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes subtleShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes loginSuccessPulse {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spinAuth {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===================================================
+   COMPLETE MICRO-INTERACTIONS & ANIMATION SYSTEM
+   =================================================== */
+
+/* 1. Card Entrance Animation */
+@keyframes loginCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-login-card {
+  animation: loginCardEntrance 550ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* 2. Sequential Staggered Entrance */
+@keyframes staggerFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-item {
+  opacity: 0;
+  animation: staggerFadeUp 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.delay-0 { animation-delay: 0ms; }
+.delay-60 { animation-delay: 60ms; }
+.delay-120 { animation-delay: 120ms; }
+.delay-180 { animation-delay: 180ms; }
+.delay-220 { animation-delay: 220ms; }
+.delay-280 { animation-delay: 280ms; }
+.delay-340 { animation-delay: 340ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-460 { animation-delay: 460ms; }
+.delay-520 { animation-delay: 520ms; }
+
+/* 3. Logo Entrance (single pass, subtle scale, no infinite spin) */
+@keyframes logoEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-logo-entrance {
+  animation: logoEntrance 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Subtle 4-Point Horizontal Shake for Form Errors */
+@keyframes subtleShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+.animate-shake {
+  animation: subtleShake 380ms ease-in-out forwards;
+}
+
+/* 5. Celebratory Success Pop */
+@keyframes successPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-success-pop {
+  animation: successPop 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 6. Form Input Focus Micro-Interactions */
+.nb-input-interactive {
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
+}
+
+.nb-input-interactive:focus {
+  border-color: #000000 !important;
+  box-shadow: 5px 5px 0px #000000 !important;
+  background-color: #FFFFFF !important;
+  transform: translateY(-2px);
+}
+
+.nb-input-group {
+  position: relative;
+  transition: transform 0.18s ease;
+}
+
+.nb-input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%) scale(1);
+  pointer-events: none;
+  color: #5A6F64;
+  transition: color 0.18s ease, transform 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nb-input-group:focus-within .nb-input-icon {
+  color: var(--brand-dark-green);
+  transform: translateY(-50%) scale(1.12);
+}
+
+/* 7. Password Toggle Micro-Interaction */
+.password-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5A6F64;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #000000;
+  transform: scale(1.15);
+}
+
+.password-toggle-btn:active {
+  transform: scale(0.92);
+}
+
+.password-icon-enter {
+  animation: eyeFlip 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes eyeFlip {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.85) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 8. Role Persona Selector Micro-Interactions */
+.nb-role-pill {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+}
+
+.nb-role-pill:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1.5px 1.5px 0px #000000;
+}
+
+.nb-role-pill:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+.nb-role-pill.active {
+  transform: translateY(-2px);
+  box-shadow: 3.5px 3.5px 0px #000000 !important;
+}
+
+.nb-role-pill.active .role-icon {
+  transform: scale(1.15);
+  transition: transform 0.15s ease;
+}
+
+/* 9. Neo-Brutalist Universal Tactile Buttons */
+.nb-btn-tactile {
+  box-shadow: 4px 4px 0px #000000;
+  transform: translate(0, 0);
+  transition: transform 0.14s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.14s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease;
+}
+
+.nb-btn-tactile:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000000;
+}
+
+.nb-btn-tactile:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+/* 10. Dropdown Expand Animation */
+@keyframes dropdownExpand {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-dropdown {
+  animation: dropdownExpand 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+/* 11. Toast Slide Right In & Out */
+.nb-toast-container {
+  position: fixed;
+  top: 86px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(420px, calc(100vw - 32px));
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.nb-toast-item {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 2.5px solid #000000;
+  box-shadow: 4px 4px 0px #000000;
+  border-radius: 6px;
+  color: #000000;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+  animation: toastSlideRightIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nb-toast-item.toast-exiting {
+  animation: toastSlideRightOut 240ms ease-in forwards;
+}
+
+@keyframes toastSlideRightIn {
+  0% {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastSlideRightOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@media (max-width: 768px) {
+  .nb-toast-container {
+    top: 76px;
+    right: 16px;
+    left: auto;
+    width: min(400px, calc(100vw - 32px));
+  }
+}
+
+@media (max-width: 480px) {
+  .nb-toast-container {
+    top: 72px;
+    left: 16px;
+    right: 16px;
+    width: calc(100vw - 32px);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* 12. Bridge Loader Connection Animation */
+@keyframes bridgeBeamPulse {
+  0% {
+    width: 0%;
+    opacity: 0.4;
+  }
+  50% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0.7;
+  }
+}
+
+.animate-bridge-beam {
+  animation: bridgeBeamPulse 900ms ease-in-out infinite;
+}
+
+/* 13. Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-shake,
+  .animate-login-card,
+  .animate-stagger-item,
+  .animate-logo-entrance,
+  .nb-input-interactive:focus,
+  .nb-role-pill:hover,
+  .nb-role-pill.active,
+  .nb-btn-tactile:hover,
+  .nb-btn-tactile:active {
+    transform: none !important;
+  }
+}
+
+/* 14. Global Route & Page Transitions */
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.page-fade-in {
+  animation: pageFadeIn 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.page-fade-out {
+  animation: pageFadeOut 80ms ease-in forwards;
+  will-change: opacity, transform;
+}
+
+
+
+

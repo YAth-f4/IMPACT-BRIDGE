@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export default function AdminTopbar({ setMobileOpen }) {
-  const { resetToMockData, addToast } = useApp();
+  const { resetToMockData, addToast, currentUser } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -285,10 +285,10 @@ export default function AdminTopbar({ setMobileOpen }) {
             </div>
             <div className="sm-hidden" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
               <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '0.75rem' }}>
-                Sunita Rao
+                {currentUser?.name || 'Sunita Rao'}
               </span>
               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--brand-dark-green)' }}>
-                SUPER ADMIN
+                {currentUser?.role?.toUpperCase() || 'SUPER ADMIN'}
               </span>
             </div>
           </div>

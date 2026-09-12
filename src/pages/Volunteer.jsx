@@ -23,9 +23,17 @@ import {
 } from 'lucide-react';
 
 export default function Volunteer() {
-  const { addVolunteer, addToast } = useApp();
+  const {
+    userRole,
+    addVolunteer,
+    addToast,
+    volunteerTasks,
+    toggleVolunteerTask,
+    addVolunteerTask,
+    logVolunteerHours
+  } = useApp();
 
-  const [activeTab, setActiveTab] = useState('join'); // 'join' | 'opportunities' | 'dashboard'
+  const [activeTab, setActiveTab] = useState(userRole === 'volunteer' ? 'dashboard' : 'join');
 
   // Form State
   const [formData, setFormData] = useState({
@@ -103,7 +111,7 @@ export default function Volunteer() {
       hoursLogged: prev.hoursLogged + Number(newLogHours)
     }));
 
-    addToast(`Successfully logged ${newLogHours} volunteer hours!`, 'success');
+    logVolunteerHours(Number(newLogHours), newLogActivity);
     setNewLogHours('');
     setNewLogActivity('');
   };
@@ -436,6 +444,87 @@ export default function Volunteer() {
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '2rem' }} className="hero-grid">
               {/* Left: Assigned Programs & Upcoming Roster */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {/* 1. What do I need to do today? Action Checklist */}
+                <Card style={{ padding: '1.5rem', backgroundColor: '#FFFFFF', border: 'var(--border-thick)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.35rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span>📋</span> What do I need to do today?
+                      </h3>
+                      <p style={{ fontSize: '0.82rem', color: '#5A6F64', margin: '0.2rem 0 0', fontWeight: 600 }}>
+                        Your immediate action checklist for this week
+                      </p>
+                    </div>
+                    <Badge variant={volunteerTasks.some(t => !t.completed) ? 'yellow' : 'green'} size="sm">
+                      {volunteerTasks.filter(t => !t.completed).length} Tasks Remaining
+                    </Badge>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {volunteerTasks.map((task) => (
+                      <div
+                        key={task.id}
+                        style={{
+                          padding: '0.85rem 1rem',
+                          border: '2px solid #000000',
+                          borderRadius: '8px',
+                          backgroundColor: task.completed ? '#E8F5E9' : '#FFFDF5',
+                          boxShadow: task.completed ? 'none' : '2px 2px 0px #000000',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '1rem',
+                          flexWrap: 'wrap',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <div style={{ flex: '1 1 240px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                            <span style={{
+                              fontWeight: 800,
+                              fontSize: '0.95rem',
+                              textDecoration: task.completed ? 'line-through' : 'none',
+                              color: task.completed ? '#4B6354' : '#000000'
+                            }}>
+                              {task.title}
+                            </span>
+                            {task.completed && (
+                              <span style={{ fontSize: '0.72rem', backgroundColor: '#2E7D5B', color: '#FFF', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 800 }}>
+                                COMPLETED
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: '#5A6F64', fontWeight: 600 }}>
+                            📌 {task.program} • 📍 {task.location}
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: '#888', marginTop: '0.15rem' }}>
+                            🕒 {task.time} • ⏱️ {task.hours} hrs credit
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <button
+                            onClick={() => toggleVolunteerTask(task.id)}
+                            style={{
+                              backgroundColor: task.completed ? '#FFFFFF' : '#F4B942',
+                              color: '#000000',
+                              border: '2px solid #000000',
+                              borderRadius: '6px',
+                              padding: '0.45rem 0.8rem',
+                              fontSize: '0.8rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              boxShadow: '1.5px 1.5px 0px #000000'
+                            }}
+                          >
+                            {task.completed ? '↩️ Reopen' : '✓ Mark Task Complete'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
                 <Card style={{ padding: '1.5rem' }}>
                   <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
                     📅 Upcoming Volunteer Schedule

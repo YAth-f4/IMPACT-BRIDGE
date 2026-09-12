@@ -13,12 +13,13 @@ import {
   Mail,
   Settings,
   Globe,
+  LogOut,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
 
 export default function AdminSidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen }) {
-  const { messages } = useApp();
+  const { messages, logoutUser } = useApp();
 
   const unreadMessagesCount = messages.filter((m) => !m.read).length;
 
@@ -244,6 +245,33 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, mobileOpen, 
             <Globe size={16} strokeWidth={2.5} />
             {!isCollapsed && <span>Public Website</span>}
           </Link>
+
+          <button
+            onClick={logoutUser}
+            style={{
+              width: '100%',
+              padding: '0.55rem',
+              backgroundColor: '#FFFFFF',
+              color: '#000000',
+              border: '2px solid #000000',
+              borderRadius: '4px',
+              boxShadow: '2px 2px 0px #000000',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 800,
+              fontSize: '0.8rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxSizing: 'border-box'
+            }}
+            title="Sign Out of Admin Portal"
+          >
+            <LogOut size={16} strokeWidth={2.5} />
+            {!isCollapsed && <span>Sign Out</span>}
+          </button>
         </div>
       </aside>
     </>

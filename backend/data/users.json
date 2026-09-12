@@ -1,0 +1,90 @@
+[
+  {
+    "id": "USR-ADMIN-01",
+    "name": "Sunita Rao",
+    "email": "sunita.rao@impactbridge.org",
+    "passwordHash": "$2b$10$qvL1p6LGp0/1xbVx1WdXPO6Y99n.g5ALCI3MSUkSKGk.TNQfOedXW",
+    "role": "admin",
+    "createdAt": "2026-01-15T09:00:00.000Z"
+  },
+  {
+    "id": "USR-ADMIN-02",
+    "name": "System Administrator",
+    "email": "admin@impactbridge.org",
+    "passwordHash": "$2b$10$k.9uXeBaNN/i9Tg6MMWtKOQO390OKBnZPceeUfDZ0lSXAAZ5gvKY2",
+    "role": "admin",
+    "createdAt": "2026-01-15T09:00:00.000Z"
+  },
+  {
+    "id": "USR-VOL-01",
+    "name": "Aarav Sharma",
+    "email": "aarav.sharma@example.com",
+    "passwordHash": "$2b$10$ILYeEdn23709uJAI8h/JXuS0w.ehRwS2feW7TLq2b8Ec4RWjzl6yO",
+    "role": "volunteer",
+    "createdAt": "2026-02-10T11:30:00.000Z"
+  },
+  {
+    "id": "USR-BEN-01",
+    "name": "Laxmi Devi",
+    "email": "laxmi.devi@example.com",
+    "passwordHash": "$2b$10$e6PAzEMAU/7lu/CicS0EqePHUnIbd.l2hyVvTqZ1K.nyaheNcgvx6",
+    "role": "beneficiary",
+    "createdAt": "2026-03-01T14:15:00.000Z"
+  },
+  {
+    "id": "USR-DON-01",
+    "name": "Aditya Singhania",
+    "email": "aditya.singhania@corp.in",
+    "passwordHash": "$2b$10$dGQogmE3CtBthgA5JaRN8OEcmqw3cAD9rDPZxYHihESnuZiuDvNDC",
+    "role": "donor",
+    "createdAt": "2026-03-05T16:45:00.000Z"
+  },
+  {
+    "id": "USR-GST-01",
+    "name": "Public Citizen",
+    "email": "visitor@example.com",
+    "passwordHash": "$2b$10$04CybQI9D1nT4L/hVaphweeNbuXoaEdqEO/MhrmYb35tjk8qBtTg2",
+    "role": "guest",
+    "createdAt": "2026-04-01T10:00:00.000Z"
+  },
+  {
+    "id": "USR-1789220447247-688",
+    "name": "Kavita Patel",
+    "email": "kavita.patel@test.org",
+    "passwordHash": "$2b$10$YCjf2MioQxb/dkSxcruhte.ObXNEJVJL7lDex4BX1W1qV2RfQsWqW",
+    "role": "volunteer",
+    "createdAt": "2026-09-12T13:40:47.247Z"
+  },
+  {
+    "id": "USR-1789220699277-807",
+    "name": "Pooja Hegde",
+    "email": "test.registered.938922825@example.com",
+    "passwordHash": "$2b$10$elJTpkH5y2EeOsM0f9hE2.3RTnoTP9AOjzyKbVUi0ESPb8/1A3FRy",
+    "role": "volunteer",
+    "createdAt": "2026-09-12T13:44:59.277Z"
+  },
+  {
+    "id": "USR-1789220699553-854",
+    "name": "Vikram Bajaj",
+    "email": "persistent.donor.1273778602@example.com",
+    "passwordHash": "$2b$10$ksqrtOZ3N1R6khVByGi88enEuNZL8hkpwDGx10fJwoX7JWfseDIyi",
+    "role": "donor",
+    "createdAt": "2026-09-12T13:44:59.553Z"
+  },
+  {
+    "id": "USR-1789220814657-800",
+    "name": "test123",
+    "email": "test123@gmail.com",
+    "passwordHash": "$2b$10$xCUOxt60IZQcyQ539twGNeM4LALZxJv6oRgoPZLwXRnx/O19OkmqS",
+    "role": "volunteer",
+    "createdAt": "2026-09-12T13:46:54.657Z"
+  },
+  {
+    "id": "USR-1789221260797-294",
+    "name": "Pooja Verma",
+    "email": "test.toast.1789221260508@example.com",
+    "passwordHash": "$2b$10$LTSICgUmiQcfuMaW9OgXROg4Au8JlMcKfQd3lLCJ5msFIIRzjHNLW",
+    "role": "volunteer",
+    "createdAt": "2026-09-12T13:54:20.797Z"
+  }
+]

@@ -136,6 +136,46 @@ export default function Donation() {
 
           {/* Left: Donation Form */}
           <Card style={{ padding: '2rem', border: 'var(--border-thick)' }}>
+            {/* 3-Step Donation Flow Indicator */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '0.5rem',
+              marginBottom: '1.75rem',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                backgroundColor: '#E8F5E9',
+                border: '2px solid #000',
+                borderRadius: '6px',
+                padding: '0.45rem 0.25rem',
+                fontWeight: 800,
+                fontSize: '0.78rem'
+              }}>
+                1. Select Program
+              </div>
+              <div style={{
+                backgroundColor: '#FFF9C4',
+                border: '2px solid #000',
+                borderRadius: '6px',
+                padding: '0.45rem 0.25rem',
+                fontWeight: 800,
+                fontSize: '0.78rem'
+              }}>
+                2. Choose Amount
+              </div>
+              <div style={{
+                backgroundColor: '#E1F5FE',
+                border: '2px solid #000',
+                borderRadius: '6px',
+                padding: '0.45rem 0.25rem',
+                fontWeight: 800,
+                fontSize: '0.78rem'
+              }}>
+                3. Instant 80G Receipt
+              </div>
+            </div>
+
             <form onSubmit={handleOpenPayment}>
               {/* Frequency Toggle */}
               <div style={{ marginBottom: '1.75rem' }}>

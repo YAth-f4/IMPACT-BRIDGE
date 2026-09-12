@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mapRoutes = require('./routes/mapRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +27,9 @@ app.get('/api/health', (req, res) => {
 
 // Map routes
 app.use('/api/map', mapRoutes);
+
+// Authentication routes
+app.use('/api/auth', authRoutes);
 
 // 404 handler for unknown routes
 app.use((req, res) => {

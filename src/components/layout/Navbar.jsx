@@ -4,23 +4,86 @@ import { useApp } from '../../context/AppContext';
 import BrandLogo from '../common/BrandLogo';
 import Button from '../common/Button';
 import Mascot from '../common/Mascot';
-import { Heart, Menu, X, Shield, User, MapPin, LogIn, Sparkles } from 'lucide-react';
+import { Heart, Menu, X, Shield, User, MapPin, LogIn, LogOut } from 'lucide-react';
 
 export default function Navbar() {
-  const { userRole, switchRole } = useApp();
+  const { userRole, switchRole, currentUser, isAuthenticated, logoutUser } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  const navLinks = [
-    { path: '/home', label: 'Home' },
-    { path: '/about', label: 'About' },
-    { path: '/programs', label: 'Programs' },
-    { path: '/volunteer', label: 'Volunteer' },
-    { path: '/donation', label: 'Donation' },
-    { path: '/impact-map', label: 'Impact Map', isMap: true },
-    { path: '/contact', label: 'Contact' }
-  ];
+  // Close role dropdown on click outside or Escape
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setRoleDropdownOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('#role-dropdown-container')) {
+        setRoleDropdownOpen(false);
+      }
+    };
+    if (roleDropdownOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('click', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [roleDropdownOpen]);
+
+  const getNavLinks = () => {
+    switch (userRole) {
+      case 'beneficiary':
+        return [
+          { path: '/beneficiary', label: 'Beneficiary Hub', icon: '🤝' },
+          { path: '/home', label: 'Home' },
+          { path: '/programs', label: 'Programs' },
+          { path: '/impact-map', label: 'Impact Map', isMap: true },
+          { path: '/contact', label: 'Contact' }
+        ];
+      case 'volunteer':
+        return [
+          { path: '/volunteer', label: 'Volunteer Tasks', icon: '📋' },
+          { path: '/home', label: 'Home' },
+          { path: '/programs', label: 'Programs' },
+          { path: '/impact-map', label: 'Impact Map', isMap: true },
+          { path: '/contact', label: 'Contact' }
+        ];
+      case 'donor':
+        return [
+          { path: '/donation', label: 'Donate & 80G', icon: '❤️' },
+          { path: '/home', label: 'Home' },
+          { path: '/programs', label: 'Programs' },
+          { path: '/impact-map', label: 'Impact Map', isMap: true },
+          { path: '/about', label: 'About Us' }
+        ];
+      case 'admin':
+        return [
+          { path: '/admin/dashboard', label: 'Admin Dashboard', icon: '⚡' },
+          { path: '/programs', label: 'Programs' },
+          { path: '/volunteer', label: 'Volunteers' },
+          { path: '/beneficiary', label: 'Beneficiaries' },
+          { path: '/impact-map', label: 'Impact Map', isMap: true }
+        ];
+      default: // 'guest' / public
+        return [
+          { path: '/home', label: 'Home' },
+          { path: '/about', label: 'About' },
+          { path: '/programs', label: 'Programs' },
+          { path: '/volunteer', label: 'Volunteer' },
+          { path: '/donation', label: 'Donation' },
+          { path: '/beneficiary', label: 'Find Help' },
+          { path: '/impact-map', label: 'Impact Map', isMap: true },
+          { path: '/contact', label: 'Contact' }
+        ];
+    }
+  };
+
+  const navLinks = getNavLinks();
 
   return (
     <header
@@ -91,7 +154,7 @@ export default function Navbar() {
         {/* Desktop Actions & Controls */}
         <div className="lg-flex" style={{ display: 'none', alignItems: 'center', gap: '0.65rem' }}>
           {/* Quick Role Switcher Pill */}
-          <div style={{ position: 'relative' }}>
+          <div id="role-dropdown-container" style={{ position: 'relative' }}>
             <button
               onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
               className="nb-btn nb-btn-lightgreen nb-btn-sm"
@@ -106,6 +169,7 @@ export default function Navbar() {
 
             {roleDropdownOpen && (
               <div
+                className="animate-dropdown"
                 style={{
                   position: 'absolute',
                   right: 0,
@@ -114,21 +178,27 @@ export default function Navbar() {
                   border: '2px solid #000000',
                   boxShadow: '4px 4px 0px #000000',
                   borderRadius: '6px',
-                  width: '180px',
+                  width: '190px',
                   zIndex: 1000,
                   overflow: 'hidden'
                 }}
               >
                 <div style={{ padding: '6px 10px', fontSize: '0.7rem', fontWeight: 800, backgroundColor: '#E2ECE6', borderBottom: '1.5px solid #000' }}>
-                  SWITCH DEMO ROLE
+                  SWITCH DEMO ROLE (5 ROLES)
                 </div>
-                {['guest', 'admin', 'volunteer', 'donor'].map((r) => (
+                {[
+                  { id: 'guest', label: 'Public User', icon: '🌐', path: '/home' },
+                  { id: 'beneficiary', label: 'Beneficiary', icon: '🤝', path: '/beneficiary' },
+                  { id: 'volunteer', label: 'Volunteer', icon: '📋', path: '/volunteer' },
+                  { id: 'donor', label: 'Donor', icon: '❤️', path: '/donation' },
+                  { id: 'admin', label: 'Administrator', icon: '🛡️', path: '/admin/dashboard' }
+                ].map((r) => (
                   <button
-                    key={r}
+                    key={r.id}
                     onClick={() => {
-                      switchRole(r);
+                      switchRole(r.id);
                       setRoleDropdownOpen(false);
-                      if (r === 'admin') navigate('/admin/dashboard');
+                      navigate(r.path);
                     }}
                     style={{
                       width: '100%',
@@ -136,18 +206,19 @@ export default function Navbar() {
                       padding: '8px 12px',
                       fontSize: '0.82rem',
                       fontFamily: 'var(--font-heading)',
-                      fontWeight: userRole === r ? 800 : 600,
-                      backgroundColor: userRole === r ? 'var(--brand-light-green)' : 'transparent',
+                      fontWeight: userRole === r.id ? 800 : 600,
+                      backgroundColor: userRole === r.id ? 'var(--brand-light-green)' : 'transparent',
                       border: 'none',
                       borderBottom: '1px solid #eee',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between'
+                      justifyContent: 'space-between',
+                      transition: 'background-color 0.15s ease'
                     }}
                   >
-                    <span>{r.toUpperCase()}</span>
-                    {userRole === r && <span style={{ color: 'var(--brand-dark-green)', fontWeight: 900 }}>✓</span>}
+                    <span>{r.icon} {r.label}</span>
+                    {userRole === r.id && <span style={{ color: 'var(--brand-dark-green)', fontWeight: 900 }}>✓</span>}
                   </button>
                 ))}
               </div>
@@ -168,12 +239,45 @@ export default function Navbar() {
             </Button>
           </Link>
 
-          {/* Login / Auth Link */}
-          <Link to="/login" style={{ textDecoration: 'none' }}>
-            <Button variant="white" size="sm" icon={LogIn}>
-              Login
-            </Button>
-          </Link>
+          {/* Authenticated Profile or Login Button */}
+          {isAuthenticated && currentUser ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span
+                style={{
+                  backgroundColor: 'var(--brand-light-green)',
+                  border: '2px solid #000',
+                  borderRadius: '4px',
+                  padding: '0.35rem 0.55rem',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  color: '#000000',
+                  boxShadow: '2px 2px 0px #000000',
+                  maxWidth: '120px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}
+                title={`Signed in as ${currentUser.name} (${currentUser.role})`}
+              >
+                👤 {currentUser.name.split(' ')[0]}
+              </span>
+              <Button
+                variant="white"
+                size="sm"
+                icon={LogOut}
+                onClick={logoutUser}
+                title="Sign Out"
+              >
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <Button variant="white" size="sm" icon={LogIn}>
+                Login
+              </Button>
+            </Link>
+          )}
 
           {/* Donate CTA Link */}
           <Link to="/donation" style={{ textDecoration: 'none' }}>
@@ -311,15 +415,19 @@ export default function Navbar() {
               Switch Demo Role: (Active: <strong>{userRole.toUpperCase()}</strong>)
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.4rem' }}>
-              {['guest', 'admin', 'volunteer', 'donor'].map((r) => (
+              {[
+                { id: 'guest', label: 'Public', path: '/home' },
+                { id: 'beneficiary', label: 'Beneficiary', path: '/beneficiary' },
+                { id: 'volunteer', label: 'Volunteer', path: '/volunteer' },
+                { id: 'donor', label: 'Donor', path: '/donation' },
+                { id: 'admin', label: 'Admin', path: '/admin/dashboard' }
+              ].map((r) => (
                 <button
-                  key={r}
+                  key={r.id}
                   onClick={() => {
-                    switchRole(r);
-                    if (r === 'admin') {
-                      setMobileMenuOpen(false);
-                      navigate('/admin/dashboard');
-                    }
+                    switchRole(r.id);
+                    setMobileMenuOpen(false);
+                    navigate(r.path);
                   }}
                   style={{
                     padding: '0.45rem',
@@ -329,12 +437,12 @@ export default function Navbar() {
                     textTransform: 'uppercase',
                     border: '1.5px solid #000',
                     borderRadius: '4px',
-                    backgroundColor: userRole === r ? 'var(--brand-dark-green)' : '#F7FAF8',
-                    color: userRole === r ? '#FFFFFF' : '#000000',
+                    backgroundColor: userRole === r.id ? 'var(--brand-dark-green)' : '#F7FAF8',
+                    color: userRole === r.id ? '#FFFFFF' : '#000000',
                     cursor: 'pointer'
                   }}
                 >
-                  {r}
+                  {r.label}
                 </button>
               ))}
             </div>
@@ -356,16 +464,30 @@ export default function Navbar() {
               </button>
             </Link>
 
-            <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ textDecoration: 'none' }}
-            >
-              <button className="nb-btn nb-btn-white nb-btn-sm" style={{ width: '100%' }}>
-                <LogIn size={14} strokeWidth={2.5} />
-                <span>Login</span>
+            {isAuthenticated && currentUser ? (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  logoutUser();
+                }}
+                className="nb-btn nb-btn-white nb-btn-sm"
+                style={{ width: '100%' }}
+              >
+                <LogOut size={14} strokeWidth={2.5} />
+                <span>Logout</span>
               </button>
-            </Link>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ textDecoration: 'none' }}
+              >
+                <button className="nb-btn nb-btn-white nb-btn-sm" style={{ width: '100%' }}>
+                  <LogIn size={14} strokeWidth={2.5} />
+                  <span>Login</span>
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       )}

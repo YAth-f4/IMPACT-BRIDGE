@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // Layouts
 import PublicLayout from './layouts/PublicLayout';
 import AdminLayout from './layouts/AdminLayout';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Public Pages
 import Home from './pages/Home';
@@ -14,6 +15,7 @@ import Volunteer from './pages/Volunteer';
 import Donation from './pages/Donation';
 import ImpactMap from './pages/ImpactMap';
 import Contact from './pages/Contact';
+import BeneficiaryPortal from './pages/BeneficiaryPortal';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
@@ -43,14 +45,22 @@ export default function App() {
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/donation" element={<Donation />} />
           <Route path="/impact-map" element={<ImpactMap />} />
+          <Route path="/beneficiary" element={<BeneficiaryPortal />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/404" element={<NotFound />} />
         </Route>
 
-        {/* ADMIN PORTAL ROUTES */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* ADMIN PORTAL ROUTES (PROTECTED) */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="volunteers" element={<AdminVolunteers />} />

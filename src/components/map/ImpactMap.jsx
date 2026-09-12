@@ -75,8 +75,14 @@ export default function ImpactMap({ isStandalone = true }) {
   const radiusCircleRef = useRef(null);
 
   // ==========================================
-  // 2. INTERNAL HUBS (EXISTING STATIC NETWORK)
+  // 2. PAN-INDIA VERIFIED HUBS (APPLICATION DATABASE)
   // ==========================================
+  const [verifiedHubs, setVerifiedHubs] = useState([]);
+  const [totalVerifiedCount, setTotalVerifiedCount] = useState(0);
+  const [isLoadingVerifiedHubs, setIsLoadingVerifiedHubs] = useState(false);
+  const [verifiedHubsError, setVerifiedHubsError] = useState(null);
+  const [dynamicCities, setDynamicCities] = useState(['All']);
+  const [dynamicStatuses, setDynamicStatuses] = useState(['All', 'Active Hub', 'Completed Site', 'High Alert / Active']);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -84,20 +90,53 @@ export default function ImpactMap({ isStandalone = true }) {
   const [activeInternalLocation, setActiveInternalLocation] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  const cities = ['All', ...Array.from(new Set(locations.map((l) => l.city)))];
+  // Fetch Verified Hubs from our backend database API
+  const fetchVerifiedHubs = async () => {
+    setIsLoadingVerifiedHubs(true);
+    setVerifiedHubsError(null);
+    try {
+      const response = await fetch('/api/map/verified-hubs');
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to load verified hubs.');
+      }
+      setVerifiedHubs(data.results || []);
+      setTotalVerifiedCount(data.totalVerified !== undefined ? data.totalVerified : (data.results ? data.results.length : 0));
+      if (data.filterOptions) {
+        if (data.filterOptions.cities) setDynamicCities(data.filterOptions.cities);
+        if (data.filterOptions.statuses) setDynamicStatuses(data.filterOptions.statuses);
+      }
+    } catch (err) {
+      console.error('[Map] Error fetching verified hubs:', err);
+      setVerifiedHubsError(err.message || 'Could not load verified hubs from application database.');
+      // Fallback to locations if API is unreachable
+      if (locations && locations.length > 0) {
+        setVerifiedHubs(locations);
+        setTotalVerifiedCount(locations.length);
+      }
+    } finally {
+      setIsLoadingVerifiedHubs(false);
+    }
+  };
 
-  const filteredInternalLocations = locations.filter((loc) => {
+  const filteredInternalLocations = verifiedHubs.filter((loc) => {
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      loc.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      loc.programName.toLowerCase().includes(searchQuery.toLowerCase());
+      !q ||
+      loc.name.toLowerCase().includes(q) ||
+      loc.city.toLowerCase().includes(q) ||
+      loc.state.toLowerCase().includes(q) ||
+      loc.address.toLowerCase().includes(q) ||
+      (loc.programName && loc.programName.toLowerCase().includes(q)) ||
+      loc.category.toLowerCase().includes(q);
 
-    const matchesCategory = selectedCategory === 'All' || loc.category === selectedCategory;
-    const matchesCity = selectedCity === 'All' || loc.city === selectedCity;
+    const matchesCategory = selectedCategory === 'All' || loc.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesCity = selectedCity === 'All' || loc.city.toLowerCase() === selectedCity.toLowerCase();
     const matchesStatus =
       selectedStatus === 'All' ||
       (selectedStatus === 'Active' && loc.status.includes('Active')) ||
-      (selectedStatus === 'Completed' && loc.status.includes('Completed'));
+      (selectedStatus === 'Completed' && loc.status.includes('Completed')) ||
+      loc.status.toLowerCase() === selectedStatus.toLowerCase();
 
     return matchesSearch && matchesCategory && matchesCity && matchesStatus;
   });
@@ -163,6 +202,7 @@ export default function ImpactMap({ isStandalone = true }) {
   // Initial Fetch on component mount
   useEffect(() => {
     fetchNearbyNgos(userCoords.lat, userCoords.lng, radius);
+    fetchVerifiedHubs();
   }, []);
 
   // Initialize or update Leaflet Map
@@ -416,7 +456,8 @@ export default function ImpactMap({ isStandalone = true }) {
             }}
           >
             <Layers size={18} strokeWidth={2.5} />
-            <span>🏢 Pan-India Verified Hubs ({locations.length})</span>
+            <span>🏢 PAN-INDIA VERIFIED HUBS ({totalVerifiedCount})</span>
+            <Badge variant="green" size="sm">DATABASE</Badge>
           </button>
         </div>
 
@@ -436,7 +477,7 @@ export default function ImpactMap({ isStandalone = true }) {
           }}
         >
           <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#2E7D5B', display: 'inline-block' }} />
-          <span>OSM OVERPASS: ONLINE</span>
+          <span>{activeTab === 'nearby-osm' ? 'OSM OVERPASS: ONLINE' : `APPLICATION DB: ${totalVerifiedCount} VERIFIED`}</span>
         </div>
       </div>
 
@@ -965,22 +1006,22 @@ export default function ImpactMap({ isStandalone = true }) {
       )}
 
       {/* ==================================================== */}
-      {/* MODE 2: PAN-INDIA VERIFIED HUBS (INTERNAL NETWORK)   */}
+      {/* MODE 2: PAN-INDIA VERIFIED HUBS (APPLICATION DB)    */}
       {/* ==================================================== */}
       {activeTab === 'internal-hubs' && (
         <div>
           {/* Top Summary KPI Cards */}
           <div className="grid-4" style={{ marginBottom: '1.5rem' }}>
             <StatCard
-              title="Total Geo-Locations"
-              value={formatNumber(locations.length)}
-              subtitle="Hubs, Centers & Outposts"
+              title="Total Verified Hubs"
+              value={formatNumber(totalVerifiedCount)}
+              subtitle="Admin-Approved Centers"
               icon={MapPin}
               variant="lightgreen"
             />
             <StatCard
               title="Active Programs"
-              value={formatNumber((programs || []).filter((p) => p.status === 'Ongoing').length)}
+              value={formatNumber(verifiedHubs.filter((p) => p.status && p.status.includes('Active')).length)}
               subtitle="Monitored in Real-Time"
               icon={Building2}
               variant="yellow"
@@ -995,12 +1036,37 @@ export default function ImpactMap({ isStandalone = true }) {
             />
             <StatCard
               title="Volunteers Deployed"
-              value={formatNumber(locations.reduce((acc, l) => acc + (l.volunteers || 0), 0))}
+              value={formatNumber(verifiedHubs.reduce((acc, l) => acc + (l.volunteers || 0), 0))}
               subtitle="Active on the Ground"
               icon={HeartHandshake}
               variant="green"
             />
           </div>
+
+          {/* Error Banner if any */}
+          {verifiedHubsError && (
+            <div
+              style={{
+                backgroundColor: '#FFEBEB',
+                border: '2px solid #E63946',
+                borderRadius: '6px',
+                padding: '1rem',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                boxShadow: '2px 2px 0px #000'
+              }}
+            >
+              <AlertCircle size={24} style={{ color: '#E63946', flexShrink: 0 }} />
+              <div style={{ flex: 1, fontSize: '0.85rem', fontWeight: 600 }}>
+                {verifiedHubsError}
+              </div>
+              <Button variant="white" size="sm" onClick={fetchVerifiedHubs}>
+                Retry
+              </Button>
+            </div>
+          )}
 
           {/* Control Filter Bar */}
           <Card
@@ -1020,6 +1086,7 @@ export default function ImpactMap({ isStandalone = true }) {
                   alignItems: 'center'
                 }}
               >
+                {/* Search Input */}
                 <div style={{ position: 'relative', width: '100%' }}>
                   <Input
                     placeholder="Search center, program, or city..."
@@ -1030,27 +1097,29 @@ export default function ImpactMap({ isStandalone = true }) {
                   />
                 </div>
 
+                {/* City Filter (Dynamic from DB) */}
                 <Select
                   label=""
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
-                  options={cities.map((c) => ({ value: c, label: `City: ${c}` }))}
+                  options={dynamicCities.map((c) => ({ value: c, label: c === 'All' ? 'City: All' : `City: ${c}` }))}
                   style={{ marginBottom: 0 }}
                 />
 
+                {/* Status Filter (Dynamic from DB) */}
                 <Select
                   label=""
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
                   options={[
                     { value: 'All', label: 'All Statuses' },
-                    { value: 'Active', label: 'Active Hubs' },
-                    { value: 'Completed', label: 'Completed Sites' }
+                    ...dynamicStatuses.filter((s) => s !== 'All').map((s) => ({ value: s, label: s }))
                   ]}
                   style={{ marginBottom: 0 }}
                 />
               </div>
 
+              {/* Category Filter Badges */}
               <div
                 style={{
                   display: 'flex',
@@ -1113,6 +1182,7 @@ export default function ImpactMap({ isStandalone = true }) {
                       setZoomLevel(1);
                       setSelectedCategory('All');
                       setSelectedCity('All');
+                      setSelectedStatus('All');
                       setSearchQuery('');
                     }}
                     className="nb-btn nb-btn-lightgreen nb-btn-sm"
@@ -1137,6 +1207,7 @@ export default function ImpactMap({ isStandalone = true }) {
               overflow: 'hidden'
             }}
           >
+            {/* Background Grid Pattern */}
             <div
               style={{
                 position: 'absolute',
@@ -1151,6 +1222,63 @@ export default function ImpactMap({ isStandalone = true }) {
               }}
             />
 
+            {/* Top Legend Badge */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '16px',
+                left: '16px',
+                backgroundColor: 'var(--white)',
+                border: '2px solid #000',
+                boxShadow: '3px 3px 0px #000',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                zIndex: 10,
+                fontSize: '0.78rem',
+                fontFamily: 'var(--font-heading)',
+                fontWeight: 800
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--brand-dark-green)' }}>
+                <Layers size={16} strokeWidth={2.5} />
+                <span>APPLICATION DATABASE • VERIFIED HUBS</span>
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#5A6F64', marginTop: '2px' }}>
+                Showing {filteredInternalLocations.length} of {totalVerifiedCount} verified hubs across India
+              </div>
+            </div>
+
+            {/* Bottom Category Legend Pill on Map */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '16px',
+                left: '16px',
+                backgroundColor: 'var(--white)',
+                border: '2px solid #000',
+                boxShadow: '3px 3px 0px #000',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                zIndex: 10,
+                display: 'flex',
+                gap: '12px',
+                flexWrap: 'wrap'
+              }}
+            >
+              {[
+                { label: 'NGO Center', color: '#2E7D5B' },
+                { label: 'Program', color: '#F4B942' },
+                { label: 'Beneficiary Area', color: '#3A86FF' },
+                { label: 'Event', color: '#E63946' }
+              ].map((item) => (
+                <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', fontWeight: 800 }}>
+                  <span style={{ width: '10px', height: '10px', backgroundColor: item.color, border: '1.5px solid #000', borderRadius: '50%' }} />
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Zoomable Canvas */}
             <div
               style={{
                 position: 'absolute',
@@ -1266,15 +1394,23 @@ export default function ImpactMap({ isStandalone = true }) {
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem' }}>
                   <div>
-                    <Badge variant="yellow" size="sm">
-                      {activeInternalLocation.category}
-                    </Badge>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <Badge variant="green" size="sm">
+                        Verified Hub
+                      </Badge>
+                      <Badge variant="yellow" size="sm">
+                        {activeInternalLocation.category}
+                      </Badge>
+                    </div>
                     <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.15rem', marginTop: '0.35rem' }}>
                       {activeInternalLocation.name}
                     </h4>
                     <p style={{ fontSize: '0.8rem', color: '#5A6F64', fontWeight: 600 }}>
                       📍 {activeInternalLocation.address}
                     </p>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--brand-dark-green)', fontWeight: 700, marginTop: '2px' }}>
+                      Source: Impact Bridge Database
+                    </div>
                   </div>
 
                   <button
@@ -1343,78 +1479,127 @@ export default function ImpactMap({ isStandalone = true }) {
 
           {/* Hub Explorer Grid */}
           <div style={{ marginTop: '2rem' }}>
-            <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.35rem', marginBottom: '1rem' }}>
-              All Ground Centers & Service Areas ({filteredInternalLocations.length})
-            </h3>
-            <div className="grid-3">
-              {filteredInternalLocations.map((loc) => (
-                <Card
-                  key={loc.id}
-                  hover={true}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.35rem' }}>
+                All Verified Ground Centers & Service Areas ({filteredInternalLocations.length})
+              </h3>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#5A6F64' }}>
+                Total Verified: <strong>{totalVerifiedCount}</strong> • Source: <strong>Impact Bridge Database</strong>
+              </div>
+            </div>
+
+            {/* Empty State */}
+            {!isLoadingVerifiedHubs && filteredInternalLocations.length === 0 && (
+              <Card
+                style={{
+                  padding: '3rem 2rem',
+                  textAlign: 'center',
+                  backgroundColor: 'var(--white)',
+                  border: 'var(--border-thick)'
+                }}
+              >
+                <AlertCircle size={40} style={{ color: '#F4B942', margin: '0 auto 12px auto' }} />
+                <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+                  No verified hubs are currently available.
+                </h4>
+                <p style={{ fontSize: '0.9rem', color: '#5A6F64', maxWidth: '460px', margin: '0 auto 1.5rem auto' }}>
+                  No verified locations match your selected city, category, or search filters.
+                </p>
+                <Button
+                  variant="green"
+                  size="sm"
                   onClick={() => {
-                    setActiveInternalLocation(loc);
-                    window.scrollTo({ top: 300, behavior: 'smooth' });
-                  }}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    padding: '1.25rem',
-                    cursor: 'pointer'
+                    setSelectedCity('All');
+                    setSelectedStatus('All');
+                    setSelectedCategory('All');
+                    setSearchQuery('');
                   }}
                 >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                      <Badge variant={loc.category === 'NGO Center' ? 'green' : loc.category === 'Program' ? 'yellow' : 'blue'} size="sm">
-                        {loc.category}
-                      </Badge>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#5A6F64' }}>
-                        {loc.state}
-                      </span>
-                    </div>
+                  Reset Filters
+                </Button>
+              </Card>
+            )}
 
-                    <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem' }}>
-                      {loc.name}
-                    </h4>
-                    <p style={{ fontSize: '0.82rem', color: '#5A6F64', marginBottom: '0.75rem', lineHeight: 1.4 }}>
-                      📍 {loc.address}
-                    </p>
+            {/* Grid of Verified Hubs */}
+            {filteredInternalLocations.length > 0 && (
+              <div className="grid-3">
+                {filteredInternalLocations.map((loc) => (
+                  <Card
+                    key={loc.id}
+                    hover={true}
+                    onClick={() => {
+                      setActiveInternalLocation(loc);
+                      window.scrollTo({ top: 300, behavior: 'smooth' });
+                    }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      padding: '1.25rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          <Badge variant="green" size="sm">
+                            Verified
+                          </Badge>
+                          <Badge
+                            variant={loc.category === 'NGO Center' ? 'green' : loc.category === 'Program' ? 'yellow' : 'blue'}
+                            size="sm"
+                          >
+                            {loc.category}
+                          </Badge>
+                        </div>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#5A6F64' }}>
+                          {loc.state}
+                        </span>
+                      </div>
+
+                      <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem' }}>
+                        {loc.name}
+                      </h4>
+                      <p style={{ fontSize: '0.82rem', color: '#5A6F64', marginBottom: '0.75rem', lineHeight: 1.4 }}>
+                        📍 {loc.address}
+                      </p>
+
+                      <div
+                        style={{
+                          padding: '0.45rem 0.65rem',
+                          backgroundColor: '#F0F7F2',
+                          border: '1.5px solid #000',
+                          borderRadius: '4px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          color: 'var(--brand-dark-green)',
+                          marginBottom: '0.75rem'
+                        }}
+                      >
+                        {loc.programName}
+                      </div>
+                    </div>
 
                     <div
                       style={{
-                        padding: '0.45rem 0.65rem',
-                        backgroundColor: '#F0F7F2',
-                        border: '1.5px solid #000',
-                        borderRadius: '4px',
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        color: 'var(--brand-dark-green)',
-                        marginBottom: '0.75rem'
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderTop: '1.5px solid #E2ECE6',
+                        paddingTop: '0.75rem',
+                        fontSize: '0.8rem',
+                        fontWeight: 700
                       }}
                     >
-                      {loc.programName}
+                      <span>👥 {formatNumber(loc.beneficiaries)} Supported</span>
+                      <span style={{ color: 'var(--brand-dark-green)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        Inspect <ArrowRight size={14} strokeWidth={2.5} />
+                      </span>
                     </div>
-                  </div>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      borderTop: '1.5px solid #E2ECE6',
-                      paddingTop: '0.75rem',
-                      fontSize: '0.8rem',
-                      fontWeight: 700
-                    }}
-                  >
-                    <span>👥 {formatNumber(loc.beneficiaries)} Supported</span>
-                    <span style={{ color: 'var(--brand-dark-green)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      Inspect <ArrowRight size={14} strokeWidth={2.5} />
-                    </span>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
