@@ -126,11 +126,11 @@ button, input, select, textarea {
   font-weight: 700;
   font-size: 0.95rem;
   padding: 0.65rem 1.35rem;
-  border: var(--border-medium);
+  border: 3px solid #000000;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow: 5px 5px 0px #000000;
   cursor: pointer;
-  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   user-select: none;
@@ -138,20 +138,20 @@ button, input, select, textarea {
 }
 
 .nb-btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-lg);
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0px #000000;
 }
 
 .nb-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: var(--shadow-sm);
+  transform: translate(4px, 4px);
+  box-shadow: 1px 1px 0px #000000;
 }
 
 .nb-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
-  box-shadow: var(--shadow-sm) !important;
+  box-shadow: 2px 2px 0px #000000 !important;
 }
 
 /* Button Variants */
@@ -329,6 +329,12 @@ button, input, select, textarea {
   background-color: var(--white);
 }
 
+.nb-card .nb-table-container {
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
 .nb-table {
   width: 100%;
   border-collapse: collapse;
@@ -494,6 +500,157 @@ button, input, select, textarea {
   .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
   .nb-container { padding: 0 1rem; }
   .nb-btn { padding: 0.55rem 1rem; font-size: 0.88rem; }
+}
+
+/* ===================================================
+   RESPONSIVE DISPLAY UTILITIES
+   =================================================== */
+@media (min-width: 1025px) {
+  .lg-flex { display: flex !important; }
+  .lg-block { display: block !important; }
+  .lg-grid { display: grid !important; }
+  .lg-hidden { display: none !important; }
+}
+
+@media (max-width: 1024px) {
+  .lg-only { display: none !important; }
+}
+
+@media (min-width: 769px) {
+  .md-flex { display: flex !important; }
+  .md-hidden { display: none !important; }
+}
+
+@media (max-width: 768px) {
+  .md-only { display: none !important; }
+  .mobile-stack { flex-direction: column !important; align-items: stretch !important; }
+  .mobile-full-width { width: 100% !important; }
+}
+
+@media (max-width: 640px) {
+  .sm-hidden { display: none !important; }
+  .sm-full { width: 100% !important; }
+}
+
+@media (max-width: 960px) {
+  .hero-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ===================================================
+   ACCESSIBILITY & FOCUS STYLES
+   =================================================== */
+:focus-visible {
+  outline: 3px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--accent-yellow) !important;
+  outline-offset: 2px !important;
+}
+
+/* ===================================================
+   PAGE TRANSITION STYLES
+   =================================================== */
+.page-transition-wrapper {
+  animation: pageSlideFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.page-fade-in {
+  animation: pageSlideFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.page-fade-out {
+  opacity: 0.85;
+  transform: translateY(-4px);
+  transition: opacity 0.08s ease-in, transform 0.08s ease-in;
+}
+
+@keyframes pageSlideFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===================================================
+   MASCOT KEYFRAME ANIMATIONS ("Bridgie")
+   =================================================== */
+@keyframes bridgieBobAnim {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.bridgie-bob {
+  animation: bridgieBobAnim 3s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+@keyframes bridgieWaveAnim {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-14deg); }
+  75% { transform: rotate(14deg); }
+}
+
+.bridgie-wave {
+  animation: bridgieWaveAnim 1.6s ease-in-out infinite;
+  transform-origin: 70px 42px;
+}
+
+@keyframes bridgieCheerAnim {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.04); }
+}
+
+.bridgie-cheer {
+  animation: bridgieCheerAnim 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-origin: center bottom;
+}
+
+@keyframes bridgieBlinkAnim {
+  0%, 96%, 100% { transform: scaleY(1); }
+  98% { transform: scaleY(0.1); }
+}
+
+.bridgie-blink {
+  animation: bridgieBlinkAnim 4s infinite;
+  transform-origin: 50px 33px;
+}
+
+@keyframes bridgiePulseAnim {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+.bridgie-pulse {
+  animation: bridgiePulseAnim 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ===================================================
+   RESPONSIVE TABLE & CARD UTILITIES
+   =================================================== */
+.nb-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: var(--border-medium);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background-color: var(--white);
+}
+
+.nb-table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+.nb-table-responsive::-webkit-scrollbar-thumb {
+  background-color: var(--brand-dark-green);
+  border: 1.5px solid #000;
 }
 
 /* Leaflet Neo-Brutalist Custom Overrides */

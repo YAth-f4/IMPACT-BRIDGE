@@ -2,9 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from './Card';
 import Badge from './Badge';
-import Button from './Button';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
-import { MapPin, Users, ArrowRight } from 'lucide-react';
+import { MapPin, ArrowRight } from 'lucide-react';
 
 export default function ProgramCard({ prog, viewMode = 'grid' }) {
   if (!prog) return null;
@@ -55,16 +54,21 @@ export default function ProgramCard({ prog, viewMode = 'grid' }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Link to={`/programs/${prog.id}`}>
-            <Button variant="yellow" size="sm" fullWidth>
-              View Details
-            </Button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '140px' }}>
+          <Link
+            to={`/programs/${prog.id}`}
+            className="nb-btn nb-btn-yellow nb-btn-sm"
+            style={{ textDecoration: 'none', width: '100%', textAlign: 'center' }}
+          >
+            <span>View Details</span>
+            <ArrowRight size={14} strokeWidth={2.5} />
           </Link>
-          <Link to="/volunteer">
-            <Button variant="green" size="sm" fullWidth>
-              Volunteer
-            </Button>
+          <Link
+            to="/volunteer"
+            className="nb-btn nb-btn-green nb-btn-sm"
+            style={{ textDecoration: 'none', width: '100%', textAlign: 'center' }}
+          >
+            <span>Volunteer</span>
           </Link>
         </div>
       </Card>
@@ -123,14 +127,17 @@ export default function ProgramCard({ prog, viewMode = 'grid' }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--brand-dark-green)' }}>
               👥 {formatNumber(prog.actualBeneficiaries)} Helped
             </span>
-            <Link to={`/programs/${prog.id}`}>
-              <Button variant="yellow" size="sm" iconRight={ArrowRight}>
-                View Details
-              </Button>
+            <Link
+              to={`/programs/${prog.id}`}
+              className="nb-btn nb-btn-yellow nb-btn-sm"
+              style={{ textDecoration: 'none' }}
+            >
+              <span>View Details</span>
+              <ArrowRight size={14} strokeWidth={2.5} />
             </Link>
           </div>
         </div>

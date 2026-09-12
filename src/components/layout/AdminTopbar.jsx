@@ -2,17 +2,12 @@ import React, { useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import Button from '../common/Button';
+import Mascot from '../common/Mascot';
 import {
   Bell,
-  Search,
   Plus,
-  User,
   Menu,
-  CheckCircle,
-  Clock,
-  Sparkles,
-  RefreshCw,
-  LogOut
+  RotateCcw
 } from 'lucide-react';
 
 export default function AdminTopbar({ setMobileOpen }) {
@@ -56,48 +51,63 @@ export default function AdminTopbar({ setMobileOpen }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 1.5rem',
+        padding: '0 clamp(0.75rem, 2vw, 1.5rem)',
         position: 'sticky',
         top: 0,
         zIndex: 890,
-        boxShadow: '0 2px 0 #000000'
+        boxShadow: '0 2px 0 #000000',
+        width: '100%',
+        boxSizing: 'border-box'
       }}
     >
       {/* Left: Mobile Toggle & Breadcrumbs */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 0 }}>
         <button
           onClick={() => setMobileOpen(true)}
           className="nb-btn nb-btn-lightgreen nb-btn-sm lg-hidden"
-          style={{ padding: '6px 8px' }}
+          style={{ padding: '6px 8px', flexShrink: 0 }}
           aria-label="Open sidebar menu"
         >
           <Menu size={20} strokeWidth={2.5} />
         </button>
 
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64' }}>
+        <div style={{ minWidth: 0, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64', whiteSpace: 'nowrap' }}>
             <Link to="/home" style={{ color: 'inherit', textDecoration: 'none' }}>IMPACT BRIDGE</Link>
             <span>/</span>
             <Link to="/admin/dashboard" style={{ color: 'inherit', textDecoration: 'none' }}>ADMIN</Link>
           </div>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-dark)' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 800,
+              fontSize: 'clamp(0.95rem, 2vw, 1.25rem)',
+              color: 'var(--text-dark)',
+              margin: 0,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
             {currentTitle}
           </h2>
         </div>
       </div>
 
       {/* Right Controls: Quick Add, Reset, Notifications, Role Profile */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
         {/* Quick Add Dropdown */}
         <div style={{ position: 'relative' }}>
-          <Button
-            variant="yellow"
-            size="sm"
-            icon={Plus}
+          <button
             onClick={() => setQuickCreateOpen(!quickCreateOpen)}
+            className="nb-btn nb-btn-yellow nb-btn-sm"
+            style={{ padding: '0.4rem 0.65rem' }}
+            title="Create new record"
+            aria-label="Quick Add"
           >
-            Quick Add
-          </Button>
+            <Plus size={16} strokeWidth={3} />
+            <span className="sm-hidden">Quick Add</span>
+          </button>
 
           {quickCreateOpen && (
             <div
@@ -141,8 +151,6 @@ export default function AdminTopbar({ setMobileOpen }) {
                     borderBottom: '1px solid #eee',
                     cursor: 'pointer'
                   }}
-                  onMouseEnter={(e) => (e.target.style.backgroundColor = '#F0F7F2')}
-                  onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
                 >
                   {act.label}
                 </button>
@@ -151,22 +159,34 @@ export default function AdminTopbar({ setMobileOpen }) {
           )}
         </div>
 
-        {/* Notifications Popover */}
+        {/* Reset Mock Data Tool */}
+        <button
+          onClick={resetToMockData}
+          className="nb-btn nb-btn-white nb-btn-sm sm-hidden"
+          style={{ padding: '0.4rem 0.65rem' }}
+          title="Reset database to default mock data"
+          aria-label="Reset Mock Data"
+        >
+          <RotateCcw size={15} strokeWidth={2.5} />
+          <span>Reset</span>
+        </button>
+
+        {/* System Notifications Bell */}
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setNotificationsOpen(!notificationsOpen)}
             className="nb-btn nb-btn-white nb-btn-sm"
-            style={{ padding: '0.45rem', position: 'relative' }}
-            aria-label="View notifications"
+            style={{ padding: '0.4rem 0.55rem', position: 'relative' }}
+            aria-label="Notifications"
           >
-            <Bell size={18} strokeWidth={2.5} />
+            <Bell size={16} strokeWidth={2.5} />
             <span
               style={{
                 position: 'absolute',
-                top: '-4px',
-                right: '-4px',
-                width: '10px',
-                height: '10px',
+                top: '-2px',
+                right: '-2px',
+                width: '8px',
+                height: '8px',
                 backgroundColor: 'var(--danger-red)',
                 borderRadius: '50%',
                 border: '1.5px solid #000'
@@ -184,7 +204,7 @@ export default function AdminTopbar({ setMobileOpen }) {
                 border: '2px solid #000',
                 boxShadow: '6px 6px 0px #000',
                 borderRadius: '6px',
-                width: '320px',
+                width: 'min(320px, calc(100vw - 32px))',
                 zIndex: 1000,
                 overflow: 'hidden'
               }}
@@ -220,7 +240,7 @@ export default function AdminTopbar({ setMobileOpen }) {
                       lineHeight: 1.4
                     }}
                   >
-                    <p style={{ fontWeight: n.unread ? 800 : 500, color: 'var(--text-dark)' }}>
+                    <p style={{ fontWeight: n.unread ? 800 : 500, color: 'var(--text-dark)', margin: 0 }}>
                       {n.text}
                     </p>
                     <span style={{ fontSize: '0.72rem', color: '#7A8E83', fontWeight: 600 }}>
@@ -233,14 +253,14 @@ export default function AdminTopbar({ setMobileOpen }) {
           )}
         </div>
 
-        {/* User Profile Pill */}
-        <Link to="/admin/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
+        {/* User Profile Pill with Mascot Avatar */}
+        <Link to="/admin/settings" style={{ textDecoration: 'none', color: 'inherit' }} aria-label="Admin Settings Profile">
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
-              padding: '4px 8px',
+              gap: '0.45rem',
+              padding: '3px 7px',
               backgroundColor: 'var(--brand-light-green)',
               border: '2px solid #000',
               borderRadius: '4px',
@@ -248,16 +268,26 @@ export default function AdminTopbar({ setMobileOpen }) {
               cursor: 'pointer'
             }}
           >
-            <img
-              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"
-              alt="Admin avatar"
-              style={{ width: '28px', height: '28px', borderRadius: '3px', border: '1.5px solid #000', objectFit: 'cover' }}
-            />
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-              <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '0.78rem' }}>
+            <div
+              style={{
+                width: '26px',
+                height: '26px',
+                borderRadius: '3px',
+                border: '1.5px solid #000',
+                backgroundColor: 'var(--accent-yellow)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden'
+              }}
+            >
+              <Mascot variant="logo" size={24} animate={false} />
+            </div>
+            <div className="sm-hidden" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+              <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '0.75rem' }}>
                 Sunita Rao
               </span>
-              <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--brand-dark-green)' }}>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--brand-dark-green)' }}>
                 SUPER ADMIN
               </span>
             </div>

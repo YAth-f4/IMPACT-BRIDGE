@@ -3,7 +3,8 @@ import { useApp } from '../context/AppContext';
 import Card from '../components/common/Card';
 import Badge from '../components/common/Badge';
 import Button from '../components/common/Button';
-import Modal from '../../src/components/common/Modal';
+import Modal from '../components/common/Modal';
+import Mascot from '../components/common/Mascot';
 import { Input, Select } from '../components/common/Input';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import confetti from 'canvas-confetti';
@@ -499,7 +500,31 @@ export default function Donation() {
               fontFamily: 'var(--font-body)'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+            {/* Celebration Header with Mascot */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                backgroundColor: 'var(--brand-light-green)',
+                border: '2px solid #000',
+                borderRadius: '6px',
+                padding: '0.85rem 1rem',
+                marginBottom: '1rem'
+              }}
+            >
+              <Mascot variant="celebrating" size={54} animate={true} />
+              <div>
+                <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 900, fontSize: '1.1rem', margin: 0 }}>
+                  Thank You for Powering Grassroots Change!
+                </h4>
+                <p style={{ fontSize: '0.78rem', color: '#26332D', margin: 0, fontWeight: 600 }}>
+                  Your contribution has been logged into the public transparency ledger.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
                 <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 900, fontSize: '1.25rem' }}>
                   {ngoProfile.name}

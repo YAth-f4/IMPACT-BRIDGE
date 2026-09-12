@@ -3,7 +3,8 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import BrandLogo from '../common/BrandLogo';
 import Button from '../common/Button';
-import { Heart, Menu, X, Shield, User, MapPin, LogIn } from 'lucide-react';
+import Mascot from '../common/Mascot';
+import { Heart, Menu, X, Shield, User, MapPin, LogIn, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const { userRole, switchRole } = useApp();
@@ -29,7 +30,8 @@ export default function Navbar() {
         zIndex: 900,
         backgroundColor: 'var(--brand-dark-green)',
         borderBottom: 'var(--border-thick)',
-        boxShadow: '0 4px 0 #000000'
+        boxShadow: '0 4px 0 #000000',
+        width: '100%'
       }}
     >
       <div
@@ -38,16 +40,16 @@ export default function Navbar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingTop: '0.75rem',
-          paddingBottom: '0.75rem'
+          paddingTop: '0.65rem',
+          paddingBottom: '0.65rem'
         }}
       >
         {/* Brand Logo Link to /home */}
-        <Link to="/home" style={{ textDecoration: 'none' }}>
+        <Link to="/home" style={{ textDecoration: 'none' }} aria-label="Impact Bridge Home">
           <BrandLogo size="md" isDark={true} />
         </Link>
 
-        {/* Desktop Nav Links */}
+        {/* Desktop Navigation Links */}
         <nav
           style={{
             display: 'none',
@@ -55,14 +57,8 @@ export default function Navbar() {
             gap: '0.35rem'
           }}
           className="lg-flex"
+          aria-label="Main Navigation"
         >
-          <style>{`
-            @media (min-width: 1024px) {
-              .lg-flex { display: flex !important; }
-              .lg-hidden { display: none !important; }
-            }
-          `}</style>
-
           {navLinks.map((link) => (
             <NavLink
               key={link.path}
@@ -72,7 +68,7 @@ export default function Navbar() {
                 color: isActive ? 'var(--black)' : '#FFFFFF',
                 border: isActive ? '2px solid #000000' : '2px solid transparent',
                 borderRadius: '4px',
-                boxShadow: isActive ? '2px 2px 0px #000000' : 'none',
+                boxShadow: isActive ? '2.5px 2.5px 0px #000000' : 'none',
                 padding: '0.45rem 0.8rem',
                 fontFamily: 'var(--font-heading)',
                 fontWeight: 700,
@@ -92,8 +88,8 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Action Controls & Role Switcher & Admin Link */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+        {/* Desktop Actions & Controls */}
+        <div className="lg-flex" style={{ display: 'none', alignItems: 'center', gap: '0.65rem' }}>
           {/* Quick Role Switcher Pill */}
           <div style={{ position: 'relative' }}>
             <button
@@ -101,6 +97,8 @@ export default function Navbar() {
               className="nb-btn nb-btn-lightgreen nb-btn-sm"
               style={{ padding: '0.35rem 0.65rem', fontSize: '0.72rem' }}
               title="Switch demo user role"
+              aria-label="Switch Demo User Role"
+              aria-expanded={roleDropdownOpen}
             >
               <User size={13} strokeWidth={2.5} />
               <span>Role: <strong>{userRole.toUpperCase()}</strong></span>
@@ -183,79 +181,192 @@ export default function Navbar() {
               Donate
             </Button>
           </Link>
+        </div>
 
-          {/* Mobile Menu Toggle Button */}
+        {/* Mobile Header Controls (Only Donate + Menu Hamburger to prevent overflow) */}
+        <div className="lg-hidden" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Link to="/donation" style={{ textDecoration: 'none' }}>
+            <button
+              className="nb-btn nb-btn-yellow nb-btn-sm"
+              style={{ padding: '0.4rem 0.75rem', fontSize: '0.78rem' }}
+              aria-label="Donate Now"
+            >
+              <Heart size={14} strokeWidth={2.5} fill="#000" />
+              <span>Donate</span>
+            </button>
+          </Link>
+
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="nb-btn nb-btn-yellow nb-btn-sm lg-hidden"
-            style={{ padding: '6px 8px' }}
+            className="nb-btn nb-btn-lightgreen nb-btn-sm"
+            style={{ padding: '6px 9px' }}
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X size={20} strokeWidth={3} /> : <Menu size={20} strokeWidth={3} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Overlay Backdrop */}
+      {mobileMenuOpen && (
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            zIndex: 940,
+            backdropFilter: 'blur(2px)'
+          }}
+        />
+      )}
+
+      {/* Mobile Drawer Menu Panel */}
       {mobileMenuOpen && (
         <div
           className="lg-hidden"
           style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
             backgroundColor: 'var(--brand-dark-green)',
-            borderTop: '2px solid #000000',
-            padding: '1rem',
+            borderBottom: 'var(--border-thick)',
+            boxShadow: '0 8px 0 #000000',
+            padding: '1.25rem 1rem',
             display: 'flex',
             flexDirection: 'column',
-            gap: '0.6rem'
+            gap: '0.75rem',
+            zIndex: 950,
+            maxHeight: 'calc(100vh - 70px)',
+            overflowY: 'auto'
           }}
         >
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              onClick={() => setMobileMenuOpen(false)}
-              style={({ isActive }) => ({
-                width: '100%',
-                padding: '0.65rem 1rem',
-                backgroundColor: isActive ? 'var(--accent-yellow)' : '#246348',
-                color: isActive ? 'var(--black)' : '#FFFFFF',
-                border: '2px solid #000000',
-                borderRadius: '4px',
-                boxShadow: isActive ? '3px 3px 0px #000' : 'none',
-                fontFamily: 'var(--font-heading)',
-                fontWeight: 700,
-                fontSize: '0.95rem',
-                textTransform: 'uppercase',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                textDecoration: 'none'
-              })}
-            >
-              {link.isMap && <MapPin size={16} strokeWidth={2.5} />}
-              {link.label}
-            </NavLink>
-          ))}
-          <NavLink
-            to="/login"
-            onClick={() => setMobileMenuOpen(false)}
+          {/* Mascot Greeting inside Mobile Drawer */}
+          <div
             style={{
-              width: '100%',
-              padding: '0.65rem 1rem',
-              backgroundColor: '#FFFFFF',
-              color: '#000000',
-              border: '2px solid #000000',
-              borderRadius: '4px',
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 800,
-              fontSize: '0.95rem',
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              textDecoration: 'none'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              backgroundColor: '#246348',
+              border: '2px solid #000',
+              borderRadius: '6px',
+              padding: '0.65rem 0.85rem'
             }}
           >
-            Sign In / Register
-          </NavLink>
+            <Mascot variant="waving" size={38} animate={true} />
+            <div>
+              <div style={{ color: '#FFFFFF', fontWeight: 800, fontSize: '0.85rem', fontFamily: 'var(--font-heading)' }}>
+                Welcome to Impact Bridge
+              </div>
+              <div style={{ color: 'var(--brand-light-green)', fontSize: '0.72rem', fontWeight: 600 }}>
+                Connecting People. Creating Impact.
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                onClick={() => setMobileMenuOpen(false)}
+                style={({ isActive }) => ({
+                  width: '100%',
+                  padding: '0.65rem 1rem',
+                  backgroundColor: isActive ? 'var(--accent-yellow)' : '#246348',
+                  color: isActive ? 'var(--black)' : '#FFFFFF',
+                  border: '2px solid #000000',
+                  borderRadius: '4px',
+                  boxShadow: isActive ? '3px 3px 0px #000' : 'none',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 700,
+                  fontSize: '0.92rem',
+                  textTransform: 'uppercase',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  textDecoration: 'none'
+                })}
+              >
+                {link.isMap && <MapPin size={16} strokeWidth={2.5} />}
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
+
+          {/* Mobile Role Switcher */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              border: '2px solid #000',
+              borderRadius: '6px',
+              padding: '0.75rem',
+              boxShadow: '3px 3px 0px #000'
+            }}
+          >
+            <div style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64', marginBottom: '0.5rem' }}>
+              Switch Demo Role: (Active: <strong>{userRole.toUpperCase()}</strong>)
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.4rem' }}>
+              {['guest', 'admin', 'volunteer', 'donor'].map((r) => (
+                <button
+                  key={r}
+                  onClick={() => {
+                    switchRole(r);
+                    if (r === 'admin') {
+                      setMobileMenuOpen(false);
+                      navigate('/admin/dashboard');
+                    }
+                  }}
+                  style={{
+                    padding: '0.45rem',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    border: '1.5px solid #000',
+                    borderRadius: '4px',
+                    backgroundColor: userRole === r ? 'var(--brand-dark-green)' : '#F7FAF8',
+                    color: userRole === r ? '#FFFFFF' : '#000000',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile Bottom Quick Actions */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+            <Link
+              to="/admin/dashboard"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (userRole !== 'admin') switchRole('admin');
+              }}
+              style={{ textDecoration: 'none' }}
+            >
+              <button className="nb-btn nb-btn-yellow nb-btn-sm" style={{ width: '100%' }}>
+                <Shield size={14} strokeWidth={2.5} />
+                <span>Admin</span>
+              </button>
+            </Link>
+
+            <Link
+              to="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ textDecoration: 'none' }}
+            >
+              <button className="nb-btn nb-btn-white nb-btn-sm" style={{ width: '100%' }}>
+                <LogIn size={14} strokeWidth={2.5} />
+                <span>Login</span>
+              </button>
+            </Link>
+          </div>
         </div>
       )}
     </header>

@@ -6,6 +6,7 @@ import Card from '../components/common/Card';
 import Badge from '../components/common/Badge';
 import StatCard from '../components/common/StatCard';
 import ProgramCard from '../components/common/ProgramCard';
+import Mascot from '../components/common/Mascot';
 import { formatCurrency, formatNumber } from '../utils/formatters';
 import { IMPACT_STORIES } from '../data/mockData';
 import {
@@ -195,23 +196,28 @@ export default function Home() {
                   position: 'relative'
                 }}
               >
-                {/* Floating Corner Badge */}
+                {/* Floating Corner Badge with Mascot */}
                 <div
                   style={{
                     position: 'absolute',
-                    top: '-16px',
+                    top: '-24px',
                     right: '-16px',
                     backgroundColor: 'var(--accent-yellow)',
                     border: '2px solid #000',
                     boxShadow: '3px 3px 0 #000',
-                    borderRadius: '4px',
-                    padding: '6px 12px',
-                    fontWeight: 900,
-                    fontSize: '0.8rem',
-                    transform: 'rotate(4deg)'
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transform: 'rotate(2deg)',
+                    zIndex: 10
                   }}
                 >
-                  TRANSPARENT NGO 2026
+                  <Mascot variant="waving" size={32} animate={true} />
+                  <span style={{ fontWeight: 900, fontSize: '0.75rem', fontFamily: 'var(--font-heading)' }}>
+                    HI, I'M BRIDGIE!
+                  </span>
                 </div>
 
                 <div
