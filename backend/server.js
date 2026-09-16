@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const mapRoutes = require('./routes/mapRoutes');
 const authRoutes = require('./routes/authRoutes');
+const aboutRoutes = require('./routes/aboutRoutes');
+const adminAboutRoutes = require('./routes/adminAboutRoutes');
 
 const path = require('path');
 const fs = require('fs');
@@ -57,8 +59,17 @@ app.get('/api/health', (req, res) => {
 // Map routes
 app.use('/api/map', mapRoutes);
 
+// Serve static public assets (images, icons)
+app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images')));
+
 // Authentication routes
 app.use('/api/auth', authRoutes);
+
+// About page public routes
+app.use('/api/about', aboutRoutes);
+
+// About page admin routes
+app.use('/api/admin/about', adminAboutRoutes);
 
 // 404 handler for unknown routes
 app.use((req, res) => {
@@ -69,11 +80,20 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
+  // Handle invalid/malformed JSON body from express.json()
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      success: false,
+      message: 'Malformed or invalid JSON payload received.'
+    });
+  }
+
   console.error('[Server Error]', err.stack || err.message);
-  res.status(500).json({
+  const statusCode = err.statusCode || err.status || 500;
+  res.status(statusCode).json({
     success: false,
-    error: 'Internal Server Error'
+    error: statusCode === 500 ? 'Internal Server Error' : err.message
   });
 });
 

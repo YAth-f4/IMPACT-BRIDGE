@@ -9,6 +9,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 // Public Pages
 import Home from './pages/Home';
 import About from './pages/About';
+import ChangemakerProfile from './pages/ChangemakerProfile';
 import Programs from './pages/Programs';
 import ProgramDetails from './pages/ProgramDetails';
 import Volunteer from './pages/Volunteer';
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/about/changemakers/:slug" element={<ChangemakerProfile />} />
           <Route path="/programs" element={<Programs />} />
           <Route path="/programs/:id" element={<ProgramDetails />} />
           <Route path="/volunteer" element={<Volunteer />} />

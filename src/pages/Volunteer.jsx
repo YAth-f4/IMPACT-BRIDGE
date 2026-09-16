@@ -84,7 +84,7 @@ export default function Volunteer() {
         spread: 70,
         origin: { y: 0.6 }
       });
-    } catch (err) {}
+    } catch (err) { }
 
     setMockVolunteer({
       name: created.name,

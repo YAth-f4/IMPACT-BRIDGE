@@ -48,6 +48,7 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  overscroll-behavior-x: auto;
 }
 
 body {
@@ -57,7 +58,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  overflow-x: hidden;
+  overscroll-behavior-x: auto;
 }
 
 /* Headings */
