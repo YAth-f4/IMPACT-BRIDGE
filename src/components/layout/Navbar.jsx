@@ -343,8 +343,9 @@ export default function Navbar() {
             flexDirection: 'column',
             gap: '0.75rem',
             zIndex: 950,
-            maxHeight: 'calc(100vh - 70px)',
-            overflowY: 'auto'
+            maxHeight: 'calc(100dvh - 65px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
           }}
         >
           {/* Mascot Greeting inside Mobile Drawer */}

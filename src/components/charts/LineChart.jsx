@@ -52,15 +52,15 @@ export default function LineChart({
   );
 
   return (
-    <Card className="chart-card" style={{ padding: '1.25rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+    <Card className="chart-card" style={{ padding: 'clamp(0.85rem, 2vw, 1.25rem)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
           <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.05rem' }}>
             {title}
           </h4>
           {subtitle && <p style={{ fontSize: '0.8rem', color: '#5A6F64', fontWeight: 600 }}>{subtitle}</p>}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.78rem', fontWeight: 700 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.78rem', fontWeight: 700, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ width: '12px', height: '4px', backgroundColor: series1Color, border: '1px solid #000', display: 'inline-block' }} />
             <span>{series1Name}</span>

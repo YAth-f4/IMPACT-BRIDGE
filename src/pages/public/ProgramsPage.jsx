@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
@@ -15,7 +15,9 @@ import {
   List,
   Heart,
   ArrowRight,
-  Filter
+  Filter,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 
 export default function ProgramsPage() {
@@ -26,6 +28,26 @@ export default function ProgramsPage() {
   const [selectedLocation, setSelectedLocation] = useState('All');
   const [activeStatusTab, setActiveStatusTab] = useState('All');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+
+  const categoryDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target)) {
+        setCategoryDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setCategoryDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const categories = [
     'All',
@@ -91,13 +113,17 @@ export default function ProgramsPage() {
       </section>
 
       {/* 2. SEARCH & FILTER CONTROLS */}
-      <section className="nb-container">
+      <section className="nb-container" style={{ position: 'relative', zIndex: 30 }}>
         <Card
+          hover={false}
           style={{
-            padding: '1.5rem',
+            padding: 'clamp(1rem, 2.5vw, 1.5rem)',
             backgroundColor: 'var(--white)',
             border: 'var(--border-thick)',
-            marginBottom: '2rem'
+            marginBottom: '2rem',
+            position: 'relative',
+            zIndex: categoryDropdownOpen ? 60 : 20,
+            overflow: 'visible'
           }}
         >
           {/* Top Row: Search, Location, View Mode */}
@@ -161,35 +187,216 @@ export default function ProgramsPage() {
             />
           </div>
 
-          {/* Category Filter Pills */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64' }}>
-              Category:
-            </span>
-            {categories.map((cat) => {
-              const isSelected = selectedCategory === cat;
-              return (
+          {/* Category Filter Dropdown Bar */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+              flexWrap: 'wrap',
+              borderTop: '2px solid #E2ECE6',
+              paddingTop: '1rem'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  fontSize: '0.82rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  color: '#5A6F64',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+              >
+                <Filter size={15} strokeWidth={2.5} /> Filter by Category:
+              </span>
+
+              {/* Neo-brutalist Category Selector Dropdown Box */}
+              <div ref={categoryDropdownRef} style={{ position: 'relative', zIndex: 70 }}>
                 <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  type="button"
+                  onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                  aria-haspopup="listbox"
+                  aria-expanded={categoryDropdownOpen}
+                  aria-label="Filter programs by category"
                   style={{
-                    padding: '0.35rem 0.85rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '0.45rem 1rem',
                     fontFamily: 'var(--font-heading)',
                     fontWeight: 800,
-                    fontSize: '0.78rem',
-                    textTransform: 'uppercase',
+                    fontSize: '0.85rem',
+                    backgroundColor: selectedCategory === 'All' ? '#FFFFFF' : 'var(--brand-dark-green)',
+                    color: selectedCategory === 'All' ? 'var(--text-dark)' : '#FFFFFF',
                     border: '2px solid #000000',
                     borderRadius: '4px',
-                    backgroundColor: isSelected ? 'var(--brand-dark-green)' : '#FFFFFF',
-                    color: isSelected ? '#FFFFFF' : '#26332D',
-                    boxShadow: isSelected ? '2.5px 2.5px 0px #000' : '1.5px 1.5px 0px #000',
-                    cursor: 'pointer'
+                    boxShadow: '3px 3px 0px #000000',
+                    cursor: 'pointer',
+                    transition: 'all 0.1s ease',
+                    userSelect: 'none'
                   }}
                 >
-                  {cat}
+                  <span>
+                    {selectedCategory === 'All' ? 'All Categories' : selectedCategory}
+                  </span>
+                  <span
+                    style={{
+                      backgroundColor: selectedCategory === 'All' ? 'var(--accent-yellow)' : '#FFFFFF',
+                      color: '#000000',
+                      padding: '1px 7px',
+                      borderRadius: '3px',
+                      fontSize: '0.72rem',
+                      fontWeight: 900,
+                      border: '1px solid #000'
+                    }}
+                  >
+                    {selectedCategory === 'All'
+                      ? programs.length
+                      : programs.filter((p) => p.category === selectedCategory).length}
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    strokeWidth={3}
+                    style={{
+                      transition: 'transform 0.2s ease',
+                      transform: categoryDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                    }}
+                  />
                 </button>
-              );
-            })}
+
+                {/* Dropdown Menu Popover */}
+                {categoryDropdownOpen && (
+                  <div
+                    role="listbox"
+                    aria-label="Category options"
+                    className="animate-dropdown"
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 6px)',
+                      left: 0,
+                      zIndex: 1000,
+                      width: 'max-content',
+                      minWidth: '260px',
+                      maxWidth: 'calc(100vw - 2.5rem)',
+                      backgroundColor: '#FFFFFF',
+                      border: '2px solid #000000',
+                      boxShadow: '5px 5px 0px #000000',
+                      borderRadius: '6px',
+                      overflow: 'hidden',
+                      transformOrigin: 'top left'
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: '6px 10px',
+                        fontSize: '0.7rem',
+                        fontWeight: 800,
+                        backgroundColor: '#F0F7F2',
+                        borderBottom: '1.5px solid #000',
+                        color: '#5A6F64',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em'
+                      }}
+                    >
+                      Select Initiative Domain
+                    </div>
+
+                    <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                      {categories.map((cat) => {
+                        const isSelected = selectedCategory === cat;
+                        const count =
+                          cat === 'All'
+                            ? programs.length
+                            : programs.filter((p) => p.category === cat).length;
+
+                        return (
+                          <button
+                            key={cat}
+                            type="button"
+                            role="option"
+                            aria-selected={isSelected}
+                            onClick={() => {
+                              setSelectedCategory(cat);
+                              setCategoryDropdownOpen(false);
+                            }}
+                            style={{
+                              width: '100%',
+                              textAlign: 'left',
+                              padding: '0.6rem 0.9rem',
+                              fontFamily: 'var(--font-heading)',
+                              fontWeight: isSelected ? 800 : 600,
+                              fontSize: '0.84rem',
+                              backgroundColor: isSelected ? 'var(--accent-yellow)' : 'transparent',
+                              color: '#000000',
+                              border: 'none',
+                              borderBottom: '1px solid #E2ECE6',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              transition: 'background-color 0.1s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isSelected) e.currentTarget.style.backgroundColor = '#F5FAF7';
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              {isSelected ? (
+                                <Check size={16} strokeWidth={3} color="var(--brand-dark-green)" />
+                              ) : (
+                                <span style={{ width: '16px', display: 'inline-block' }} />
+                              )}
+                              <span>{cat === 'All' ? 'All Categories' : cat}</span>
+                            </div>
+
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                backgroundColor: isSelected ? '#FFFFFF' : '#E2ECE6',
+                                padding: '1px 6px',
+                                borderRadius: '3px',
+                                border: '1px solid #000'
+                              }}
+                            >
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Clear Filter Link if a category filter is active */}
+            {selectedCategory !== 'All' && (
+              <button
+                type="button"
+                onClick={() => setSelectedCategory('All')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  fontSize: '0.78rem',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 800,
+                  color: 'var(--brand-dark-green)',
+                  textDecoration: 'underline',
+                  cursor: 'pointer'
+                }}
+              >
+                Clear Category Filter ({selectedCategory}) ×
+              </button>
+            )}
           </div>
         </Card>
 

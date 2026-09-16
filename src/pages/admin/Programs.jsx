@@ -272,10 +272,10 @@ export default function Programs() {
 
       {/* 4. KANBAN STATUS BOARD VIEW */}
       {viewMode === 'kanban' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }} className="hero-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }} className="kanban-grid">
           <style>{`
-            @media (max-width: 900px) {
-              .hero-grid { grid-template-columns: 1fr !important; }
+            @media (max-width: 1024px) {
+              .kanban-grid { grid-template-columns: 1fr !important; }
             }
           `}</style>
 

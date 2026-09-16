@@ -103,12 +103,20 @@ export default function Messages() {
         <style>{`
           @media (max-width: 1024px) {
             .inbox-grid { grid-template-columns: 1fr !important; }
+            .inbox-folders {
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+            }
+            .inbox-folders button {
+              flex: 1 1 auto !important;
+              min-width: 130px !important;
+            }
           }
         `}</style>
 
         {/* Column 1: Folder Navigation */}
-        <Card style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', backgroundColor: 'var(--white)' }}>
-          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#5A6F64', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+        <Card className="inbox-folders" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', backgroundColor: 'var(--white)' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#5A6F64', textTransform: 'uppercase', marginBottom: '0.35rem', width: '100%' }}>
             FOLDERS
           </span>
           {folders.map((f) => {
@@ -205,10 +213,10 @@ export default function Messages() {
         </Card>
 
         {/* Column 3: Message Detail View */}
-        <Card style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'var(--white)' }}>
+        <Card style={{ padding: 'clamp(1rem, 2vw, 1.5rem)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'var(--white)' }}>
           {selectedMessage ? (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '1rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '1rem', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                     <Badge variant="yellow" size="sm">{selectedMessage.category}</Badge>

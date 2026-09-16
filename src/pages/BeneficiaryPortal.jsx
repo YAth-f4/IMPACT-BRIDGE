@@ -158,7 +158,7 @@ export default function BeneficiaryPortal() {
           border: '3px solid #000000',
           boxShadow: '6px 6px 0px #000000',
           borderRadius: '16px',
-          padding: '2rem',
+          padding: 'clamp(1.25rem, 3vw, 2rem)',
           marginBottom: '2rem',
           display: 'flex',
           flexDirection: 'row',
@@ -167,7 +167,7 @@ export default function BeneficiaryPortal() {
           flexWrap: 'wrap',
           gap: '1.5rem'
         }}>
-          <div style={{ flex: '1 1 500px' }}>
+          <div style={{ flex: '1 1 280px', minWidth: 0 }}>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -467,7 +467,7 @@ export default function BeneficiaryPortal() {
             border: '3px solid #000000',
             boxShadow: '6px 6px 0px #000000',
             borderRadius: '16px',
-            padding: '2rem'
+            padding: 'clamp(1rem, 3.5vw, 2rem)'
           }}>
             <div style={{ marginBottom: '1.5rem', borderBottom: '2px solid #EEEEEE', paddingBottom: '1rem' }}>
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 0.5rem 0', color: '#000000' }}>
@@ -746,7 +746,7 @@ export default function BeneficiaryPortal() {
                     border: '3px solid #000000',
                     boxShadow: '6px 6px 0px #000000',
                     borderRadius: '16px',
-                    padding: '2rem',
+                    padding: 'clamp(1rem, 3.5vw, 2rem)',
                     marginBottom: '2rem'
                   }}>
                     <div style={{
@@ -793,7 +793,7 @@ export default function BeneficiaryPortal() {
                     <div style={{ marginBottom: '2rem' }}>
                       <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(4, 1fr)',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
                         gap: '0.5rem',
                         marginBottom: '1rem'
                       }}>

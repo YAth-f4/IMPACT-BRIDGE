@@ -254,7 +254,7 @@ export default function Settings() {
       {activeTab === 'data' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }} className="hero-grid">
           <style>{`
-            @media (max-width: 800px) {
+            @media (max-width: 1024px) {
               .hero-grid { grid-template-columns: 1fr !important; }
             }
           `}</style>

@@ -22,7 +22,7 @@ export default function ProgramCard({ prog, viewMode = 'grid' }) {
         className="list-card-grid"
       >
         <style>{`
-          @media (max-width: 768px) {
+          @media (max-width: 1024px) {
             .list-card-grid { grid-template-columns: 1fr !important; }
           }
         `}</style>

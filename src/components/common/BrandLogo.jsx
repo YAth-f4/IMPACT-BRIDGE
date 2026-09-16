@@ -33,9 +33,10 @@ export default function BrandLogo({
     >
       {/* Neo-Brutalist Mascot Avatar Container */}
       <div
+        className="brand-mascot-box"
         style={{
-          width: `${mascotSize}px`,
-          height: `${mascotSize}px`,
+          width: `clamp(${isSmall ? '28px' : '34px'}, 8vw, ${mascotSize}px)`,
+          height: `clamp(${isSmall ? '28px' : '34px'}, 8vw, ${mascotSize}px)`,
           backgroundColor: '#F4B942',
           border: '2.5px solid #000000',
           boxShadow: isSmall ? '2px 2px 0px #000' : '3px 3px 0px #000',
@@ -51,16 +52,21 @@ export default function BrandLogo({
       </div>
 
       {/* Brand Typographic Lockup */}
-      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
           <span
             style={{
               fontFamily: 'var(--font-heading)',
               fontWeight: 900,
-              fontSize: isSmall ? '1.05rem' : isLarge ? '1.75rem' : '1.35rem',
+              fontSize: isSmall
+                ? 'clamp(0.9rem, 2.8vw, 1.05rem)'
+                : isLarge
+                ? 'clamp(1.35rem, 3.8vw, 1.75rem)'
+                : 'clamp(1.05rem, 3.2vw, 1.35rem)',
               letterSpacing: '-0.03em',
               color: isDark ? '#FFFFFF' : '#26332D',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap'
             }}
           >
             IMPACT <span style={{ color: isDark ? '#F4B942' : '#2E7D5B' }}>BRIDGE</span>

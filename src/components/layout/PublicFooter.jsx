@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import BrandLogo from '../common/BrandLogo';
 import Button from '../common/Button';
@@ -240,14 +241,22 @@ export default function PublicFooter() {
           <div>
             © {new Date().getFullYear()} {ngoProfile.name}. All rights reserved. Registered Indian Public Charitable Trust.
           </div>
-          <div style={{ display: 'flex', gap: '1.25rem' }}>
-            <span>Privacy Policy</span>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <Link to="/privacy" style={{ color: '#D2DDD7', textDecoration: 'none' }}>
+              Privacy Policy
+            </Link>
             <span>•</span>
-            <span>Terms of Service</span>
+            <Link to="/terms" style={{ color: '#D2DDD7', textDecoration: 'none' }}>
+              Terms of Service
+            </Link>
             <span>•</span>
-            <span>80G Tax Exemption Guide</span>
+            <Link to="/donation" style={{ color: '#D2DDD7', textDecoration: 'none' }}>
+              80G Tax Exemption Guide
+            </Link>
             <span>•</span>
-            <span>FCRA Disclosures</span>
+            <Link to="/about" style={{ color: '#D2DDD7', textDecoration: 'none' }}>
+              FCRA Disclosures
+            </Link>
           </div>
         </div>
       </div>

@@ -24,8 +24,8 @@ export default function BarChart({
   );
 
   return (
-    <Card className="chart-card" style={{ padding: '1.25rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+    <Card className="chart-card" style={{ padding: 'clamp(0.85rem, 2vw, 1.25rem)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
           <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.05rem' }}>
             {title}
@@ -36,7 +36,7 @@ export default function BarChart({
         </div>
 
         {hasSecondary && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.78rem', fontWeight: 700 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.78rem', fontWeight: 700, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <span style={{ width: '12px', height: '12px', backgroundColor: barColor, border: '1.5px solid #000', display: 'inline-block' }} />
               <span>{primaryLabel}</span>

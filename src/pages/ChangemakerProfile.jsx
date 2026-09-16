@@ -581,7 +581,7 @@ export default function ChangemakerProfile() {
           className="profile-content-grid"
         >
           <style>{`
-            @media (max-width: 900px) {
+            @media (max-width: 1024px) {
               .profile-content-grid {
                 grid-template-columns: 1fr !important;
                 gap: 2rem !important;

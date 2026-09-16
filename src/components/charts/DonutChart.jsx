@@ -21,7 +21,7 @@ export default function DonutChart({
   let accumulatedPercent = 0;
 
   return (
-    <Card className="chart-card" style={{ padding: '1.25rem' }}>
+    <Card className="chart-card" style={{ padding: 'clamp(0.85rem, 2vw, 1.25rem)' }}>
       <div style={{ marginBottom: '0.75rem' }}>
         <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.05rem' }}>
           {title}
@@ -89,7 +89,7 @@ export default function DonutChart({
         </div>
 
         {/* Legend */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '140px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: '1 1 140px', minWidth: 'min(100%, 140px)' }}>
           {data.map((item, idx) => {
             const percent = Math.round((item.value / total) * 100);
             const isHovered = hoveredIdx === idx;

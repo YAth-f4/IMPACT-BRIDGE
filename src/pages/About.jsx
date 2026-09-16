@@ -305,7 +305,7 @@ export default function About() {
       <section className="nb-container">
         <div className="grid-3" style={{ marginBottom: '1rem' }}>
           {/* Mission Card */}
-          <Card variant="green" hover={true} style={{ padding: '2rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card variant="green" hover={true} style={{ padding: 'clamp(1.25rem, 3vw, 2rem)', display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <Compass size={24} color="var(--accent-yellow)" />
               <h3 style={{ color: '#FFFFFF', fontSize: '1.35rem' }}>{mission.title || 'Our Mission'}</h3>
@@ -316,7 +316,7 @@ export default function About() {
           </Card>
 
           {/* Vision Card */}
-          <Card variant="yellow" hover={true} style={{ padding: '2rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card variant="yellow" hover={true} style={{ padding: 'clamp(1.25rem, 3vw, 2rem)', display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <Sparkles size={24} color="#000000" />
               <h3 style={{ color: '#000000', fontSize: '1.35rem' }}>{vision.title || 'Our Vision'}</h3>
@@ -327,7 +327,7 @@ export default function About() {
           </Card>
 
           {/* Strategic Goals Card */}
-          <Card variant="lightgreen" hover={true} style={{ padding: '2rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card variant="lightgreen" hover={true} style={{ padding: 'clamp(1.25rem, 3vw, 2rem)', display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <Target size={24} color="var(--brand-dark-green)" />
               <h3 style={{ color: '#26332D', fontSize: '1.35rem' }}>Strategic Goals</h3>
@@ -618,8 +618,8 @@ export default function About() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '2rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+              gap: 'clamp(1.25rem, 3vw, 2rem)'
             }}
           >
             {filteredChangemakers.map((c, idx) => {

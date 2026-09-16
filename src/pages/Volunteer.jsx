@@ -170,13 +170,13 @@ export default function Volunteer() {
         {activeTab === 'join' && (
           <div style={{ marginTop: '2rem', display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '2.5rem' }} className="hero-grid">
             <style>{`
-              @media (max-width: 900px) {
-                .hero-grid { grid-template-columns: 1fr !important; }
+              @media (max-width: 1024px) {
+                .hero-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
               }
             `}</style>
 
             {/* Form */}
-            <Card style={{ padding: '2rem', border: 'var(--border-thick)' }}>
+            <Card style={{ padding: 'clamp(1rem, 3.5vw, 2rem)', border: 'var(--border-thick)' }}>
               <div style={{ marginBottom: '1.5rem' }}>
                 <h3 style={{ fontSize: '1.4rem', marginBottom: '0.35rem' }}>
                   Volunteer Application

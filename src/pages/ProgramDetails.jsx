@@ -73,7 +73,7 @@ export default function ProgramDetails() {
       <section className="nb-container">
         <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.7fr', gap: '2.5rem' }} className="hero-grid">
           <style>{`
-            @media (max-width: 960px) {
+            @media (max-width: 1024px) {
               .hero-grid { grid-template-columns: 1fr !important; }
             }
           `}</style>
@@ -84,7 +84,7 @@ export default function ProgramDetails() {
             <div
               style={{
                 width: '100%',
-                height: '340px',
+                height: 'clamp(200px, 35vw, 340px)',
                 border: 'var(--border-thick)',
                 borderRadius: '8px',
                 boxShadow: 'var(--shadow-xl)',

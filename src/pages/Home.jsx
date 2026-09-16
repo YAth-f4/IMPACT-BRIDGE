@@ -94,8 +94,8 @@ export default function Home() {
             className="hero-grid"
           >
             <style>{`
-              @media (max-width: 900px) {
-                .hero-grid { grid-template-columns: 1fr !important; }
+              @media (max-width: 1024px) {
+                .hero-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
               }
             `}</style>
 
@@ -192,7 +192,7 @@ export default function Home() {
                   border: 'var(--border-thick)',
                   borderRadius: '8px',
                   boxShadow: 'var(--shadow-2xl)',
-                  padding: '1.75rem',
+                  padding: 'clamp(1rem, 3vw, 1.75rem)',
                   position: 'relative'
                 }}
               >
@@ -200,8 +200,8 @@ export default function Home() {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '-24px',
-                    right: '-16px',
+                    top: '-20px',
+                    right: 'clamp(4px, 2vw, 12px)',
                     backgroundColor: 'var(--accent-yellow)',
                     border: '2px solid #000',
                     boxShadow: '3px 3px 0 #000',
@@ -579,7 +579,7 @@ export default function Home() {
             border: 'var(--border-thick)',
             boxShadow: 'var(--shadow-2xl)',
             borderRadius: '8px',
-            padding: '3rem 2.5rem',
+            padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3.5vw, 2.5rem)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -587,18 +587,18 @@ export default function Home() {
             flexWrap: 'wrap'
           }}
         >
-          <div style={{ maxWidth: '650px' }}>
+          <div style={{ maxWidth: '650px', flex: '1 1 280px' }}>
             <Badge variant="yellow" size="md">EVERY RUPEE COUNTS</Badge>
-            <h2 style={{ color: '#FFFFFF', fontSize: '2.4rem', marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+            <h2 style={{ color: '#FFFFFF', fontSize: 'clamp(1.6rem, 3.5vw, 2.4rem)', marginTop: '0.75rem', marginBottom: '0.75rem' }}>
               Join Hands to Build a Stronger India Today
             </h2>
-            <p style={{ color: '#D6E9DE', fontSize: '1.05rem', lineHeight: 1.6, fontWeight: 500 }}>
+            <p style={{ color: '#D6E9DE', fontSize: 'clamp(0.9rem, 2vw, 1.05rem)', lineHeight: 1.6, fontWeight: 500 }}>
               Your tax-deductible contribution funds child education kits, hot nutritious meals, and rural telemedicine vans. Instant 80G tax receipt issued.
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: '220px' }}>
-            <Link to="/donation" style={{ textDecoration: 'none' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: '1 1 220px', maxWidth: '320px', width: '100%' }}>
+            <Link to="/donation" style={{ textDecoration: 'none', width: '100%' }}>
               <Button
                 variant="yellow"
                 size="lg"
@@ -608,7 +608,7 @@ export default function Home() {
                 Make a Donation
               </Button>
             </Link>
-            <Link to="/volunteer" style={{ textDecoration: 'none' }}>
+            <Link to="/volunteer" style={{ textDecoration: 'none', width: '100%' }}>
               <Button
                 variant="white"
                 size="md"

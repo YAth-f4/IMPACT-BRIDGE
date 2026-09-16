@@ -427,16 +427,17 @@ export default function ImpactMap({ isStandalone = true }) {
           justifyContent: 'space-between'
         }}
       >
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', width: '100%', maxWidth: '100%' }}>
           <button
             onClick={() => setActiveTab('nearby-osm')}
             className={`nb-btn ${activeTab === 'nearby-osm' ? 'nb-btn-green' : 'nb-btn-white'}`}
             style={{
-              padding: '0.65rem 1.25rem',
-              fontSize: '0.95rem',
+              padding: 'clamp(0.5rem, 1.5vw, 0.65rem) clamp(0.75rem, 2vw, 1.25rem)',
+              fontSize: 'clamp(0.82rem, 1.6vw, 0.95rem)',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              flex: '1 1 auto'
             }}
           >
             <Radio size={18} strokeWidth={2.5} className={activeTab === 'nearby-osm' ? 'spin-subtle' : ''} />
@@ -448,11 +449,12 @@ export default function ImpactMap({ isStandalone = true }) {
             onClick={() => setActiveTab('internal-hubs')}
             className={`nb-btn ${activeTab === 'internal-hubs' ? 'nb-btn-green' : 'nb-btn-white'}`}
             style={{
-              padding: '0.65rem 1.25rem',
-              fontSize: '0.95rem',
+              padding: 'clamp(0.5rem, 1.5vw, 0.65rem) clamp(0.75rem, 2vw, 1.25rem)',
+              fontSize: 'clamp(0.82rem, 1.6vw, 0.95rem)',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              flex: '1 1 auto'
             }}
           >
             <Layers size={18} strokeWidth={2.5} />
@@ -626,7 +628,8 @@ export default function ImpactMap({ isStandalone = true }) {
             style={{
               position: 'relative',
               width: '100%',
-              height: isStandalone ? '600px' : '480px',
+              minHeight: '360px',
+              height: isStandalone ? 'clamp(380px, 65vh, 600px)' : 'clamp(320px, 50vh, 480px)',
               border: 'var(--border-thick)',
               boxShadow: 'var(--shadow-xl)',
               borderRadius: '8px',
@@ -648,13 +651,14 @@ export default function ImpactMap({ isStandalone = true }) {
             <div
               style={{
                 position: 'absolute',
-                top: '16px',
-                left: '16px',
+                top: '12px',
+                left: '12px',
+                maxWidth: 'calc(100% - 24px)',
                 backgroundColor: 'var(--white)',
                 border: '2px solid #000',
                 boxShadow: '3px 3px 0px #000',
                 borderRadius: '6px',
-                padding: '8px 14px',
+                padding: '8px 12px',
                 zIndex: 500,
                 fontSize: '0.8rem',
                 fontFamily: 'var(--font-heading)',
@@ -677,16 +681,17 @@ export default function ImpactMap({ isStandalone = true }) {
             <div
               style={{
                 position: 'absolute',
-                bottom: '16px',
-                left: '16px',
+                bottom: '12px',
+                left: '12px',
+                maxWidth: 'calc(100% - 24px)',
                 backgroundColor: 'var(--white)',
                 border: '2px solid #000',
                 boxShadow: '3px 3px 0px #000',
                 borderRadius: '6px',
-                padding: '8px 12px',
+                padding: '6px 10px',
                 zIndex: 500,
                 display: 'flex',
-                gap: '12px',
+                gap: '8px 12px',
                 flexWrap: 'wrap',
                 pointerEvents: 'auto'
               }}
@@ -698,7 +703,7 @@ export default function ImpactMap({ isStandalone = true }) {
                 { label: 'Community Center', color: '#F4B942' }
               ].map((item) => (
                 <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', fontWeight: 800 }}>
-                  <span style={{ width: '10px', height: '10px', backgroundColor: item.color, border: '1.5px solid #000', borderRadius: '50%' }} />
+                  <span style={{ width: '10px', height: '10px', backgroundColor: item.color, border: '1.5px solid #000', borderRadius: '50%', flexShrink: 0 }} />
                   <span>{item.label}</span>
                 </div>
               ))}
@@ -762,8 +767,8 @@ export default function ImpactMap({ isStandalone = true }) {
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <div style={{ width: '220px' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', flex: '1 1 300px', width: '100%' }}>
+              <div style={{ flex: '1 1 200px', minWidth: '140px' }}>
                 <Input
                   placeholder="Filter organizations..."
                   icon={Search}
@@ -773,7 +778,7 @@ export default function ImpactMap({ isStandalone = true }) {
                 />
               </div>
 
-              <div style={{ width: '180px' }}>
+              <div style={{ flex: '1 1 180px', minWidth: '140px' }}>
                 <Select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
@@ -948,7 +953,7 @@ export default function ImpactMap({ isStandalone = true }) {
               <p style={{ fontSize: '0.9rem', color: '#5A6F64', maxWidth: '460px', margin: '0 auto 1.5rem auto' }}>
                 Try expanding your search radius to 10 km or 25 km, or switch to one of the major metro city presets above.
               </p>
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Button
                   variant="green"
                   size="md"
@@ -1199,7 +1204,8 @@ export default function ImpactMap({ isStandalone = true }) {
             style={{
               position: 'relative',
               width: '100%',
-              height: isStandalone ? '620px' : '480px',
+              minHeight: '360px',
+              height: isStandalone ? 'clamp(380px, 65vh, 620px)' : 'clamp(320px, 50vh, 480px)',
               backgroundColor: '#D6E9DE',
               border: 'var(--border-thick)',
               boxShadow: 'var(--shadow-xl)',
@@ -1226,8 +1232,9 @@ export default function ImpactMap({ isStandalone = true }) {
             <div
               style={{
                 position: 'absolute',
-                top: '16px',
-                left: '16px',
+                top: '12px',
+                left: '12px',
+                maxWidth: 'calc(100% - 24px)',
                 backgroundColor: 'var(--white)',
                 border: '2px solid #000',
                 boxShadow: '3px 3px 0px #000',
@@ -1252,16 +1259,17 @@ export default function ImpactMap({ isStandalone = true }) {
             <div
               style={{
                 position: 'absolute',
-                bottom: '16px',
-                left: '16px',
+                bottom: '12px',
+                left: '12px',
+                maxWidth: 'calc(100% - 24px)',
                 backgroundColor: 'var(--white)',
                 border: '2px solid #000',
                 boxShadow: '3px 3px 0px #000',
                 borderRadius: '6px',
-                padding: '8px 12px',
+                padding: '6px 10px',
                 zIndex: 10,
                 display: 'flex',
-                gap: '12px',
+                gap: '8px 12px',
                 flexWrap: 'wrap'
               }}
             >
@@ -1272,7 +1280,7 @@ export default function ImpactMap({ isStandalone = true }) {
                 { label: 'Event', color: '#E63946' }
               ].map((item) => (
                 <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', fontWeight: 800 }}>
-                  <span style={{ width: '10px', height: '10px', backgroundColor: item.color, border: '1.5px solid #000', borderRadius: '50%' }} />
+                  <span style={{ width: '10px', height: '10px', backgroundColor: item.color, border: '1.5px solid #000', borderRadius: '50%', flexShrink: 0 }} />
                   <span>{item.label}</span>
                 </div>
               ))}

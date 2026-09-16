@@ -552,7 +552,7 @@ export default function Login() {
                 <span style={{ fontSize: '0.72rem', color: '#777', fontWeight: 600 }}>5 Verified Roles</span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.35rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(76px, 1fr))', gap: '0.35rem' }}>
                 {DEMO_ROLES.map((r) => {
                   const Icon = r.icon;
                   const isSelected = selectedRole === r.id;

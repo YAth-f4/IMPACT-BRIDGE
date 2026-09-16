@@ -183,13 +183,13 @@ export default function Contact() {
       <section className="nb-container">
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '2.5rem' }} className="hero-grid">
           <style>{`
-            @media (max-width: 900px) {
-              .hero-grid { grid-template-columns: 1fr !important; }
+            @media (max-width: 1024px) {
+              .hero-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
             }
           `}</style>
 
           {/* Left: Contact Form */}
-          <Card style={{ padding: '2rem', border: 'var(--border-thick)' }}>
+          <Card style={{ padding: 'clamp(1rem, 3.5vw, 2rem)', border: 'var(--border-thick)' }}>
             <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem' }}>
               Send an Official Message
             </h3>

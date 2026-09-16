@@ -4,6 +4,7 @@ const mapRoutes = require('./routes/mapRoutes');
 const authRoutes = require('./routes/authRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
 const adminAboutRoutes = require('./routes/adminAboutRoutes');
+const newsletterRoutes = require('./routes/newsletterRoutes');
 
 const path = require('path');
 const fs = require('fs');
@@ -70,6 +71,9 @@ app.use('/api/about', aboutRoutes);
 
 // About page admin routes
 app.use('/api/admin/about', adminAboutRoutes);
+
+// Newsletter subscription routes
+app.use('/api/newsletter', newsletterRoutes);
 
 // 404 handler for unknown routes
 app.use((req, res) => {

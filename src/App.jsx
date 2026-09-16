@@ -19,6 +19,8 @@ import Contact from './pages/Contact';
 import BeneficiaryPortal from './pages/BeneficiaryPortal';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import NotFound from './pages/NotFound';
 
 // Admin Pages
@@ -51,6 +53,8 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           <Route path="/404" element={<NotFound />} />
         </Route>
 

@@ -26,10 +26,10 @@ export default function Tabs({
             type="button"
             onClick={() => onChange(tab.id)}
             style={{
-              padding: '0.55rem 1.15rem',
+              padding: 'clamp(0.45rem, 1.2vw, 0.55rem) clamp(0.75rem, 1.8vw, 1.15rem)',
               fontFamily: 'var(--font-heading)',
               fontWeight: 800,
-              fontSize: '0.88rem',
+              fontSize: 'clamp(0.78rem, 1.4vw, 0.88rem)',
               textTransform: 'uppercase',
               letterSpacing: '0.03em',
               border: '2px solid #000000',

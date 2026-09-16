@@ -129,17 +129,17 @@ export default function Donation() {
       <section className="nb-container">
         <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.7fr', gap: '2.5rem' }} className="hero-grid">
           <style>{`
-            @media (max-width: 960px) {
-              .hero-grid { grid-template-columns: 1fr !important; }
+            @media (max-width: 1024px) {
+              .hero-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
             }
           `}</style>
 
           {/* Left: Donation Form */}
-          <Card style={{ padding: '2rem', border: 'var(--border-thick)' }}>
+          <Card style={{ padding: 'clamp(1rem, 3.5vw, 2rem)', border: 'var(--border-thick)' }}>
             {/* 3-Step Donation Flow Indicator */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(95px, 1fr))',
               gap: '0.5rem',
               marginBottom: '1.75rem',
               textAlign: 'center'
@@ -150,7 +150,7 @@ export default function Donation() {
                 borderRadius: '6px',
                 padding: '0.45rem 0.25rem',
                 fontWeight: 800,
-                fontSize: '0.78rem'
+                fontSize: 'clamp(0.72rem, 2vw, 0.78rem)'
               }}>
                 1. Select Program
               </div>
@@ -160,7 +160,7 @@ export default function Donation() {
                 borderRadius: '6px',
                 padding: '0.45rem 0.25rem',
                 fontWeight: 800,
-                fontSize: '0.78rem'
+                fontSize: 'clamp(0.72rem, 2vw, 0.78rem)'
               }}>
                 2. Choose Amount
               </div>
@@ -170,7 +170,7 @@ export default function Donation() {
                 borderRadius: '6px',
                 padding: '0.45rem 0.25rem',
                 fontWeight: 800,
-                fontSize: '0.78rem'
+                fontSize: 'clamp(0.72rem, 2vw, 0.78rem)'
               }}>
                 3. Instant 80G Receipt
               </div>
@@ -180,15 +180,15 @@ export default function Donation() {
               {/* Frequency Toggle */}
               <div style={{ marginBottom: '1.75rem' }}>
                 <label className="nb-label">Select Contribution Type</label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem' }}>
                   <button
                     type="button"
                     onClick={() => setFrequency('one-time')}
                     style={{
-                      padding: '0.75rem',
+                      padding: '0.75rem 0.5rem',
                       fontFamily: 'var(--font-heading)',
                       fontWeight: 800,
-                      fontSize: '0.95rem',
+                      fontSize: 'clamp(0.82rem, 2.5vw, 0.95rem)',
                       border: '2px solid #000',
                       borderRadius: '6px',
                       backgroundColor: frequency === 'one-time' ? 'var(--brand-dark-green)' : '#FFFFFF',
@@ -204,10 +204,10 @@ export default function Donation() {
                     type="button"
                     onClick={() => setFrequency('monthly')}
                     style={{
-                      padding: '0.75rem',
+                      padding: '0.75rem 0.5rem',
                       fontFamily: 'var(--font-heading)',
                       fontWeight: 800,
-                      fontSize: '0.95rem',
+                      fontSize: 'clamp(0.82rem, 2.5vw, 0.95rem)',
                       border: '2px solid #000',
                       borderRadius: '6px',
                       backgroundColor: frequency === 'monthly' ? 'var(--accent-yellow)' : '#FFFFFF',
@@ -224,7 +224,7 @@ export default function Donation() {
               {/* Amount Presets */}
               <div style={{ marginBottom: '1.75rem' }}>
                 <label className="nb-label">Choose Amount (INR ₹)</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
                   {presetAmounts.map((amt) => {
                     const isSelected = !customAmount && amount === amt;
                     return (
