@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 export default function Login() {
-  const { loginUser, addToast } = useApp();
+  const { loginUser, loginWithGoogle, addToast } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -42,6 +42,7 @@ export default function Login() {
 
   // Interactive UI State
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successUser, setSuccessUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -51,6 +52,133 @@ export default function Login() {
   // Field validation errors
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  // Google OAuth Client ID from Vite environment
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+  // Initialize Google Identity Services if client ID and window.google are present
+  useEffect(() => {
+    if (!googleClientId || !window.google?.accounts?.id) return;
+    try {
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: async (response) => {
+          if (response?.credential) {
+            await handleGoogleAuthentication({ credential: response.credential });
+          }
+        },
+        auto_select: false
+      });
+    } catch (gErr) {
+      console.warn('[Google GIS] Initialization notice:', gErr.message);
+    }
+  }, [googleClientId]);
+
+  // Handle verified Google identity submission to backend
+  const handleGoogleAuthentication = async (authPayload) => {
+    setIsGoogleLoading(true);
+    setErrorMessage('');
+
+    try {
+      const result = await loginWithGoogle(authPayload);
+      setIsGoogleLoading(false);
+
+      if (!result.success) {
+        setErrorMessage(result.message || 'Unable to sign in with Google. Please try again.');
+        addToast(result.message || 'Unable to sign in with Google.', 'error');
+        triggerShake();
+        return;
+      }
+
+      // Success State & Smooth Transition
+      setIsSuccess(true);
+      setSuccessUser(result.user);
+      addToast(`Signed in successfully as ${result.user.name} (${result.user.role.toUpperCase()})`, 'success');
+
+      setTimeout(() => {
+        const targetRoute = returnUrlRef.current || (
+          result.user.role === 'admin'
+            ? '/admin/dashboard'
+            : result.user.role === 'volunteer'
+            ? '/volunteer'
+            : result.user.role === 'beneficiary'
+            ? '/beneficiary'
+            : result.user.role === 'donor'
+            ? '/donation'
+            : '/home'
+        );
+        navigate(targetRoute, { replace: true });
+      }, 700);
+    } catch (err) {
+      setIsGoogleLoading(false);
+      const friendlyErr = 'Unable to connect to authentication server. Please try again.';
+      setErrorMessage(friendlyErr);
+      addToast(friendlyErr, 'error');
+      triggerShake();
+    }
+  };
+
+  // Trigger Google OAuth 2.0 Identity Services flow
+  const handleGoogleSignIn = () => {
+    if (isLoading || isGoogleLoading || isSuccess) return;
+    setErrorMessage('');
+
+    // Check if Google Client ID is configured
+    if (!googleClientId || googleClientId.includes('your_google_client_id')) {
+      const configMsg = 'Google Sign-In is not configured yet. Please configure VITE_GOOGLE_CLIENT_ID in your .env file.';
+      setErrorMessage(configMsg);
+      addToast(configMsg, 'info');
+      triggerShake();
+      return;
+    }
+
+    // Check if Google Identity Services SDK is loaded
+    if (!window.google?.accounts?.oauth2) {
+      const sdkMsg = 'Google authentication services are still loading. Please check your network and try again.';
+      setErrorMessage(sdkMsg);
+      addToast(sdkMsg, 'error');
+      triggerShake();
+      return;
+    }
+
+    try {
+      setIsGoogleLoading(true);
+      const tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: googleClientId,
+        scope: 'openid email profile',
+        prompt: 'select_account',
+        callback: async (tokenResponse) => {
+          if (tokenResponse?.access_token) {
+            await handleGoogleAuthentication({ accessToken: tokenResponse.access_token });
+          } else if (tokenResponse?.error) {
+            setIsGoogleLoading(false);
+            if (tokenResponse.error === 'popup_closed_by_user' || tokenResponse.error === 'access_denied') {
+              addToast('Google sign-in was cancelled.', 'info');
+            } else {
+              addToast('Unable to sign in with Google. Please try again.', 'error');
+            }
+          } else {
+            setIsGoogleLoading(false);
+            addToast('Google sign-in was cancelled.', 'info');
+          }
+        },
+        error_callback: (error) => {
+          setIsGoogleLoading(false);
+          if (error?.type === 'popup_closed') {
+            addToast('Google sign-in was cancelled.', 'info');
+          } else {
+            addToast('Unable to sign in with Google. Please try again.', 'error');
+          }
+        }
+      });
+
+      tokenClient.requestAccessToken();
+    } catch (err) {
+      setIsGoogleLoading(false);
+      console.error('[Google OAuth] Error launching popup:', err.message);
+      addToast('Unable to launch Google sign-in window.', 'error');
+    }
+  };
 
   // Check if redirected with registration state or message — consume ONCE and immediately clear state
   useEffect(() => {
@@ -510,7 +638,7 @@ export default function Login() {
                 variant="yellow"
                 size="lg"
                 fullWidth
-                disabled={isLoading || isSuccess}
+                disabled={isLoading || isGoogleLoading || isSuccess}
                 className="nb-btn-tactile"
                 iconRight={!isLoading && !isSuccess ? ArrowRight : null}
               >
@@ -527,7 +655,62 @@ export default function Login() {
               </Button>
             </div>
 
-            {/* 6. Register Link */}
+            {/* Neo-Brutalist OR Divider */}
+            <div
+              className="animate-stagger-item delay-480"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                margin: '1.25rem 0',
+                gap: '0.75rem'
+              }}
+            >
+              <div style={{ flex: 1, height: '2px', backgroundColor: '#000000' }} />
+              <span
+                style={{
+                  fontWeight: 900,
+                  fontSize: '0.8rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: '#5A6F64',
+                  backgroundColor: '#FFFFFF',
+                  padding: '0 0.25rem'
+                }}
+              >
+                OR
+              </span>
+              <div style={{ flex: 1, height: '2px', backgroundColor: '#000000' }} />
+            </div>
+
+            {/* 6. Continue with Google Button */}
+            <div className="animate-stagger-item delay-500">
+              <button
+                type="button"
+                id="google-signin-btn"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading || isGoogleLoading || isSuccess}
+                className="nb-google-btn nb-btn-tactile"
+                aria-label="Continue with Google"
+              >
+                {isGoogleLoading ? (
+                  <BridgeLoader inline={true} label="Signing in..." />
+                ) : (
+                  <>
+                    <span className="google-icon-wrapper" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                      </svg>
+                    </span>
+                    <span>Continue with Google</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* 7. Register Link */}
             <div className="animate-stagger-item delay-520" style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.88rem', fontWeight: 600 }}>
               Don't have an account yet?{' '}
               <Link

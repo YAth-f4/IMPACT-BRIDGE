@@ -127,6 +127,84 @@ class UserModel {
     return users.find((u) => u.id === id) || null;
   }
 
+  findByGoogleId(googleId) {
+    if (!googleId) return null;
+    const users = this.loadUsers();
+    return users.find((u) => u.googleId === String(googleId)) || null;
+  }
+
+  /**
+   * Find or create user via verified Google credentials.
+   * Preserves existing roles and ensures new users get the safe default normal-user role.
+   */
+  async findOrCreateGoogleUser({ googleId, email, name, avatar }) {
+    if (!email) {
+      throw new Error('MISSING_EMAIL');
+    }
+
+    const users = this.loadUsers();
+    const cleanEmail = String(email).toLowerCase().trim();
+    const strGoogleId = googleId ? String(googleId) : null;
+
+    // 1. Check if user already exists by googleId
+    if (strGoogleId) {
+      const existingGoogleUser = users.find((u) => u.googleId === strGoogleId);
+      if (existingGoogleUser) {
+        let updated = false;
+        if (avatar && !existingGoogleUser.avatar) {
+          existingGoogleUser.avatar = avatar;
+          updated = true;
+        }
+        if (name && (!existingGoogleUser.name || existingGoogleUser.name === 'Community Member')) {
+          existingGoogleUser.name = name.trim();
+          updated = true;
+        }
+        if (updated) {
+          this.saveUsers(users);
+        }
+        return this.toSafeUser(existingGoogleUser);
+      }
+    }
+
+    // 2. Check if user exists by verified email (account linking)
+    const existingEmailUser = users.find((u) => u.email.toLowerCase().trim() === cleanEmail);
+    if (existingEmailUser) {
+      // Link Google ID to existing account while strictly preserving existing database role
+      if (strGoogleId && !existingEmailUser.googleId) {
+        existingEmailUser.googleId = strGoogleId;
+      }
+      if (!existingEmailUser.authProvider) {
+        existingEmailUser.authProvider = 'local+google';
+      } else if (!existingEmailUser.authProvider.includes('google')) {
+        existingEmailUser.authProvider = `${existingEmailUser.authProvider}+google`;
+      }
+      if (avatar && !existingEmailUser.avatar) {
+        existingEmailUser.avatar = avatar;
+      }
+      this.saveUsers(users);
+      return this.toSafeUser(existingEmailUser);
+    }
+
+    // 3. Brand new Google user — apply safe default normal-user onboarding role ('donor')
+    // Under no circumstances can a new Google user self-assign Admin
+    const newUser = {
+      id: `USR-GGL-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      name: (name && String(name).trim()) || 'Community Member',
+      email: cleanEmail,
+      passwordHash: null,
+      role: 'donor', // Safe community role
+      googleId: strGoogleId,
+      authProvider: 'google',
+      avatar: avatar || null,
+      createdAt: new Date().toISOString()
+    };
+
+    users.push(newUser);
+    this.saveUsers(users);
+
+    return this.toSafeUser(newUser);
+  }
+
   async comparePassword(plainPassword, passwordHash) {
     if (!plainPassword || !passwordHash) return false;
     try {

@@ -221,6 +221,69 @@ button, input, select, textarea {
   box-shadow: var(--shadow-xl);
 }
 
+/* Neo-Brutalist Google Authentication Button */
+.nb-google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  padding: 0.82rem 1.35rem;
+  background-color: #FFFFFF;
+  color: #111827;
+  border: 3px solid #000000;
+  border-radius: var(--radius-md);
+  box-shadow: 5px 5px 0px #000000;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.nb-google-btn:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0px #000000;
+  background-color: #F8FAF9;
+}
+
+.nb-google-btn:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 1px 1px 0px #000000;
+  background-color: #F3F4F6;
+}
+
+.nb-google-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 2px 2px 0px #000000 !important;
+  background-color: #F9FAFB;
+}
+
+.nb-google-btn .google-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-google-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
 /* Cards */
 .nb-card {
   background-color: var(--white);

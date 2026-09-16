@@ -86,5 +86,16 @@
     "passwordHash": "$2b$10$LTSICgUmiQcfuMaW9OgXROg4Au8JlMcKfQd3lLCJ5msFIIRzjHNLW",
     "role": "volunteer",
     "createdAt": "2026-09-12T13:54:20.797Z"
+  },
+  {
+    "id": "USR-1789542673687-316",
+    "name": "Yatharth Raut",
+    "email": "aatishraut84@gmail.com",
+    "passwordHash": "$2b$10$s6D0xZcwgRZ1587txrfMrOEZueAQfI7vYNgGGuHIo/tbR3zeUWFFi",
+    "role": "volunteer",
+    "createdAt": "2026-09-16T07:11:13.687Z",
+    "googleId": "113192446986912014600",
+    "authProvider": "local+google",
+    "avatar": "https://lh3.googleusercontent.com/a/ACg8ocK38wahqHVgMaT7PsS2_UbEIrobDKqm9j-piyaz14GaoVHzH96W=s96-c"
   }
 ]

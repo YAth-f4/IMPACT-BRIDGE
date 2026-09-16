@@ -8,6 +8,9 @@ router.post('/login', authController.login);
 // POST /api/auth/register
 router.post('/register', authController.register);
 
+// POST /api/auth/google
+router.post('/google', authController.googleLogin);
+
 // GET /api/auth/me
 router.get('/me', authController.getMe);
 

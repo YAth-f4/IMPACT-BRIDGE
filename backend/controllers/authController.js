@@ -248,10 +248,180 @@ const verifyAdmin = async (req, res) => {
   }
 };
 
+/**
+ * Real Google OAuth / GIS Credential Verification and Login
+ * Authenticates user through official Google verification, looks up or creates user in database,
+ * preserves database roles, and generates standard Impact Bridge JWT.
+ */
+const googleLogin = async (req, res) => {
+  try {
+    const { credential, accessToken, code } = req.body || {};
+
+    if (!credential && !accessToken && !code) {
+      return res.status(400).json({
+        success: false,
+        message: 'No Google authentication credentials were provided.'
+      });
+    }
+
+    const { OAuth2Client } = require('google-auth-library');
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+    const googleOAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET);
+
+    let verifiedPayload = null;
+
+    // 1. Verify Google ID Token (JWT from Google Identity Services)
+    if (credential) {
+      try {
+        const ticket = await googleOAuthClient.verifyIdToken({
+          idToken: credential,
+          audience: GOOGLE_CLIENT_ID || undefined
+        });
+        verifiedPayload = ticket.getPayload();
+      } catch (idErr) {
+        // Fallback to Google's official public tokeninfo endpoint for resilience
+        try {
+          const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+          if (verifyRes.ok) {
+            const data = await verifyRes.json();
+            if (GOOGLE_CLIENT_ID && data.aud && data.aud !== GOOGLE_CLIENT_ID) {
+              return res.status(401).json({
+                success: false,
+                message: 'Invalid token audience.'
+              });
+            }
+            verifiedPayload = data;
+          } else {
+            console.error('[Google Auth] Token verification failed:', idErr.message);
+            return res.status(401).json({
+              success: false,
+              message: 'Google authentication credential is invalid or has expired.'
+            });
+          }
+        } catch (fetchErr) {
+          console.error('[Google Auth] Verification error:', idErr.message);
+          return res.status(401).json({
+            success: false,
+            message: 'Unable to verify Google credentials. Please try again.'
+          });
+        }
+      }
+    }
+    // 2. Verify Google OAuth Access Token
+    else if (accessToken) {
+      try {
+        const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        if (!userinfoRes.ok) {
+          return res.status(401).json({
+            success: false,
+            message: 'Invalid Google access token.'
+          });
+        }
+        verifiedPayload = await userinfoRes.json();
+      } catch (tokenErr) {
+        console.error('[Google Auth] Access token error:', tokenErr.message);
+        return res.status(401).json({
+          success: false,
+          message: 'Unable to verify Google access token.'
+        });
+      }
+    }
+    // 3. Verify Google Authorization Code
+    else if (code) {
+      try {
+        const { tokens } = await googleOAuthClient.getToken(code);
+        if (tokens.id_token) {
+          const ticket = await googleOAuthClient.verifyIdToken({
+            idToken: tokens.id_token,
+            audience: GOOGLE_CLIENT_ID || undefined
+          });
+          verifiedPayload = ticket.getPayload();
+        } else if (tokens.access_token) {
+          const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${tokens.access_token}` }
+          });
+          if (userinfoRes.ok) {
+            verifiedPayload = await userinfoRes.json();
+          }
+        }
+      } catch (codeErr) {
+        console.error('[Google Auth] Authorization code exchange error:', codeErr.message);
+        return res.status(401).json({
+          success: false,
+          message: 'Failed to exchange authorization code with Google.'
+        });
+      }
+    }
+
+    if (!verifiedPayload || !verifiedPayload.email) {
+      return res.status(401).json({
+        success: false,
+        message: 'Could not obtain a verified email from Google.'
+      });
+    }
+
+    // Ensure email is verified by Google
+    const isEmailVerified = verifiedPayload.email_verified === true || verifiedPayload.email_verified === 'true';
+    if (!isEmailVerified) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your Google email address has not been verified by Google.'
+      });
+    }
+
+    const verifiedGoogleId = verifiedPayload.sub;
+    const verifiedEmail = verifiedPayload.email;
+    const verifiedName = verifiedPayload.name || verifiedPayload.given_name || 'Google User';
+    const verifiedPicture = verifiedPayload.picture || null;
+
+    // Lookup or create user in database
+    const safeUser = await userModel.findOrCreateGoogleUser({
+      googleId: verifiedGoogleId,
+      email: verifiedEmail,
+      name: verifiedName,
+      avatar: verifiedPicture
+    });
+
+    // Obtain the user's authentic database role (strictly server-side, never self-assigned)
+    const userInDb = userModel.findById(safeUser.id);
+    const trustedRole = userInDb ? userInDb.role : safeUser.role || 'donor';
+
+    // Generate Impact Bridge JWT
+    const payload = {
+      id: safeUser.id,
+      email: safeUser.email,
+      name: safeUser.name,
+      role: trustedRole
+    };
+
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+
+    return res.status(200).json({
+      success: true,
+      message: `Welcome to Impact Bridge, ${safeUser.name}!`,
+      token,
+      user: {
+        ...safeUser,
+        role: trustedRole
+      }
+    });
+  } catch (err) {
+    console.error('[authController.googleLogin] Error:', err.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Server encountered an error while authenticating with Google.'
+    });
+  }
+};
+
 module.exports = {
   login,
   register,
   getMe,
   verifyAdmin,
+  googleLogin,
   JWT_SECRET
 };

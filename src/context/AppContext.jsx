@@ -604,6 +604,46 @@ export function AppProvider({ children }) {
     }
   };
 
+  const loginWithGoogle = async (googleCredentials) => {
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(googleCredentials)
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return {
+          success: false,
+          message: data.message || 'Unable to sign in with Google. Please try again.'
+        };
+      }
+
+      // Store in existing token storage
+      localStorage.setItem('ib_auth_token', data.token);
+      sessionStorage.removeItem('ib_auth_token');
+
+      setToken(data.token);
+      setCurrentUser(data.user);
+      setUserRole(data.user.role);
+      localStorage.setItem('ib_user_role', data.user.role);
+
+      return {
+        success: true,
+        message: data.message,
+        user: data.user,
+        token: data.token
+      };
+    } catch (err) {
+      console.error('[Auth] Google login error:', err.message);
+      return {
+        success: false,
+        message: 'Unable to connect to authentication server. Please try again.'
+      };
+    }
+  };
+
   const logoutUser = () => {
     localStorage.removeItem('ib_auth_token');
     sessionStorage.removeItem('ib_auth_token');
@@ -639,6 +679,7 @@ export function AppProvider({ children }) {
         isAuthenticated: Boolean(currentUser && token),
         isAuthLoading,
         loginUser,
+        loginWithGoogle,
         registerUser,
         logoutUser,
         userRole,
