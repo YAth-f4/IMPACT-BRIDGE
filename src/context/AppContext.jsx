@@ -20,10 +20,8 @@ export function AppProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
-  // Role Session: 'guest' | 'admin' | 'volunteer' | 'donor' | 'beneficiary'
-  const [userRole, setUserRole] = useState(() => {
-    return localStorage.getItem('ib_user_role') || 'guest';
-  });
+  // Role Session: strictly 'guest' unless authenticated with a verified token from backend
+  const [userRole, setUserRole] = useState('guest');
 
   // Verify stored JWT session with backend on initial load
   useEffect(() => {
@@ -31,6 +29,8 @@ export function AppProvider({ children }) {
       const storedToken = localStorage.getItem('ib_auth_token') || sessionStorage.getItem('ib_auth_token');
       if (!storedToken) {
         setIsAuthLoading(false);
+        setUserRole('guest');
+        setCurrentUser(null);
         return;
       }
       try {
@@ -42,18 +42,19 @@ export function AppProvider({ children }) {
           setCurrentUser(data.user);
           setUserRole(data.user.role);
           setToken(storedToken);
-          localStorage.setItem('ib_user_role', data.user.role);
         } else {
-          // Token invalid or expired
+          // Token invalid or expired - reset to GUEST
           localStorage.removeItem('ib_auth_token');
           sessionStorage.removeItem('ib_auth_token');
+          localStorage.removeItem('ib_user_role');
           setToken(null);
           setCurrentUser(null);
           setUserRole('guest');
-          localStorage.setItem('ib_user_role', 'guest');
         }
       } catch (err) {
         console.error('[Auth] Verification failed:', err.message);
+        setUserRole('guest');
+        setCurrentUser(null);
       } finally {
         setIsAuthLoading(false);
       }
@@ -256,12 +257,6 @@ export function AppProvider({ children }) {
       return [...prev, { id, message: cleanMsg, type }];
     });
   }, [removeToast]);
-
-  // Role Switcher
-  const switchRole = (newRole) => {
-    setUserRole(newRole);
-    addToast(`Active session role: ${newRole.toUpperCase()}`, 'info');
-  };
 
   // PROGRAM CRUD
   const addProgram = (programData) => {
@@ -570,7 +565,6 @@ export function AppProvider({ children }) {
       setToken(data.token);
       setCurrentUser(data.user);
       setUserRole(data.user.role);
-      localStorage.setItem('ib_user_role', data.user.role);
 
       return {
         success: true,
@@ -627,7 +621,6 @@ export function AppProvider({ children }) {
       setToken(data.token);
       setCurrentUser(data.user);
       setUserRole(data.user.role);
-      localStorage.setItem('ib_user_role', data.user.role);
 
       return {
         success: true,
@@ -652,6 +645,380 @@ export function AppProvider({ children }) {
     setCurrentUser(null);
     setUserRole('guest');
     addToast('You have been signed out successfully.', 'info');
+  };
+
+  // BACKEND API CLIENT HELPERS
+  const authHeaders = () => {
+    const currentToken = token || localStorage.getItem('ib_auth_token') || sessionStorage.getItem('ib_auth_token');
+    return {
+      'Content-Type': 'application/json',
+      ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {})
+    };
+  };
+
+  // Find Help API
+  const submitFindHelp = async (formData) => {
+    try {
+      const res = await fetch('/api/requests/find-help', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, message: data.message || 'Submission failed.' };
+      }
+      addToast('Your help request has been submitted and is awaiting admin review.', 'success');
+      return { success: true, ...data };
+    } catch (err) {
+      console.error('[API] submitFindHelp error:', err.message);
+      return { success: false, message: 'Server connection error.' };
+    }
+  };
+
+  const fetchMyFindHelpRequests = async () => {
+    try {
+      const res = await fetch('/api/requests/my-find-help', {
+        headers: authHeaders()
+      });
+      const data = await res.json();
+      return data.success ? data.requests : [];
+    } catch (err) {
+      console.error('[API] fetchMyFindHelpRequests error:', err.message);
+      return [];
+    }
+  };
+
+  // Fund Raise API
+  const submitFundRaise = async (formData) => {
+    try {
+      const res = await fetch('/api/requests/fund-raise', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, message: data.message || 'Submission failed.' };
+      }
+      addToast('Campaign proposal submitted and awaiting admin approval.', 'success');
+      return { success: true, ...data };
+    } catch (err) {
+      return { success: false, message: 'Server connection error.' };
+    }
+  };
+
+  const fetchMyFundRaiseRequests = async () => {
+    try {
+      const res = await fetch('/api/requests/my-fund-raise', {
+        headers: authHeaders()
+      });
+      const data = await res.json();
+      return data.success ? data.campaigns : [];
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const fetchApprovedFundraisers = async () => {
+    try {
+      const res = await fetch('/api/requests/fund-raise/approved');
+      const data = await res.json();
+      return data.success ? data.campaigns : [];
+    } catch (err) {
+      return [];
+    }
+  };
+
+  // Volunteer API
+  const submitVolunteerApplication = async (formData) => {
+    try {
+      const res = await fetch('/api/requests/volunteer', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, message: data.message || 'Submission failed.' };
+      }
+      addToast('Volunteer application submitted and placed in review queue.', 'success');
+      return { success: true, ...data };
+    } catch (err) {
+      return { success: false, message: 'Server connection error.' };
+    }
+  };
+
+  const fetchMyVolunteerApplications = async () => {
+    try {
+      const res = await fetch('/api/requests/my-volunteer', {
+        headers: authHeaders()
+      });
+      const data = await res.json();
+      return data.success ? data.applications : [];
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const submitVolunteerHours = async (hours, programTitle) => {
+    try {
+      const res = await fetch('/api/requests/my-volunteer/log-hours', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ hours, programTitle })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`Successfully logged ${hours} volunteer hours!`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Failed to record hours.' };
+    }
+  };
+
+  // Admin Operations
+  const fetchAdminStats = async () => {
+    try {
+      const res = await fetch('/api/admin/stats', { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data.stats : null;
+    } catch (err) {
+      return null;
+    }
+  };
+
+  const fetchAdminFindHelp = async (query = '') => {
+    try {
+      const res = await fetch(`/api/admin/requests/find-help?${query}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : { requests: [], total: 0 };
+    } catch (err) {
+      return { requests: [], total: 0 };
+    }
+  };
+
+  const updateAdminFindHelpStatus = async (id, status, note = '') => {
+    try {
+      const res = await fetch(`/api/admin/requests/find-help/${id}/status`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ status, note })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`Request ${id} status set to ${status}.`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Update failed.' };
+    }
+  };
+
+  const fetchAdminFundRaise = async (query = '') => {
+    try {
+      const res = await fetch(`/api/admin/requests/fund-raise?${query}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : { requests: [], total: 0 };
+    } catch (err) {
+      return { requests: [], total: 0 };
+    }
+  };
+
+  const updateAdminFundRaiseStatus = async (id, status, note = '') => {
+    try {
+      const res = await fetch(`/api/admin/requests/fund-raise/${id}/status`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ status, note })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`Campaign ${id} status set to ${status}.`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Update failed.' };
+    }
+  };
+
+  const fetchAdminVolunteers = async (query = '') => {
+    try {
+      const res = await fetch(`/api/admin/requests/volunteers?${query}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : { applications: [], total: 0 };
+    } catch (err) {
+      return { applications: [], total: 0 };
+    }
+  };
+
+  const updateAdminVolunteerStatus = async (id, status, note = '') => {
+    try {
+      const res = await fetch(`/api/admin/requests/volunteers/${id}/status`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ status, note })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`Volunteer application ${id} set to ${status}.`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Update failed.' };
+    }
+  };
+
+  const fetchAdminUsers = async () => {
+    try {
+      const res = await fetch('/api/admin/users', { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data.users : [];
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const updateAdminUserRole = async (id, role) => {
+    try {
+      const res = await fetch(`/api/admin/users/${id}/role`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ role })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`User role updated to ${role.toUpperCase()}.`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Role update failed.' };
+    }
+  };
+
+  // NGO Registration & Directory API
+  const submitNgoRegistration = async (formData) => {
+    try {
+      const res = await fetch('/api/ngos', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, message: data.message || 'Registration submission failed.' };
+      }
+      addToast('NGO registration submitted successfully! Awaiting administrator verification.', 'success');
+      return { success: true, ...data };
+    } catch (err) {
+      console.error('[API] submitNgoRegistration error:', err.message);
+      return { success: false, message: 'Server connection error.' };
+    }
+  };
+
+  const fetchPublicNgos = async (query = '') => {
+    try {
+      const res = await fetch(`/api/ngos?${query}`);
+      const data = await res.json();
+      return data.success ? data.ngos : [];
+    } catch (err) {
+      console.error('[API] fetchPublicNgos error:', err.message);
+      return [];
+    }
+  };
+
+  const fetchPublicNgoById = async (id) => {
+    try {
+      const res = await fetch(`/api/ngos/${id}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data.ngo : null;
+    } catch (err) {
+      console.error('[API] fetchPublicNgoById error:', err.message);
+      return null;
+    }
+  };
+
+  const fetchMyNgos = async () => {
+    try {
+      const res = await fetch('/api/ngos/my', { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data.ngos : [];
+    } catch (err) {
+      console.error('[API] fetchMyNgos error:', err.message);
+      return [];
+    }
+  };
+
+  const updateMyNgo = async (id, updates) => {
+    try {
+      const res = await fetch(`/api/ngos/${id}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updates)
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast('NGO details updated successfully.', 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Update failed.' };
+    }
+  };
+
+  const resubmitNgo = async (id, note = '') => {
+    try {
+      const res = await fetch(`/api/ngos/${id}/resubmit`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ note })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast('NGO application resubmitted for admin review.', 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Resubmission failed.' };
+    }
+  };
+
+  const fetchAdminNgos = async (status = 'ALL') => {
+    try {
+      const res = await fetch(`/api/admin/ngos?status=${status}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : { ngos: [], total: 0, counts: {} };
+    } catch (err) {
+      return { ngos: [], total: 0, counts: {} };
+    }
+  };
+
+  const fetchAdminNgoById = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/ngos/${id}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data.ngo : null;
+    } catch (err) {
+      return null;
+    }
+  };
+
+  const updateAdminNgoStatus = async (id, status, note = '') => {
+    try {
+      const res = await fetch(`/api/admin/ngos/${id}/status`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ status, note })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`NGO ${id} status transitioned to ${status}.`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Status update failed.' };
+    }
   };
 
   // Reset to default mock data
@@ -683,7 +1050,6 @@ export function AppProvider({ children }) {
         registerUser,
         logoutUser,
         userRole,
-        switchRole,
         programs,
         addProgram,
         updateProgram,
@@ -717,6 +1083,34 @@ export function AppProvider({ children }) {
         toggleVolunteerTask,
         addVolunteerTask,
         logVolunteerHours,
+        // Live Request Management API methods
+        submitFindHelp,
+        fetchMyFindHelpRequests,
+        submitFundRaise,
+        fetchMyFundRaiseRequests,
+        fetchApprovedFundraisers,
+        submitVolunteerApplication,
+        fetchMyVolunteerApplications,
+        submitVolunteerHours,
+        fetchAdminStats,
+        fetchAdminFindHelp,
+        updateAdminFindHelpStatus,
+        fetchAdminFundRaise,
+        updateAdminFundRaiseStatus,
+        fetchAdminVolunteers,
+        updateAdminVolunteerStatus,
+        fetchAdminUsers,
+        updateAdminUserRole,
+        // NGO Registration & Directory Methods
+        submitNgoRegistration,
+        fetchPublicNgos,
+        fetchPublicNgoById,
+        fetchMyNgos,
+        updateMyNgo,
+        resubmitNgo,
+        fetchAdminNgos,
+        fetchAdminNgoById,
+        updateAdminNgoStatus,
         toasts,
         addToast,
         removeToast,

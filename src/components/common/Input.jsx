@@ -160,3 +160,5 @@ export function Textarea({
     </div>
   );
 }
+
+export const TextArea = Textarea;

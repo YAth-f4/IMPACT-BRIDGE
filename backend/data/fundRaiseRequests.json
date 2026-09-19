@@ -1,0 +1,220 @@
+[
+  {
+    "id": "REQ-FR-753416-641",
+    "userId": "USR-BEN-01",
+    "organizerName": "Laxmi Devi",
+    "email": "laxmi.devi@example.com",
+    "phone": "+91 94310 12345",
+    "title": "Flood Relief Shelter Staging",
+    "category": "Disaster Relief",
+    "targetAmount": 500000,
+    "raisedAmount": 0,
+    "description": "Pre-positioning essential survival food kits for flood affected families.",
+    "beneficiaryStory": "Direct aid to displaced rural families.",
+    "location": "Patna, Bihar",
+    "status": "APPROVED",
+    "adminNotes": "Approved for active fundraising portal listing.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi",
+        "timestamp": "2026-09-19T18:49:13.416Z",
+        "note": "Fundraising proposal submitted and awaiting admin approval"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:49:13.420Z",
+        "note": "Approved for active fundraising portal listing."
+      }
+    ],
+    "createdAt": "2026-09-19T18:49:13.416Z",
+    "updatedAt": "2026-09-19T18:49:13.420Z"
+  },
+  {
+    "id": "REQ-FR-267934-877",
+    "userId": "USR-DON-01",
+    "organizerName": "Aditya Singhania",
+    "email": "aditya.singhania@corp.in",
+    "phone": "",
+    "title": "Solar Water Filtration for Melghat",
+    "category": "Community Support",
+    "targetAmount": 250000,
+    "raisedAmount": 0,
+    "description": "Community solar powered UV water treatment system",
+    "beneficiaryStory": "",
+    "location": "Melghat, Maharashtra",
+    "status": "APPROVED",
+    "adminNotes": "",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aditya Singhania",
+        "timestamp": "2026-09-19T18:07:47.934Z",
+        "note": "Fundraising proposal submitted and awaiting admin approval"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:07:47.939Z",
+        "note": "Status updated to APPROVED"
+      }
+    ],
+    "createdAt": "2026-09-19T18:07:47.934Z",
+    "updatedAt": "2026-09-19T18:07:47.939Z"
+  },
+  {
+    "id": "REQ-FR-195979-119",
+    "userId": "USR-DON-01",
+    "organizerName": "Aditya Singhania",
+    "email": "aditya.singhania@corp.in",
+    "phone": "",
+    "title": "Solar Water Filtration for Melghat",
+    "category": "Community Support",
+    "targetAmount": 250000,
+    "raisedAmount": 0,
+    "description": "Community solar powered UV water treatment system",
+    "beneficiaryStory": "",
+    "location": "Melghat, Maharashtra",
+    "status": "APPROVED",
+    "adminNotes": "",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aditya Singhania",
+        "timestamp": "2026-09-19T17:49:55.979Z",
+        "note": "Fundraising proposal submitted and awaiting admin approval"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T17:49:55.984Z",
+        "note": "Status updated to APPROVED"
+      }
+    ],
+    "createdAt": "2026-09-19T17:49:55.979Z",
+    "updatedAt": "2026-09-19T17:49:55.984Z"
+  },
+  {
+    "id": "REQ-FR-164834-239",
+    "userId": "USR-DON-01",
+    "organizerName": "Aditya Singhania",
+    "email": "aditya.singhania@corp.in",
+    "phone": "",
+    "title": "Solar Water Filtration for Melghat",
+    "category": "Community Support",
+    "targetAmount": 250000,
+    "raisedAmount": 0,
+    "description": "Community solar powered UV water treatment system",
+    "beneficiaryStory": "",
+    "location": "Melghat, Maharashtra",
+    "status": "APPROVED",
+    "adminNotes": "",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aditya Singhania",
+        "timestamp": "2026-09-19T17:49:24.834Z",
+        "note": "Fundraising proposal submitted and awaiting admin approval"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T17:49:24.839Z",
+        "note": "Status updated to APPROVED"
+      }
+    ],
+    "createdAt": "2026-09-19T17:49:24.834Z",
+    "updatedAt": "2026-09-19T17:49:24.839Z"
+  },
+  {
+    "id": "REQ-FR-072765-147",
+    "userId": "USR-DON-01",
+    "organizerName": "Aditya Singhania",
+    "email": "aditya.singhania@corp.in",
+    "phone": "",
+    "title": "Solar Water Filtration for Melghat",
+    "category": "Community Support",
+    "targetAmount": 250000,
+    "raisedAmount": 0,
+    "description": "Community solar powered UV water treatment system",
+    "beneficiaryStory": "",
+    "location": "Melghat, Maharashtra",
+    "status": "APPROVED",
+    "adminNotes": "",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aditya Singhania",
+        "timestamp": "2026-09-19T17:47:52.765Z",
+        "note": "Fundraising proposal submitted and awaiting admin approval"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T17:47:52.770Z",
+        "note": "Status updated to APPROVED"
+      }
+    ],
+    "createdAt": "2026-09-19T17:47:52.765Z",
+    "updatedAt": "2026-09-19T17:47:52.770Z"
+  },
+  {
+    "id": "REQ-FR-2026-001",
+    "userId": "USR-DON-01",
+    "organizerName": "Aditya Singhania",
+    "email": "aditya.singhania@corp.in",
+    "phone": "+91 98200 12345",
+    "title": "Solar Powered STEM Digital Lab for Sundarbans",
+    "category": "Education & Tech",
+    "targetAmount": 350000,
+    "raisedAmount": 120000,
+    "description": "Setting up off-grid solar panels, battery banks, and 15 rugged learning tablets for children living in tidal delta islands.",
+    "beneficiaryStory": "Children currently travel 2 hours by rowboat to access electricity. This lab powers offline Wikipedia and math tutorials.",
+    "location": "Sundarbans, West Bengal",
+    "status": "APPROVED",
+    "adminNotes": "Campaign verified and partner hub confirmed by Dr. Ananya Iyer.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aditya Singhania",
+        "timestamp": "2026-08-20T10:00:00.000Z",
+        "note": "Fundraiser proposal submitted"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Executive Administrator (admin@impactbridge.org)",
+        "timestamp": "2026-08-22T14:00:00.000Z",
+        "note": "Approved for public listing"
+      }
+    ],
+    "createdAt": "2026-08-20T10:00:00.000Z",
+    "updatedAt": "2026-08-22T14:00:00.000Z"
+  },
+  {
+    "id": "REQ-FR-2026-002",
+    "userId": "USR-VOL-01",
+    "organizerName": "Aarav Sharma",
+    "email": "aarav.sharma@example.com",
+    "phone": "+91 98111 22334",
+    "title": "Warm Winter Clothes & Blanket Drive for Delhi Slums",
+    "category": "Emergency Shelter",
+    "targetAmount": 150000,
+    "raisedAmount": 0,
+    "description": "Procuring 800 thermal blankets, woollen sweaters, and socks for pavement dwellers and migrant families before peak north Indian winter.",
+    "beneficiaryStory": "Winter nighttime temperatures dip to 3°C on Yamuna banks; thermal kits prevent cold shock in newborns and seniors.",
+    "location": "Yamuna Floodplains & Okhla, New Delhi",
+    "status": "PENDING",
+    "adminNotes": "",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aarav Sharma",
+        "timestamp": "2026-09-12T15:30:00.000Z",
+        "note": "Submitted for upcoming winter cycle"
+      }
+    ],
+    "createdAt": "2026-09-12T15:30:00.000Z",
+    "updatedAt": "2026-09-12T15:30:00.000Z"
+  }
+]

@@ -1,0 +1,372 @@
+const fs = require('fs');
+const path = require('path');
+
+const DATA_DIR = path.join(__dirname, '..', 'data');
+const PROGRAMS_FILE = path.join(DATA_DIR, 'programs.json');
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+const INITIAL_PROGRAMS = [
+  {
+    id: 'PRG-101',
+    title: 'GyanSetu: Digital Classrooms for Slum Youth',
+    category: 'Education',
+    location: 'Dharavi, Mumbai',
+    city: 'Mumbai',
+    coordinates: [19.0434, 72.8562],
+    startDate: '2025-04-01',
+    endDate: '2026-03-31',
+    status: 'Ongoing',
+    progress: 74,
+    budget: 1850000,
+    fundsRaised: 1420000,
+    targetBeneficiaries: 1200,
+    actualBeneficiaries: 890,
+    volunteersNeeded: 35,
+    volunteersEnrolled: 29,
+    lead: 'Dr. Ananya Iyer',
+    shortDesc: 'Equipping underprivileged urban community centers with smart tablets, solar power, and certified STEM mentors.',
+    description: 'Project GyanSetu bridges the deep digital divide by converting municipal community centers into vibrant smart learning hubs.',
+    tags: ['Digital Literacy', 'STEM', 'Child Education', 'Urban Upliftment'],
+    image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2025-03-15T09:00:00.000Z',
+    updatedAt: '2025-03-15T09:00:00.000Z'
+  },
+  {
+    id: 'PRG-102',
+    title: 'Annapurna Seva: Poshan & Daily Meals for Daily Wagers',
+    category: 'Food & Nutrition',
+    location: 'Majnu Ka Tilla & Okhla, New Delhi',
+    city: 'New Delhi',
+    coordinates: [28.7041, 77.2289],
+    startDate: '2025-01-15',
+    endDate: '2025-12-31',
+    status: 'Ongoing',
+    progress: 88,
+    budget: 2400000,
+    fundsRaised: 2150000,
+    targetBeneficiaries: 5000,
+    actualBeneficiaries: 4620,
+    volunteersNeeded: 50,
+    volunteersEnrolled: 48,
+    lead: 'Vikramjit Singh',
+    shortDesc: 'Hot hygienic nutritious meals, fortified ration kits, and maternal micro-nutrition support in high-density labor settlements.',
+    description: 'Providing daily hot meals containing essential proteins and micronutrients to unorganized migrant construction workers and their families.',
+    tags: ['Zero Hunger', 'Maternal Health', 'Ration Support', 'Nutrition'],
+    image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2025-01-10T10:00:00.000Z',
+    updatedAt: '2025-01-10T10:00:00.000Z'
+  },
+  {
+    id: 'PRG-103',
+    title: 'Arogya Vahini: Mobile Primary Healthcare & Telemedicine',
+    category: 'Healthcare',
+    location: 'Rural Melghat & Gadchiroli, Maharashtra',
+    city: 'Amravati',
+    coordinates: [21.2858, 77.4089],
+    startDate: '2024-11-01',
+    endDate: '2025-10-31',
+    status: 'Ongoing',
+    progress: 65,
+    budget: 3200000,
+    fundsRaised: 2380000,
+    targetBeneficiaries: 8500,
+    actualBeneficiaries: 5900,
+    volunteersNeeded: 25,
+    volunteersEnrolled: 22,
+    lead: 'Dr. Rohan Deshmukh',
+    shortDesc: 'Specially equipped all-terrain clinical vans delivering diagnostic labs, tele-consults, and free generic medicines to tribal hamlets.',
+    description: 'Serving remote forest villages that lack motorable all-weather roads and primary health centers.',
+    tags: ['Tribal Health', 'Mobile Clinic', 'Telemedicine', 'Preventive Care'],
+    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2024-10-25T11:00:00.000Z',
+    updatedAt: '2024-10-25T11:00:00.000Z'
+  },
+  {
+    id: 'PRG-104',
+    title: 'Sakhi Udyam: Micro-Enterprise & Weaving Collective',
+    category: 'Women & Child Empowerment',
+    location: 'Varanasi Weavers Colony, Uttar Pradesh',
+    city: 'Varanasi',
+    coordinates: [25.3176, 82.9739],
+    startDate: '2025-02-01',
+    endDate: '2026-01-31',
+    status: 'Ongoing',
+    progress: 52,
+    budget: 1600000,
+    fundsRaised: 1100000,
+    targetBeneficiaries: 350,
+    actualBeneficiaries: 210,
+    volunteersNeeded: 20,
+    volunteersEnrolled: 18,
+    lead: 'Sunita Devi & Meera Agarwal',
+    shortDesc: 'Direct market linkages, artisanal upskilling, and seed micro-grants for marginalized women handloom weavers and artisans.',
+    description: 'Empowering 350 rural women artisans through modern design workshops, organic yarn sourcing, and financial literacy.',
+    tags: ['Livelihoods', 'Women Empowerment', 'Artisans', 'Financial Inclusion'],
+    image: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2025-01-20T12:00:00.000Z',
+    updatedAt: '2025-01-20T12:00:00.000Z'
+  },
+  {
+    id: 'PRG-105',
+    title: 'Jal Chetna: Rainwater Harvesting & Filtered Well Rejuvenation',
+    category: 'Community Development',
+    location: 'Thar Desert Fringe, Barmer, Rajasthan',
+    city: 'Barmer',
+    coordinates: [25.7532, 71.3967],
+    startDate: '2024-06-01',
+    endDate: '2025-05-31',
+    status: 'Completed',
+    progress: 100,
+    budget: 2800000,
+    fundsRaised: 2800000,
+    targetBeneficiaries: 6200,
+    actualBeneficiaries: 6480,
+    volunteersNeeded: 30,
+    volunteersEnrolled: 30,
+    lead: 'Er. Rajesh Rathore',
+    shortDesc: 'Constructing traditional underground Taankas and community bio-sand filtration systems for drought-hit desert hamlets.',
+    description: 'Reviving indigenous rainwater harvesting structures alongside community filtration units.',
+    tags: ['Clean Water', 'Drought Relief', 'Sustainability', 'Community Owned'],
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2024-05-20T14:00:00.000Z',
+    updatedAt: '2025-05-31T18:00:00.000Z'
+  },
+  {
+    id: 'PRG-106',
+    title: 'Suraksha: Emergency Flood Resilience & Disaster Relief Hubs',
+    category: 'Emergency Support',
+    location: 'Brahmaputra Floodplains, Morigaon, Assam',
+    city: 'Guwahati',
+    coordinates: [26.1445, 91.7362],
+    startDate: '2025-05-15',
+    endDate: '2025-11-30',
+    status: 'Upcoming',
+    progress: 20,
+    budget: 3500000,
+    fundsRaised: 950000,
+    targetBeneficiaries: 12000,
+    actualBeneficiaries: 0,
+    volunteersNeeded: 60,
+    volunteersEnrolled: 24,
+    lead: 'Pranabjyoti Barman',
+    shortDesc: 'Pre-positioning rescue speedboats, elevated shelter relief kits, and medical supplies before monsoon flooding.',
+    description: 'Establishing 6 elevated community resilience staging centers along the flood-prone banks of the Brahmaputra.',
+    tags: ['Disaster Relief', 'Flood Preparedness', 'Emergency Aid', 'First Responders'],
+    image: 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2025-04-10T16:00:00.000Z',
+    updatedAt: '2025-04-10T16:00:00.000Z'
+  },
+  {
+    id: 'PRG-107',
+    title: 'Yuva Kaushal: Coding & IT Skills for Orphanage Teens',
+    category: 'Education',
+    location: 'Koramangala & Whitefield, Bengaluru',
+    city: 'Bengaluru',
+    coordinates: [12.9716, 77.5946],
+    startDate: '2025-03-01',
+    endDate: '2026-02-28',
+    status: 'Ongoing',
+    progress: 60,
+    budget: 1500000,
+    fundsRaised: 1250000,
+    targetBeneficiaries: 200,
+    actualBeneficiaries: 145,
+    volunteersNeeded: 25,
+    volunteersEnrolled: 22,
+    lead: 'Karthik Narayanan',
+    shortDesc: 'Intensive 6-month fullstack web development and English speaking bootcamps for shelter teenagers.',
+    description: 'Providing guaranteed corporate internship pathways and vocational IT skills for youths turning 18.',
+    tags: ['IT Bootcamps', 'Youth Livelihoods', 'Corporate Mentorship', 'Education'],
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2025-02-15T11:00:00.000Z',
+    updatedAt: '2025-02-15T11:00:00.000Z'
+  },
+  {
+    id: 'PRG-108',
+    title: 'Sanjeevani: Cancer Screening & Palliative Care Vans',
+    category: 'Healthcare',
+    location: 'Tier 3 Towns & Mandis, Jaipur & Ajmer, Rajasthan',
+    city: 'Jaipur',
+    coordinates: [26.9124, 75.7873],
+    startDate: '2024-09-01',
+    endDate: '2025-08-31',
+    status: 'Ongoing',
+    progress: 82,
+    budget: 4100000,
+    fundsRaised: 3900000,
+    targetBeneficiaries: 10000,
+    actualBeneficiaries: 8400,
+    volunteersNeeded: 30,
+    volunteersEnrolled: 28,
+    lead: 'Dr. Shalini Kulkarni',
+    shortDesc: 'Free mobile mammography, oral cancer screening, and palliative home visits for rural cancer warriors.',
+    description: 'Early detection camps for oral, breast, and cervical cancers across rural mandis.',
+    tags: ['Cancer Screening', 'Palliative Care', 'Healthcare', 'Preventive'],
+    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80',
+    createdAt: '2024-08-20T10:00:00.000Z',
+    updatedAt: '2024-08-20T10:00:00.000Z'
+  }
+];
+
+class ProgramModel {
+  constructor() {
+    this.initDatabase();
+  }
+
+  initDatabase() {
+    try {
+      if (!fs.existsSync(PROGRAMS_FILE)) {
+        fs.writeFileSync(PROGRAMS_FILE, JSON.stringify(INITIAL_PROGRAMS, null, 2), 'utf-8');
+      }
+    } catch (err) {
+      console.error('[ProgramModel] Error initializing programs.json:', err.message);
+    }
+  }
+
+  loadPrograms() {
+    try {
+      if (!fs.existsSync(PROGRAMS_FILE)) {
+        return [];
+      }
+      const raw = fs.readFileSync(PROGRAMS_FILE, 'utf-8');
+      return JSON.parse(raw);
+    } catch (err) {
+      console.error('[ProgramModel] Error loading programs.json:', err.message);
+      return [];
+    }
+  }
+
+  savePrograms(programs) {
+    try {
+      fs.writeFileSync(PROGRAMS_FILE, JSON.stringify(programs, null, 2), 'utf-8');
+      return true;
+    } catch (err) {
+      console.error('[ProgramModel] Error saving programs.json:', err.message);
+      return false;
+    }
+  }
+
+  findAll(filters = {}) {
+    let programs = this.loadPrograms();
+    const { category, status, search, page = 1, limit = 50 } = filters;
+
+    if (category && category !== 'ALL') {
+      programs = programs.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+    }
+
+    if (status && status !== 'ALL') {
+      programs = programs.filter((p) => p.status.toLowerCase() === status.toLowerCase());
+    }
+
+    if (search && search.trim()) {
+      const q = search.toLowerCase().trim();
+      programs = programs.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.location.toLowerCase().includes(q) ||
+          p.city.toLowerCase().includes(q) ||
+          p.lead.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q)
+      );
+    }
+
+    const total = programs.length;
+    const startIndex = (page - 1) * limit;
+    const paginated = programs.slice(startIndex, startIndex + Number(limit));
+
+    return {
+      programs: paginated,
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / Number(limit))
+    };
+  }
+
+  findById(id) {
+    if (!id) return null;
+    const programs = this.loadPrograms();
+    return programs.find((p) => p.id === id) || null;
+  }
+
+  create(programData) {
+    const programs = this.loadPrograms();
+    const timestamp = Date.now();
+    const newId = `PRG-${timestamp.toString().slice(-4)}`;
+
+    const newProgram = {
+      id: newId,
+      title: String(programData.title).trim(),
+      category: programData.category || 'General',
+      location: String(programData.location || '').trim(),
+      city: String(programData.city || '').trim(),
+      coordinates: Array.isArray(programData.coordinates) ? programData.coordinates : [20.5937, 78.9629],
+      startDate: programData.startDate || new Date().toISOString().split('T')[0],
+      endDate: programData.endDate || '',
+      status: programData.status || 'Ongoing',
+      progress: Number(programData.progress) || 0,
+      budget: Number(programData.budget) || 0,
+      fundsRaised: Number(programData.fundsRaised) || 0,
+      targetBeneficiaries: Number(programData.targetBeneficiaries) || 0,
+      actualBeneficiaries: Number(programData.actualBeneficiaries) || 0,
+      volunteersNeeded: Number(programData.volunteersNeeded) || 0,
+      volunteersEnrolled: Number(programData.volunteersEnrolled) || 0,
+      lead: String(programData.lead || 'Program Coordinator').trim(),
+      shortDesc: String(programData.shortDesc || '').trim(),
+      description: String(programData.description || '').trim(),
+      tags: Array.isArray(programData.tags) ? programData.tags : [],
+      image: programData.image || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    programs.unshift(newProgram);
+    this.savePrograms(programs);
+    return newProgram;
+  }
+
+  update(id, updates = {}) {
+    const programs = this.loadPrograms();
+    const index = programs.findIndex((p) => p.id === id);
+    if (index === -1) return null;
+
+    const program = programs[index];
+    const updatedProgram = {
+      ...program,
+      ...updates,
+      id: program.id, // Immutable ID
+      updatedAt: new Date().toISOString()
+    };
+
+    programs[index] = updatedProgram;
+    this.savePrograms(programs);
+    return updatedProgram;
+  }
+
+  delete(id) {
+    const programs = this.loadPrograms();
+    const index = programs.findIndex((p) => p.id === id);
+    if (index === -1) return false;
+
+    const removed = programs.splice(index, 1)[0];
+    this.savePrograms(programs);
+    return removed;
+  }
+
+  getStats() {
+    const programs = this.loadPrograms();
+    const active = programs.filter(
+      (p) => p.status === 'Ongoing' || p.status === 'Active'
+    ).length;
+
+    return {
+      total: programs.length,
+      active
+    };
+  }
+}
+
+module.exports = new ProgramModel();

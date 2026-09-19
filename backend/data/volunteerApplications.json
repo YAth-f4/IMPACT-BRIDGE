@@ -1,0 +1,83 @@
+[
+  {
+    "id": "REQ-VOL-2026-001",
+    "userId": "USR-VOL-01",
+    "name": "Aarav Sharma",
+    "email": "aarav.sharma@example.com",
+    "phone": "+91 98765 01234",
+    "city": "Mumbai",
+    "skills": [
+      "Python Coding",
+      "STEM Teaching",
+      "Graphic Design"
+    ],
+    "interests": [
+      "Education Support",
+      "Digital Literacy"
+    ],
+    "availability": "Weekends (6 hrs/week)",
+    "emergencyContact": "Sunil Sharma (+91 98765 01235)",
+    "status": "APPROVED",
+    "hoursLogged": 144.5,
+    "assignedPrograms": [
+      "PRG-101 (GyanSetu Digital Classrooms)",
+      "PRG-107 (Yuva Kaushal Coding Bootcamp)"
+    ],
+    "adminNotes": "Field orientation completed. Active volunteer and mentor lead.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aarav Sharma",
+        "timestamp": "2026-02-10T11:30:00.000Z",
+        "note": "Application submitted"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Executive Administrator (admin@impactbridge.org)",
+        "timestamp": "2026-02-12T10:00:00.000Z",
+        "note": "Approved after background verification"
+      },
+      {
+        "action": "HOURS_LOGGED",
+        "performedBy": "Aarav Sharma",
+        "timestamp": "2026-09-19T18:39:27.140Z",
+        "note": "Logged 2.5 hours for GyanSetu: Digital Classrooms"
+      }
+    ],
+    "createdAt": "2026-02-10T11:30:00.000Z",
+    "updatedAt": "2026-09-19T18:39:27.139Z"
+  },
+  {
+    "id": "REQ-VOL-2026-002",
+    "userId": null,
+    "name": "Megha Sundaram",
+    "email": "megha.sundaram@iitb.ac.in",
+    "phone": "+91 98333 44556",
+    "city": "Mumbai",
+    "skills": [
+      "Renewable Energy",
+      "Solar Hardware",
+      "Tutoring"
+    ],
+    "interests": [
+      "STEM Education",
+      "Clean Energy"
+    ],
+    "availability": "Saturdays & Sundays (8 hrs/week)",
+    "emergencyContact": "Dr. V. Sundaram (+91 98333 44557)",
+    "status": "PENDING",
+    "hoursLogged": 0,
+    "assignedPrograms": [],
+    "adminNotes": "",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Megha Sundaram (Public Applicant)",
+        "timestamp": "2026-09-14T09:15:00.000Z",
+        "note": "New volunteer registration"
+      }
+    ],
+    "createdAt": "2026-09-14T09:15:00.000Z",
+    "updatedAt": "2026-09-14T09:15:00.000Z"
+  }
+]

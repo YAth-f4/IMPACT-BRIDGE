@@ -20,56 +20,50 @@ if (!fs.existsSync(DATA_DIR)) {
  */
 const SALT_ROUNDS = 10;
 
-const DEFAULT_SEEDED_USERS = [
-  {
-    id: 'USR-ADMIN-01',
-    name: 'Sunita Rao',
-    email: 'sunita.rao@impactbridge.org',
-    passwordHash: bcrypt.hashSync('admin123', SALT_ROUNDS),
-    role: 'admin',
-    createdAt: '2026-01-15T09:00:00.000Z'
-  },
-  {
-    id: 'USR-ADMIN-02',
-    name: 'System Administrator',
-    email: 'admin@impactbridge.org',
-    passwordHash: bcrypt.hashSync('admin123', SALT_ROUNDS),
-    role: 'admin',
-    createdAt: '2026-01-15T09:00:00.000Z'
-  },
-  {
-    id: 'USR-VOL-01',
-    name: 'Aarav Sharma',
-    email: 'aarav.sharma@example.com',
-    passwordHash: bcrypt.hashSync('volunteer123', SALT_ROUNDS),
-    role: 'volunteer',
-    createdAt: '2026-02-10T11:30:00.000Z'
-  },
-  {
-    id: 'USR-BEN-01',
-    name: 'Laxmi Devi',
-    email: 'laxmi.devi@example.com',
-    passwordHash: bcrypt.hashSync('help123', SALT_ROUNDS),
-    role: 'beneficiary',
-    createdAt: '2026-03-01T14:15:00.000Z'
-  },
-  {
-    id: 'USR-DON-01',
-    name: 'Aditya Singhania',
-    email: 'aditya.singhania@corp.in',
-    passwordHash: bcrypt.hashSync('donor123', SALT_ROUNDS),
-    role: 'donor',
-    createdAt: '2026-03-05T16:45:00.000Z'
-  },
-  {
-    id: 'USR-GST-01',
-    name: 'Public Citizen',
-    email: 'visitor@example.com',
-    passwordHash: bcrypt.hashSync('guest123', SALT_ROUNDS),
-    role: 'guest',
-    createdAt: '2026-04-01T10:00:00.000Z'
-  }
-];
+// Read configured single admin credentials from environment or fallback
+const getAdminEmail = () => (process.env.ADMIN_EMAIL || 'admin@impactbridge.org').toLowerCase().trim();
+const getAdminPassword = () => process.env.ADMIN_PASSWORD || 'admin123';
+
+const buildDefaultUsers = () => {
+  const adminEmail = getAdminEmail();
+  const adminPassword = getAdminPassword();
+
+  return [
+    {
+      id: 'USR-ADMIN-01',
+      name: 'System Administrator',
+      email: adminEmail,
+      passwordHash: bcrypt.hashSync(adminPassword, SALT_ROUNDS),
+      role: 'admin',
+      isPrimaryAdmin: true,
+      createdAt: '2026-01-15T09:00:00.000Z'
+    },
+    {
+      id: 'USR-VOL-01',
+      name: 'Aarav Sharma',
+      email: 'aarav.sharma@example.com',
+      passwordHash: bcrypt.hashSync('volunteer123', SALT_ROUNDS),
+      role: 'volunteer',
+      createdAt: '2026-02-10T11:30:00.000Z'
+    },
+    {
+      id: 'USR-BEN-01',
+      name: 'Laxmi Devi',
+      email: 'laxmi.devi@example.com',
+      passwordHash: bcrypt.hashSync('help123', SALT_ROUNDS),
+      role: 'beneficiary',
+      createdAt: '2026-03-01T14:15:00.000Z'
+    },
+    {
+      id: 'USR-DON-01',
+      name: 'Aditya Singhania',
+      email: 'aditya.singhania@corp.in',
+      passwordHash: bcrypt.hashSync('donor123', SALT_ROUNDS),
+      role: 'donor',
+      createdAt: '2026-03-05T16:45:00.000Z'
+    }
+  ];
+};
 
 class UserModel {
   constructor() {
@@ -79,10 +73,61 @@ class UserModel {
   initDatabase() {
     try {
       if (!fs.existsSync(USERS_FILE)) {
-        fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_SEEDED_USERS, null, 2), 'utf-8');
+        fs.writeFileSync(USERS_FILE, JSON.stringify(buildDefaultUsers(), null, 2), 'utf-8');
+      } else {
+        this.ensureSingleAdmin();
       }
     } catch (err) {
       console.error('[UserModel] Error initializing users.json:', err.message);
+    }
+  }
+
+  /**
+   * Ensures the single primary admin account exists and matches configured ADMIN_EMAIL/PASSWORD
+   * Also prunes invalid guest users from database since Guest is strictly an unauthenticated state
+   */
+  ensureSingleAdmin() {
+    try {
+      const users = this.loadUsers();
+      const adminEmail = getAdminEmail();
+      const adminPassword = getAdminPassword();
+
+      // Prune any legacy "guest" database users - guest is not an authenticated database role
+      const validDbUsers = users.filter((u) => u.role !== 'guest');
+
+      // Find all existing admins
+      const adminUsers = validDbUsers.filter((u) => u.role === 'admin');
+
+      // Keep only one primary admin
+      let primaryAdmin = adminUsers.find((u) => u.email.toLowerCase() === adminEmail) || adminUsers[0];
+
+      if (!primaryAdmin) {
+        primaryAdmin = {
+          id: 'USR-ADMIN-01',
+          name: 'System Administrator',
+          email: adminEmail,
+          passwordHash: bcrypt.hashSync(adminPassword, SALT_ROUNDS),
+          role: 'admin',
+          isPrimaryAdmin: true,
+          createdAt: new Date().toISOString()
+        };
+      } else {
+        primaryAdmin.email = adminEmail;
+        primaryAdmin.name = primaryAdmin.name || 'System Administrator';
+        primaryAdmin.role = 'admin';
+        primaryAdmin.isPrimaryAdmin = true;
+        if (adminPassword) {
+          primaryAdmin.passwordHash = bcrypt.hashSync(adminPassword, SALT_ROUNDS);
+        }
+      }
+
+      // Remove any duplicate admin accounts
+      const nonAdminUsers = validDbUsers.filter((u) => u.role !== 'admin');
+      const updatedUsers = [primaryAdmin, ...nonAdminUsers];
+
+      this.saveUsers(updatedUsers);
+    } catch (err) {
+      console.error('[UserModel] Error ensuring single admin:', err.message);
     }
   }
 
@@ -95,7 +140,7 @@ class UserModel {
       return JSON.parse(data);
     } catch (err) {
       console.error('[UserModel] Error reading users file:', err.message);
-      return DEFAULT_SEEDED_USERS;
+      return [];
     }
   }
 
@@ -133,10 +178,6 @@ class UserModel {
     return users.find((u) => u.googleId === String(googleId)) || null;
   }
 
-  /**
-   * Find or create user via verified Google credentials.
-   * Preserves existing roles and ensures new users get the safe default normal-user role.
-   */
   async findOrCreateGoogleUser({ googleId, email, name, avatar }) {
     if (!email) {
       throw new Error('MISSING_EMAIL');
@@ -146,7 +187,6 @@ class UserModel {
     const cleanEmail = String(email).toLowerCase().trim();
     const strGoogleId = googleId ? String(googleId) : null;
 
-    // 1. Check if user already exists by googleId
     if (strGoogleId) {
       const existingGoogleUser = users.find((u) => u.googleId === strGoogleId);
       if (existingGoogleUser) {
@@ -166,10 +206,8 @@ class UserModel {
       }
     }
 
-    // 2. Check if user exists by verified email (account linking)
     const existingEmailUser = users.find((u) => u.email.toLowerCase().trim() === cleanEmail);
     if (existingEmailUser) {
-      // Link Google ID to existing account while strictly preserving existing database role
       if (strGoogleId && !existingEmailUser.googleId) {
         existingEmailUser.googleId = strGoogleId;
       }
@@ -185,8 +223,6 @@ class UserModel {
       return this.toSafeUser(existingEmailUser);
     }
 
-    // 3. Brand new Google user — apply safe default normal-user onboarding role ('donor')
-    // Under no circumstances can a new Google user self-assign Admin
     const newUser = {
       id: `USR-GGL-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
       name: (name && String(name).trim()) || 'Community Member',
@@ -215,25 +251,39 @@ class UserModel {
     }
   }
 
-  async createUser({ name, email, password, role = 'guest' }) {
+  async createUser({ name, email, password, role = 'donor' }) {
     const users = this.loadUsers();
     const cleanEmail = email.toLowerCase().trim();
 
-    // Check duplicate
     if (users.some((u) => u.email.toLowerCase().trim() === cleanEmail)) {
       throw new Error('DUPLICATE_EMAIL');
     }
 
+    const targetRole = String(role || 'donor').toLowerCase().trim();
+
+    // Security check: Never allow registration as admin
+    if (targetRole === 'admin') {
+      throw new Error('ADMIN_REGISTRATION_FORBIDDEN');
+    }
+
+    // Security check: Guest is not an authenticated database role
+    if (targetRole === 'guest') {
+      throw new Error('GUEST_REGISTRATION_FORBIDDEN');
+    }
+
+    const validPublicRoles = ['volunteer', 'beneficiary', 'donor'];
+    if (!validPublicRoles.includes(targetRole)) {
+      throw new Error('INVALID_REGISTRATION_ROLE');
+    }
+
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    const validRoles = ['admin', 'volunteer', 'beneficiary', 'donor', 'guest'];
-    const assignedRole = validRoles.includes(role.toLowerCase()) ? role.toLowerCase() : 'guest';
 
     const newUser = {
       id: `USR-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
       name: name.trim(),
       email: cleanEmail,
       passwordHash,
-      role: assignedRole,
+      role: targetRole,
       createdAt: new Date().toISOString()
     };
 
@@ -241,6 +291,45 @@ class UserModel {
     this.saveUsers(users);
 
     return this.toSafeUser(newUser);
+  }
+
+  updateUserProfile(id, updates = {}) {
+    const users = this.loadUsers();
+    const user = users.find((u) => u.id === id);
+    if (!user) return null;
+
+    // Strict Security Requirement: Normal users cannot update their own role
+    if (updates.role !== undefined && updates.role !== user.role) {
+      throw new Error('ROLE_MODIFICATION_FORBIDDEN');
+    }
+
+    if (updates.name) user.name = String(updates.name).trim();
+    if (updates.phone) user.phone = String(updates.phone).trim();
+    if (updates.avatar) user.avatar = String(updates.avatar).trim();
+
+    user.updatedAt = new Date().toISOString();
+    this.saveUsers(users);
+    return this.toSafeUser(user);
+  }
+
+  updateUserRole(id, newRole) {
+    const users = this.loadUsers();
+    const user = users.find((u) => u.id === id);
+    if (!user) return null;
+
+    if (user.isPrimaryAdmin && newRole !== 'admin') {
+      throw new Error('PRIMARY_ADMIN_CANNOT_BE_DEMOTED');
+    }
+
+    const validRoles = ['admin', 'volunteer', 'beneficiary', 'donor'];
+    if (!validRoles.includes(newRole)) {
+      throw new Error('INVALID_ROLE');
+    }
+
+    user.role = newRole;
+    user.updatedAt = new Date().toISOString();
+    this.saveUsers(users);
+    return this.toSafeUser(user);
   }
 
   getAllSafeUsers() {

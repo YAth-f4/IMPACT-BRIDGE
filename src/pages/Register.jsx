@@ -129,9 +129,7 @@ export default function Register() {
   const ROLES = [
     { id: 'donor', label: 'Donor', icon: Heart, desc: 'Support impactful programs' },
     { id: 'volunteer', label: 'Volunteer', icon: Users, desc: 'Contribute skills & time' },
-    { id: 'beneficiary', label: 'Beneficiary', icon: HandHeart, desc: 'Request & receive support' },
-    { id: 'guest', label: 'Public', icon: Globe, desc: 'General community supporter' },
-    { id: 'admin', label: 'Staff', icon: ShieldCheck, desc: 'NGO administration' }
+    { id: 'beneficiary', label: 'Beneficiary', icon: HandHeart, desc: 'Request & receive support' }
   ];
 
   return (

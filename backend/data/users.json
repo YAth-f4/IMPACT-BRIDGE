@@ -2,18 +2,11 @@
   {
     "id": "USR-ADMIN-01",
     "name": "Sunita Rao",
-    "email": "sunita.rao@impactbridge.org",
-    "passwordHash": "$2b$10$qvL1p6LGp0/1xbVx1WdXPO6Y99n.g5ALCI3MSUkSKGk.TNQfOedXW",
-    "role": "admin",
-    "createdAt": "2026-01-15T09:00:00.000Z"
-  },
-  {
-    "id": "USR-ADMIN-02",
-    "name": "System Administrator",
     "email": "admin@impactbridge.org",
-    "passwordHash": "$2b$10$k.9uXeBaNN/i9Tg6MMWtKOQO390OKBnZPceeUfDZ0lSXAAZ5gvKY2",
+    "passwordHash": "$2b$10$RddwWAAJQmjdQShn2T34ruUdZ4TNIeDWa236Dy8uk19UG/YkRLYFO",
     "role": "admin",
-    "createdAt": "2026-01-15T09:00:00.000Z"
+    "createdAt": "2026-01-15T09:00:00.000Z",
+    "isPrimaryAdmin": true
   },
   {
     "id": "USR-VOL-01",
@@ -38,14 +31,6 @@
     "passwordHash": "$2b$10$dGQogmE3CtBthgA5JaRN8OEcmqw3cAD9rDPZxYHihESnuZiuDvNDC",
     "role": "donor",
     "createdAt": "2026-03-05T16:45:00.000Z"
-  },
-  {
-    "id": "USR-GST-01",
-    "name": "Public Citizen",
-    "email": "visitor@example.com",
-    "passwordHash": "$2b$10$04CybQI9D1nT4L/hVaphweeNbuXoaEdqEO/MhrmYb35tjk8qBtTg2",
-    "role": "guest",
-    "createdAt": "2026-04-01T10:00:00.000Z"
   },
   {
     "id": "USR-1789220447247-688",
@@ -97,5 +82,133 @@
     "googleId": "113192446986912014600",
     "authProvider": "local+google",
     "avatar": "https://lh3.googleusercontent.com/a/ACg8ocK38wahqHVgMaT7PsS2_UbEIrobDKqm9j-piyaz14GaoVHzH96W=s96-c"
+  },
+  {
+    "id": "USR-1789841260874-394",
+    "name": "Rohan Donor",
+    "email": "test.donor.1789841260812@example.com",
+    "passwordHash": "$2b$10$yDUYmru.9OR/7lrIN/oes.GOsEGqOfw9wy9oTbuUtMgAASW8pTSMO",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:07:40.874Z"
+  },
+  {
+    "id": "USR-1789841261119-200",
+    "name": "Kavita Beneficiary",
+    "email": "test.ben2.1789841261064@example.com",
+    "passwordHash": "$2b$10$sYWgOEJdIb0MYApn94WZausAJJfO/imF40stY2rDZ7nzAdb/V7aby",
+    "role": "beneficiary",
+    "createdAt": "2026-09-19T18:07:41.119Z"
+  },
+  {
+    "id": "USR-1789842341251-302",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842341192@example.com",
+    "passwordHash": "$2b$10$u42uxMMLuPkpcOuSBExTwuhgigCgBh/qdH8s9G.K5RHRirAS.XJjO",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:25:41.251Z"
+  },
+  {
+    "id": "USR-1789842364082-453",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842364024@example.com",
+    "passwordHash": "$2b$10$im0CPYmnk3gQ6S.U0/ueSujLORI2Y5XyaVRZz3.GF1c4HIo2h5lbe",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:26:04.082Z"
+  },
+  {
+    "id": "USR-1789842399831-604",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842399786@example.com",
+    "passwordHash": "$2b$10$H8wHT8Ry1j/mUVkiSElS1eELmeNPlWOvKXLifXPKuXcYupLjWyhyG",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:26:39.831Z"
+  },
+  {
+    "id": "USR-1789842453863-982",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842453807@example.com",
+    "passwordHash": "$2b$10$yZV1oOMkalGJyqVlCK12t.n6Tm2PchXOgbVw9w7y..bBVzaFpTKXC",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:27:33.863Z"
+  },
+  {
+    "id": "USR-1789842474668-131",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842474617@example.com",
+    "passwordHash": "$2b$10$aKd93h1KK2mVMnueUYIVBuRWKm0VuIX/EDAZ8akK8MZeiAUs9lnOm",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:27:54.668Z"
+  },
+  {
+    "id": "USR-1789842496693-225",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842496645@example.com",
+    "passwordHash": "$2b$10$JXE95goF2CNbcnyG8BqGL.v0M2Y8w6e25G42OkyulmB3mbQNYd6Ui",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:28:16.693Z"
+  },
+  {
+    "id": "USR-1789842507241-768",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842507185@example.com",
+    "passwordHash": "$2b$10$h3jFEzVPaZK9hkLm/Oy.BO0iS7m1xpVJn3DC8UkkP6a5C9Na7uPJO",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:28:27.241Z"
+  },
+  {
+    "id": "USR-1789842518793-152",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789842518736@example.com",
+    "passwordHash": "$2b$10$mbNeZZ0/64JiRii1HmMJbuILHeYmcnD8jvRgbKbbyx3nT9Hy8RvrG",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:28:38.793Z"
+  },
+  {
+    "id": "USR-1789842524173-308",
+    "name": "Rohan Donor",
+    "email": "test.donor.1789842524111@example.com",
+    "passwordHash": "$2b$10$8521ZJ1sRF6yHYUQP0VDSOkeJB1tBDl4GC1SxQu.9VpLcNlWmRUIS",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:28:44.173Z"
+  },
+  {
+    "id": "USR-1789842524419-199",
+    "name": "Kavita Beneficiary",
+    "email": "test.ben2.1789842524364@example.com",
+    "passwordHash": "$2b$10$Y5IM71SCjpdZmZxI2EhRHuMIqpXFr97SQ1W5NBIywwmG4mT5w.s.C",
+    "role": "beneficiary",
+    "createdAt": "2026-09-19T18:28:44.419Z"
+  },
+  {
+    "id": "USR-1789843005345-218",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789843005290@example.com",
+    "passwordHash": "$2b$10$MfHZNjNmJQjQCBRQ6Zc1ReLq1DsfI2u.60maLwRizbB3CO2.tyXIC",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:36:45.345Z"
+  },
+  {
+    "id": "USR-1789843776679-904",
+    "name": "Rohan Donor",
+    "email": "test.donor.1789843776612@example.com",
+    "passwordHash": "$2b$10$XjHWjaibDHvFkEtDO1Kf1eawIPNeZBIPkJAI2FzGAbwE0RRdI9FUe",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:49:36.679Z"
+  },
+  {
+    "id": "USR-1789843776934-722",
+    "name": "Kavita Beneficiary",
+    "email": "test.ben2.1789843776879@example.com",
+    "passwordHash": "$2b$10$COGrLZZ3Z4w3XSPO6Z2XNuHdqril2Y5tmxwf6jZYGNbziuiUJTlfO",
+    "role": "beneficiary",
+    "createdAt": "2026-09-19T18:49:36.934Z"
+  },
+  {
+    "id": "USR-1789843781020-776",
+    "name": "Priya Verma",
+    "email": "rep.ngo.1789843780959@example.com",
+    "passwordHash": "$2b$10$HI/o5HyOQfxRk9.TpQKBAuSKYOQBT88eIxdSR7PyraAniRfVB5S9G",
+    "role": "donor",
+    "createdAt": "2026-09-19T18:49:41.020Z"
   }
 ]

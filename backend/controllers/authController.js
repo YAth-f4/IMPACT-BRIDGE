@@ -122,13 +122,38 @@ const register = async (req, res) => {
       });
     }
 
+    // Explicit security check: forbid admin registration through public endpoint
+    const cleanRole = role ? String(role).toLowerCase().trim() : 'donor';
+
+    if (cleanRole === 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'Administrator accounts cannot be created via public registration.'
+      });
+    }
+
+    if (cleanRole === 'guest') {
+      return res.status(400).json({
+        success: false,
+        message: 'Guest is an unauthenticated visitor state, not a registrable user account.'
+      });
+    }
+
+    const validPublicRoles = ['donor', 'volunteer', 'beneficiary'];
+    if (!validPublicRoles.includes(cleanRole)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role selected. Allowed roles are: DONOR, VOLUNTEER, or BENEFICIARY.'
+      });
+    }
+
     // 2. Create user
     try {
       const newUser = await userModel.createUser({
         name: String(name).trim(),
         email: cleanEmail,
         password: String(password),
-        role: role || 'guest'
+        role: cleanRole
       });
 
       return res.status(201).json({
@@ -141,6 +166,18 @@ const register = async (req, res) => {
         return res.status(409).json({
           success: false,
           message: 'An account with this email already exists.'
+        });
+      }
+      if (createErr.message === 'ADMIN_REGISTRATION_FORBIDDEN') {
+        return res.status(400).json({
+          success: false,
+          message: 'Administrator accounts cannot be created via public registration.'
+        });
+      }
+      if (createErr.message === 'GUEST_REGISTRATION_FORBIDDEN') {
+        return res.status(400).json({
+          success: false,
+          message: 'Guest is an unauthenticated state, not a registered database account.'
         });
       }
       throw createErr;
@@ -196,6 +233,43 @@ const getMe = async (req, res) => {
       success: false,
       message: 'Unable to verify session right now. Please try again.'
     });
+  }
+};
+
+/**
+ * Update current user profile (PATCH /api/users/me)
+ * Strictly enforces that user roles are immutable and cannot be changed by normal users
+ */
+const updateMe = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Authentication required.' });
+    }
+
+    // Security requirement: Normal users must NOT be allowed to update role
+    if (req.body && req.body.role !== undefined && req.body.role.toLowerCase() !== user.role.toLowerCase()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Role modification is strictly forbidden. User roles are permanently immutable.'
+      });
+    }
+
+    const updatedUser = userModel.updateUserProfile(user.id, req.body);
+    return res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully.',
+      user: updatedUser
+    });
+  } catch (err) {
+    if (err.message === 'ROLE_MODIFICATION_FORBIDDEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Role modification is strictly forbidden. User roles are permanently immutable.'
+      });
+    }
+    console.error('[authController.updateMe] Error:', err.message);
+    return res.status(500).json({ success: false, message: 'Failed to update profile.' });
   }
 };
 
@@ -421,6 +495,7 @@ module.exports = {
   login,
   register,
   getMe,
+  updateMe,
   verifyAdmin,
   googleLogin,
   JWT_SECRET

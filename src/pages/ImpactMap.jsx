@@ -38,6 +38,86 @@ export default function ImpactMap() {
           >
             Explore all verified NGO regional headquarters, mobile telemetry routes, disaster response staging posts, and community impact clusters across India.
           </p>
+
+          {/* Register Your NGO Callout Banner */}
+          <div
+            style={{
+              marginTop: '2rem',
+              backgroundColor: '#FFFFFF',
+              border: 'var(--border-thick)',
+              boxShadow: '6px 6px 0px #000000',
+              padding: '1.25rem 1.75rem',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1.25rem'
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <span
+                  style={{
+                    backgroundColor: 'var(--accent-yellow)',
+                    border: '2px solid #000',
+                    fontWeight: 900,
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    padding: '0.15rem 0.5rem'
+                  }}
+                >
+                  NGO Discovery Hub
+                </span>
+                <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>
+                  Are you a Registered NGO in India?
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: '#4B5563', fontWeight: 500 }}>
+                Get listed on Impact Bridge, undergo document verification, and earn the official <strong>Verified by Impact Bridge</strong> badge.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <a
+                href="/ngos"
+                style={{
+                  textDecoration: 'none',
+                  backgroundColor: '#FFFFFF',
+                  color: '#000000',
+                  border: '2px solid #000000',
+                  padding: '0.5rem 1rem',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  textTransform: 'uppercase',
+                  boxShadow: '3px 3px 0px #000000',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                Browse Verified Directory
+              </a>
+              <a
+                href="/register-ngo"
+                style={{
+                  textDecoration: 'none',
+                  backgroundColor: 'var(--accent-yellow)',
+                  color: '#000000',
+                  border: '2px solid #000000',
+                  padding: '0.5rem 1.25rem',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  textTransform: 'uppercase',
+                  boxShadow: '3px 3px 0px #000000',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                Register Your NGO →
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 

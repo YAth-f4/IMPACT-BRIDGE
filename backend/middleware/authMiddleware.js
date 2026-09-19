@@ -62,7 +62,8 @@ const requireAuth = (req, res, next) => {
  * Rejects non-admin authenticated users with 403 Forbidden.
  */
 const requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
+  const userRole = req.user?.role ? String(req.user.role).toLowerCase() : '';
+  if (!req.user || userRole !== 'admin') {
     return res.status(403).json({
       success: false,
       message: 'Access forbidden. Administrator privileges are required to perform this action.'
@@ -75,8 +76,10 @@ const requireAdmin = (req, res, next) => {
  * Generic Role-Based Authorization Helper
  */
 const requireRole = (...roles) => {
+  const allowed = roles.map((r) => String(r).toLowerCase());
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    const userRole = req.user?.role ? String(req.user.role).toLowerCase() : '';
+    if (!req.user || !allowed.includes(userRole)) {
       return res.status(403).json({
         success: false,
         message: `Access forbidden. Required role: ${roles.join(' or ')}.`

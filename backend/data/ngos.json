@@ -1,0 +1,396 @@
+[
+  {
+    "id": "NGO-1789843781096-454",
+    "organizationName": "Rural Health & Literacy Mission",
+    "description": "Dedicated to providing primary healthcare clinics and evening schools in tribal belts.",
+    "ngoType": "Trust",
+    "founder": "Dr. Ramesh Sharma",
+    "authorizedRepresentative": "Priya Verma",
+    "contactEmail": "contact@ruralhealthmission.org",
+    "phone": "+91 98765 43210",
+    "website": "https://ruralhealthmission.org",
+    "address": "Plot 45, Seva Kendra Marg",
+    "city": "Ranchi",
+    "state": "Jharkhand",
+    "pincode": "834001",
+    "registrationNumber": "REG-TEST-1789843781096",
+    "registrationCertificate": "/uploads/ngos/cert-1789843781095-1713.pdf",
+    "logo": "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80",
+    "photos": [],
+    "causes": [
+      "Healthcare",
+      "Education"
+    ],
+    "areasOfWork": [],
+    "programs": [
+      "Mobile Health Van",
+      "Tribal Night School"
+    ],
+    "yearsOfOperation": 6,
+    "ownerUserId": "USR-1789843781020-776",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Sunita Rao (USR-ADMIN-01)",
+      "reviewedAt": "2026-09-19T18:49:41.130Z",
+      "status": "APPROVED",
+      "note": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge.",
+      "notes": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge.",
+      "reviewNotes": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge."
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Priya Verma (rep.ngo.1789843780959@example.com)",
+        "timestamp": "2026-09-19T18:49:41.096Z",
+        "note": "New NGO registration application submitted for administrator verification."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_NEEDS_INFO",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:49:41.118Z",
+        "note": "Please upload a clearer scan of Section 12A/80G registration certificate."
+      },
+      {
+        "action": "RESUBMITTED_BY_OWNER",
+        "performedBy": "NGO Owner",
+        "timestamp": "2026-09-19T18:49:41.125Z",
+        "note": "Owner addressed information requests and resubmitted application for verification."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:49:41.130Z",
+        "note": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge."
+      }
+    ],
+    "createdAt": "2026-09-19T18:49:41.096Z",
+    "updatedAt": "2026-09-19T18:49:41.130Z"
+  },
+  {
+    "id": "NGO-1789843753390-410",
+    "organizationName": "Pratibha Education Society",
+    "description": "Empowering tribal girl children with educational scholarships and mentoring.",
+    "ngoType": "Society",
+    "founder": "Shalini Pradhan",
+    "authorizedRepresentative": "Shalini Pradhan",
+    "contactEmail": "pratibha.1789843753394@example.org",
+    "phone": "+91 99887 76655",
+    "website": "",
+    "address": "Plot 10, Civil Lines",
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "pincode": "440001",
+    "registrationNumber": "MH/1789843753394/TEST",
+    "registrationCertificate": "/images/cert-sample.pdf",
+    "logo": "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80",
+    "photos": [],
+    "causes": [
+      "Education",
+      "Girl Child"
+    ],
+    "areasOfWork": [
+      "Scholarships",
+      "Mentorship"
+    ],
+    "programs": [
+      "Shiksha Jyoti"
+    ],
+    "yearsOfOperation": 5,
+    "ownerUserId": "USR-BEN-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Sunita Rao (USR-ADMIN-01)",
+      "reviewedAt": "2026-09-19T18:49:13.404Z",
+      "status": "APPROVED",
+      "note": "Exemplary credentials verified. Approved as Impact Bridge Partner.",
+      "notes": "Exemplary credentials verified. Approved as Impact Bridge Partner.",
+      "reviewNotes": "Exemplary credentials verified. Approved as Impact Bridge Partner."
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi (laxmi.devi@example.com)",
+        "timestamp": "2026-09-19T18:49:13.390Z",
+        "note": "New NGO registration application submitted for administrator verification."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_NEEDS_INFO",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:49:13.394Z",
+        "note": "Please provide certified audit statement copy."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_REJECTED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:49:13.399Z",
+        "note": "Non-compliant documentation submitted."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:49:13.404Z",
+        "note": "Exemplary credentials verified. Approved as Impact Bridge Partner."
+      }
+    ],
+    "createdAt": "2026-09-19T18:49:13.390Z",
+    "updatedAt": "2026-09-19T18:49:13.404Z"
+  },
+  {
+    "id": "NGO-1789843719867-849",
+    "organizationName": "Pratibha Education Society",
+    "description": "Empowering tribal girl children with educational scholarships and mentoring.",
+    "ngoType": "Society",
+    "founder": "Shalini Pradhan",
+    "authorizedRepresentative": "Shalini Pradhan",
+    "contactEmail": "pratibha.1789843719868@example.org",
+    "phone": "+91 99887 76655",
+    "website": "",
+    "address": "Plot 10, Civil Lines",
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "pincode": "440001",
+    "registrationNumber": "MH/1789843719868/TEST",
+    "registrationCertificate": "/images/cert-sample.pdf",
+    "logo": "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80",
+    "photos": [],
+    "causes": [
+      "Education",
+      "Girl Child"
+    ],
+    "areasOfWork": [
+      "Scholarships",
+      "Mentorship"
+    ],
+    "programs": [
+      "Shiksha Jyoti"
+    ],
+    "yearsOfOperation": 5,
+    "ownerUserId": "USR-BEN-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Sunita Rao (USR-ADMIN-01)",
+      "reviewedAt": "2026-09-19T18:48:39.884Z",
+      "status": "APPROVED",
+      "note": "Exemplary credentials verified. Approved as Impact Bridge Partner.",
+      "notes": "Exemplary credentials verified. Approved as Impact Bridge Partner.",
+      "reviewNotes": "Exemplary credentials verified. Approved as Impact Bridge Partner."
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi (laxmi.devi@example.com)",
+        "timestamp": "2026-09-19T18:48:39.867Z",
+        "note": "New NGO registration application submitted for administrator verification."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_NEEDS_INFO",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:48:39.873Z",
+        "note": "Please provide certified audit statement copy."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_REJECTED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:48:39.879Z",
+        "note": "Non-compliant documentation submitted."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-19T18:48:39.884Z",
+        "note": "Exemplary credentials verified. Approved as Impact Bridge Partner."
+      }
+    ],
+    "createdAt": "2026-09-19T18:48:39.867Z",
+    "updatedAt": "2026-09-19T18:48:39.884Z"
+  },
+  {
+    "id": "NGO-2026-001",
+    "organizationName": "Goonj Social Impact Foundation",
+    "description": "A pan-India movement turning urban surplus into tools of dignity for rural community development and disaster relief across 28 states.",
+    "ngoType": "Trust",
+    "founder": "Anshu Gupta",
+    "authorizedRepresentative": "Meenakshi Gupta",
+    "contactEmail": "mail@goonj.org",
+    "phone": "+91 11 2697 2222",
+    "website": "https://goonj.org",
+    "address": "J-93, Sarita Vihar",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "pincode": "110076",
+    "registrationNumber": "DL/2004/0014298",
+    "registrationCertificate": "/images/cert-sample.pdf",
+    "logo": "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80",
+    "photos": [
+      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=800&q=80"
+    ],
+    "causes": [
+      "Disaster Relief",
+      "Rural Development",
+      "Sanitation & Health",
+      "Women Empowerment"
+    ],
+    "areasOfWork": [
+      "Clothing as Dignity",
+      "Not Just a Piece of Cloth",
+      "School to School",
+      "Dignity for Work"
+    ],
+    "programs": [
+      "Flood Relief Material Mobilization",
+      "Winter Cloth Drive",
+      "Rural Infrastructure Self-Help"
+    ],
+    "yearsOfOperation": 22,
+    "ownerUserId": "USR-ADMIN-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Executive Administrator (admin@impactbridge.org)",
+      "reviewedAt": "2026-01-20T10:00:00.000Z",
+      "notes": "FCRA and 80G tax exemptions verified against NITI Aayog Darpan portal. Exemplary track record."
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Meenakshi Gupta (Representative)",
+        "timestamp": "2026-01-19T08:30:00.000Z",
+        "note": "NGO Registration submitted with statutory order copies."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Executive Administrator",
+        "timestamp": "2026-01-20T10:00:00.000Z",
+        "note": "Approved and awarded Verified Impact Bridge Partner status."
+      }
+    ],
+    "createdAt": "2026-01-19T08:30:00.000Z",
+    "updatedAt": "2026-01-20T10:00:00.000Z"
+  },
+  {
+    "id": "NGO-2026-002",
+    "organizationName": "Akshaya Patra Foundation",
+    "description": "Striving to eliminate classroom hunger through hot, nutritious mid-day meals in government and government-aided schools across India.",
+    "ngoType": "Society",
+    "founder": "Madhu Pandit Dasa",
+    "authorizedRepresentative": "Shreedhar Venkat",
+    "contactEmail": "infodesk@akshayapatra.org",
+    "phone": "+91 80 3014 3400",
+    "website": "https://www.akshayapatra.org",
+    "address": "Hare Krishna Hill, West of Chord Road, Rajajinagar",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "pincode": "560010",
+    "registrationNumber": "KA/2001/0089123",
+    "registrationCertificate": "/images/cert-sample.pdf",
+    "logo": "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=400&q=80",
+    "photos": [
+      "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80"
+    ],
+    "causes": [
+      "Child Nutrition",
+      "Classroom Education",
+      "Zero Hunger"
+    ],
+    "areasOfWork": [
+      "PM POSHAN Mid-Day Meal",
+      "Breakfast Feeds",
+      "Disaster Food Relief"
+    ],
+    "programs": [
+      "Centralized Kitchens Network",
+      "Direct Feeding to 2 Million Children"
+    ],
+    "yearsOfOperation": 24,
+    "ownerUserId": "USR-ADMIN-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Executive Administrator (admin@impactbridge.org)",
+      "reviewedAt": "2026-02-01T12:00:00.000Z",
+      "notes": "State food safety certifications verified. Mega kitchen audits passed."
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Shreedhar Venkat (Authorized Officer)",
+        "timestamp": "2026-02-01T09:00:00.000Z",
+        "note": "Submitted application for national food radar listing."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Executive Administrator",
+        "timestamp": "2026-02-01T12:00:00.000Z",
+        "note": "Approved as accredited partner."
+      }
+    ],
+    "createdAt": "2026-02-01T09:00:00.000Z",
+    "updatedAt": "2026-02-01T12:00:00.000Z"
+  },
+  {
+    "id": "NGO-2026-003",
+    "organizationName": "Smile Foundation India",
+    "description": "Empowering underprivileged children, youth, and women through relevant education, healthcare, and livelihood programs.",
+    "ngoType": "Section 8 Non-Profit",
+    "founder": "Santanu Mishra",
+    "authorizedRepresentative": "Vikram Singh Verma",
+    "contactEmail": "info@smilefoundationindia.org",
+    "phone": "+91 11 4312 3700",
+    "website": "https://www.smilefoundationindia.org",
+    "address": "161 B/4, 3rd Floor, Gulmohar House, Yusuf Sarai Community Centre",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "pincode": "110049",
+    "registrationNumber": "DL/2002/0045612",
+    "registrationCertificate": "/images/cert-sample.pdf",
+    "logo": "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=400&q=80",
+    "photos": [
+      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80"
+    ],
+    "causes": [
+      "Education for All",
+      "Mobile Healthcare",
+      "Livelihood Training",
+      "Women Empowerment"
+    ],
+    "areasOfWork": [
+      "Mission Education",
+      "Smile on Wheels",
+      "STeP (Twin e-Learning)",
+      "Swabhiman"
+    ],
+    "programs": [
+      "Mobile Medical Units",
+      "Remedial Learning Centres"
+    ],
+    "yearsOfOperation": 21,
+    "ownerUserId": "USR-ADMIN-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Executive Administrator (admin@impactbridge.org)",
+      "reviewedAt": "2026-02-15T15:00:00.000Z",
+      "notes": "Annual audit report and 12A/80G certificates validated."
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Santanu Mishra",
+        "timestamp": "2026-02-14T11:00:00.000Z",
+        "note": "Submitted registration form."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Executive Administrator",
+        "timestamp": "2026-02-15T15:00:00.000Z",
+        "note": "Official verification granted."
+      }
+    ],
+    "createdAt": "2026-02-14T11:00:00.000Z",
+    "updatedAt": "2026-02-15T15:00:00.000Z"
+  }
+]

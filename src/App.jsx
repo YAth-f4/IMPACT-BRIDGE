@@ -16,6 +16,7 @@ import Volunteer from './pages/Volunteer';
 import Donation from './pages/Donation';
 import ImpactMap from './pages/ImpactMap';
 import Contact from './pages/Contact';
+import FindHelp from './pages/FindHelp';
 import BeneficiaryPortal from './pages/BeneficiaryPortal';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -23,8 +24,24 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import NotFound from './pages/NotFound';
 
+// Role-Specific Dashboards
+import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
+import DonorDashboard from './pages/donor/DonorDashboard';
+import BeneficiaryDashboard from './pages/beneficiary/BeneficiaryDashboard';
+
+// NGO Feature Pages
+import NgoDirectory from './pages/public/NgoDirectory';
+import NgoProfile from './pages/public/NgoProfile';
+import RegisterNgo from './pages/public/RegisterNgo';
+import MyNgoSubmissions from './pages/ngo/MyNgoSubmissions';
+
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
+import AdminFindHelp from './pages/admin/AdminFindHelp';
+import AdminFundRaise from './pages/admin/AdminFundRaise';
+import AdminVolunteerRequests from './pages/admin/AdminVolunteerRequests';
+import AdminNgoRegistrations from './pages/admin/AdminNgoRegistrations';
+import AdminUsers from './pages/admin/AdminUsers';
 import AdminVolunteers from './pages/admin/Volunteers';
 import AdminBeneficiaries from './pages/admin/Beneficiaries';
 import AdminDonations from './pages/admin/Donations';
@@ -49,16 +66,66 @@ export default function App() {
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/donation" element={<Donation />} />
           <Route path="/impact-map" element={<ImpactMap />} />
-          <Route path="/beneficiary" element={<BeneficiaryPortal />} />
+          <Route path="/find-help" element={<FindHelp />} />
+          <Route path="/beneficiary" element={<FindHelp />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/ngos" element={<NgoDirectory />} />
+          <Route path="/ngos/:id" element={<NgoProfile />} />
+          <Route path="/register-ngo" element={<RegisterNgo />} />
+          <Route
+            path="/my-ngos"
+            element={
+              <ProtectedRoute>
+                <MyNgoSubmissions />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/404" element={<NotFound />} />
+
+          {/* VOLUNTEER ROLE PROTECTED ROUTES */}
+          <Route
+            path="/volunteer/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['volunteer']}>
+                <VolunteerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* DONOR ROLE PROTECTED ROUTES */}
+          <Route
+            path="/donor/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['donor']}>
+                <DonorDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* BENEFICIARY ROLE PROTECTED ROUTES */}
+          <Route
+            path="/beneficiary/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['beneficiary']}>
+                <BeneficiaryDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/beneficiary/requests"
+            element={
+              <ProtectedRoute allowedRoles={['beneficiary']}>
+                <BeneficiaryDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
-        {/* ADMIN PORTAL ROUTES (PROTECTED) */}
+        {/* ADMIN PORTAL ROUTES (STRICTLY ADMIN ONLY) */}
         <Route
           path="/admin"
           element={
@@ -69,6 +136,11 @@ export default function App() {
         >
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="requests/find-help" element={<AdminFindHelp />} />
+          <Route path="requests/fund-raise" element={<AdminFundRaise />} />
+          <Route path="requests/volunteers" element={<AdminVolunteerRequests />} />
+          <Route path="ngo-registrations" element={<AdminNgoRegistrations />} />
+          <Route path="users" element={<AdminUsers />} />
           <Route path="volunteers" element={<AdminVolunteers />} />
           <Route path="beneficiaries" element={<AdminBeneficiaries />} />
           <Route path="donations" element={<AdminDonations />} />

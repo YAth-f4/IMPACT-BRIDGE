@@ -1,24 +1,42 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import Modal from '../common/Modal';
 import Button from '../common/Button';
 import { Input } from '../common/Input';
-import { Lock, Mail, User, ShieldCheck, Heart, Users } from 'lucide-react';
+import { Lock, Mail } from 'lucide-react';
 
 export default function AuthModal() {
-  const { authModal, setAuthModal, switchRole, addToast } = useApp();
+  const { authModal = { isOpen: false, mode: 'login' }, setAuthModal, loginUser, addToast } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [selectedRole, setSelectedRole] = useState('donor');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  if (!authModal.isOpen) return null;
+  if (!authModal || !authModal.isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    switchRole(selectedRole);
-    setAuthModal({ isOpen: false, mode: 'login' });
-    addToast(`Logged in successfully as ${selectedRole.toUpperCase()}!`, 'success');
+    if (!loginUser) {
+      if (setAuthModal) setAuthModal({ isOpen: false, mode: 'login' });
+      navigate('/login');
+      return;
+    }
+
+    setLoading(true);
+    const res = await loginUser({ email, password });
+    setLoading(false);
+
+    if (res.success) {
+      if (setAuthModal) setAuthModal({ isOpen: false, mode: 'login' });
+      addToast(`Welcome back, ${res.user.name}!`, 'success');
+      if (res.user.role === 'admin') navigate('/admin/dashboard');
+      else if (res.user.role === 'volunteer') navigate('/volunteer/dashboard');
+      else if (res.user.role === 'donor') navigate('/donor/dashboard');
+      else if (res.user.role === 'beneficiary') navigate('/beneficiary/dashboard');
+    } else {
+      addToast(res.message || 'Login failed.', 'error');
+    }
   };
 
   const isLogin = authModal.mode === 'login';
@@ -26,119 +44,32 @@ export default function AuthModal() {
   return (
     <Modal
       isOpen={authModal.isOpen}
-      onClose={() => setAuthModal({ isOpen: false, mode: 'login' })}
+      onClose={() => setAuthModal && setAuthModal({ isOpen: false, mode: 'login' })}
       title={isLogin ? 'Sign In to IMPACT BRIDGE' : 'Create Free Supporter Account'}
-      maxWidth="500px"
+      maxWidth="440px"
     >
-      <div style={{ marginBottom: '1.25rem' }}>
-        <p style={{ fontSize: '0.9rem', color: '#5A6F64', fontWeight: 600 }}>
-          {isLogin
-            ? 'Access your donor receipts, volunteer task rosters, or NGO administration portal.'
-            : 'Join our grassroots movement across 140+ Indian communities.'}
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        {!isLogin && (
-          <Input
-            label="Full Name"
-            icon={User}
-            required
-            placeholder="e.g. Radhika Sharma"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        )}
-
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <Input
           label="Email Address"
           type="email"
-          icon={Mail}
-          required
           placeholder="your.email@example.com"
+          required
+          icon={Mail}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-
         <Input
           label="Password"
           type="password"
-          icon={Lock}
+          placeholder="••••••••"
           required
-          placeholder="••••••••••••"
+          icon={Lock}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
-        {/* Demo Role Selector */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label className="nb-label">Select Demo Access Role</label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
-            {[
-              { id: 'admin', label: 'Admin', icon: ShieldCheck },
-              { id: 'volunteer', label: 'Volunteer', icon: Users },
-              { id: 'donor', label: 'Donor', icon: Heart }
-            ].map((role) => {
-              const Icon = role.icon;
-              const isSelected = selectedRole === role.id;
-              return (
-                <button
-                  type="button"
-                  key={role.id}
-                  onClick={() => setSelectedRole(role.id)}
-                  style={{
-                    padding: '0.6rem 0.4rem',
-                    border: '2px solid #000',
-                    borderRadius: '4px',
-                    backgroundColor: isSelected ? 'var(--accent-yellow)' : '#FFFFFF',
-                    boxShadow: isSelected ? '3px 3px 0px #000' : '1.5px 1.5px 0px #000',
-                    fontFamily: 'var(--font-heading)',
-                    fontWeight: 800,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '0.3rem'
-                  }}
-                >
-                  <Icon size={18} strokeWidth={2.5} />
-                  <span>{role.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <Button type="submit" variant="yellow" size="lg" fullWidth>
-          {isLogin ? 'Sign In to Portal' : 'Complete Registration'}
+        <Button type="submit" variant="yellow" size="md" style={{ width: '100%', marginTop: '0.5rem' }}>
+          {loading ? 'Authenticating...' : (isLogin ? 'Sign In to Dashboard' : 'Register Account')}
         </Button>
-
-        <div style={{ marginTop: '1.25rem', textAlign: 'center', fontSize: '0.85rem', fontWeight: 600 }}>
-          {isLogin ? (
-            <span>
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
-                style={{ color: 'var(--brand-dark-green)', fontWeight: 800, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-              >
-                Register Now
-              </button>
-            </span>
-          ) : (
-            <span>
-              Already registered?{' '}
-              <button
-                type="button"
-                onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-                style={{ color: 'var(--brand-dark-green)', fontWeight: 800, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-              >
-                Sign In
-              </button>
-            </span>
-          )}
-        </div>
       </form>
     </Modal>
   );

@@ -5,6 +5,11 @@ const authRoutes = require('./routes/authRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
 const adminAboutRoutes = require('./routes/adminAboutRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
+const requestRoutes = require('./routes/requestRoutes');
+const adminRequestRoutes = require('./routes/adminRequestRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const { donorRouter, volunteerRouter, beneficiaryRouter, usersRouter } = require('./routes/roleRoutes');
+const { ngoRouter, adminNgoRouter } = require('./routes/ngoRoutes');
 
 const path = require('path');
 const fs = require('fs');
@@ -60,8 +65,9 @@ app.get('/api/health', (req, res) => {
 // Map routes
 app.use('/api/map', mapRoutes);
 
-// Serve static public assets (images, icons)
+// Serve static public assets (images, icons, uploads)
 app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images')));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
 
 // Authentication routes
 app.use('/api/auth', authRoutes);
@@ -74,6 +80,22 @@ app.use('/api/admin/about', adminAboutRoutes);
 
 // Newsletter subscription routes
 app.use('/api/newsletter', newsletterRoutes);
+
+// Public & User Request routes (Find Help, Fund Raise, Volunteer)
+app.use('/api/requests', requestRoutes);
+
+// Dedicated Role-Based Endpoints (Requirement 8)
+app.use('/api/donor', donorRouter);
+app.use('/api/volunteer', volunteerRouter);
+app.use('/api/beneficiary', beneficiaryRouter);
+app.use('/api/users', usersRouter);
+
+// Protected Admin Dashboard and Management routes
+app.use('/api/admin', adminRoutes);
+app.use('/api/admin/requests', adminRoutes);
+
+// Register Your NGO & Verified Impact Bridge Directory
+app.use('/api/ngos', ngoRouter);
 
 // 404 handler for unknown routes
 app.use((req, res) => {

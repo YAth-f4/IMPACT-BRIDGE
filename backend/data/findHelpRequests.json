@@ -1,0 +1,344 @@
+[
+  {
+    "id": "REQ-FH-776877-473",
+    "userId": "USR-BEN-01",
+    "requesterName": "Laxmi Devi",
+    "phone": "9876543210",
+    "email": "",
+    "city": "Mumbai",
+    "category": "Education Support",
+    "description": "Textbooks and study material",
+    "urgency": "HIGH",
+    "status": "APPROVED",
+    "adminNotes": "Approved by Dr. Ananya Iyer for digital tablet dispatch.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi (Registered User)",
+        "timestamp": "2026-09-19T18:49:36.877Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:49:37.079Z",
+        "note": "Approved by Dr. Ananya Iyer for digital tablet dispatch."
+      }
+    ],
+    "createdAt": "2026-09-19T18:49:36.877Z",
+    "updatedAt": "2026-09-19T18:49:37.079Z"
+  },
+  {
+    "id": "REQ-FH-753409-613",
+    "userId": "USR-BEN-01",
+    "requesterName": "Kishore Kumar",
+    "phone": "+91 98765 43219",
+    "email": "",
+    "city": "Pune",
+    "category": "Healthcare Support",
+    "description": "Require post-surgery medication assistance for elder parent.",
+    "urgency": "High",
+    "status": "APPROVED",
+    "adminNotes": "Verified with local dispensary in Pune.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Kishore Kumar (Registered User)",
+        "timestamp": "2026-09-19T18:49:13.409Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:49:13.413Z",
+        "note": "Verified with local dispensary in Pune."
+      }
+    ],
+    "createdAt": "2026-09-19T18:49:13.409Z",
+    "updatedAt": "2026-09-19T18:49:13.413Z"
+  },
+  {
+    "id": "REQ-FH-719890-175",
+    "userId": "USR-BEN-01",
+    "requesterName": "Kishore Kumar",
+    "phone": "+91 98765 43219",
+    "email": "",
+    "city": "Pune",
+    "category": "Healthcare Support",
+    "description": "Require post-surgery medication assistance for elder parent.",
+    "urgency": "High",
+    "status": "APPROVED",
+    "adminNotes": "Verified with local dispensary in Pune.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Kishore Kumar (Registered User)",
+        "timestamp": "2026-09-19T18:48:39.890Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:48:39.894Z",
+        "note": "Verified with local dispensary in Pune."
+      }
+    ],
+    "createdAt": "2026-09-19T18:48:39.890Z",
+    "updatedAt": "2026-09-19T18:48:39.894Z"
+  },
+  {
+    "id": "REQ-FH-524362-338",
+    "userId": "USR-BEN-01",
+    "requesterName": "Laxmi Devi",
+    "phone": "9876543210",
+    "email": "",
+    "city": "Mumbai",
+    "category": "Education Support",
+    "description": "Textbooks and study material",
+    "urgency": "HIGH",
+    "status": "APPROVED",
+    "adminNotes": "Approved by Dr. Ananya Iyer for digital tablet dispatch.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi (Registered User)",
+        "timestamp": "2026-09-19T18:28:44.362Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:28:44.549Z",
+        "note": "Approved by Dr. Ananya Iyer for digital tablet dispatch."
+      }
+    ],
+    "createdAt": "2026-09-19T18:28:44.362Z",
+    "updatedAt": "2026-09-19T18:28:44.549Z"
+  },
+  {
+    "id": "REQ-FH-267920-273",
+    "userId": null,
+    "requesterName": "Anita Sharma",
+    "phone": "+91 99887 76655",
+    "email": "anita.guest@example.com",
+    "city": "Pune",
+    "category": "Education Support",
+    "description": "Need school uniform and books for two orphan children.",
+    "urgency": "High",
+    "status": "APPROVED",
+    "adminNotes": "Approved by field lead Anita Rao",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Anita Sharma (Guest User)",
+        "timestamp": "2026-09-19T18:07:47.920Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:07:47.927Z",
+        "note": "Approved by field lead Anita Rao"
+      }
+    ],
+    "createdAt": "2026-09-19T18:07:47.920Z",
+    "updatedAt": "2026-09-19T18:07:47.927Z"
+  },
+  {
+    "id": "REQ-FH-261063-823",
+    "userId": "USR-BEN-01",
+    "requesterName": "Laxmi Devi",
+    "phone": "9876543210",
+    "email": "",
+    "city": "Mumbai",
+    "category": "Education Support",
+    "description": "Textbooks and study material",
+    "urgency": "HIGH",
+    "status": "APPROVED",
+    "adminNotes": "Approved by Dr. Ananya Iyer for digital tablet dispatch.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi (Registered User)",
+        "timestamp": "2026-09-19T18:07:41.063Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T18:07:41.244Z",
+        "note": "Approved by Dr. Ananya Iyer for digital tablet dispatch."
+      }
+    ],
+    "createdAt": "2026-09-19T18:07:41.063Z",
+    "updatedAt": "2026-09-19T18:07:41.244Z"
+  },
+  {
+    "id": "REQ-FH-195962-545",
+    "userId": null,
+    "requesterName": "Anita Sharma",
+    "phone": "+91 99887 76655",
+    "email": "anita.guest@example.com",
+    "city": "Pune",
+    "category": "Education Support",
+    "description": "Need school uniform and books for two orphan children.",
+    "urgency": "High",
+    "status": "APPROVED",
+    "adminNotes": "Approved by field lead Anita Rao",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Anita Sharma (Guest User)",
+        "timestamp": "2026-09-19T17:49:55.962Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T17:49:55.970Z",
+        "note": "Approved by field lead Anita Rao"
+      }
+    ],
+    "createdAt": "2026-09-19T17:49:55.962Z",
+    "updatedAt": "2026-09-19T17:49:55.970Z"
+  },
+  {
+    "id": "REQ-FH-164818-381",
+    "userId": null,
+    "requesterName": "Anita Sharma",
+    "phone": "+91 99887 76655",
+    "email": "anita.guest@example.com",
+    "city": "Pune",
+    "category": "Education Support",
+    "description": "Need school uniform and books for two orphan children.",
+    "urgency": "High",
+    "status": "APPROVED",
+    "adminNotes": "Approved by field lead Anita Rao",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Anita Sharma (Guest User)",
+        "timestamp": "2026-09-19T17:49:24.818Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T17:49:24.826Z",
+        "note": "Approved by field lead Anita Rao"
+      }
+    ],
+    "createdAt": "2026-09-19T17:49:24.818Z",
+    "updatedAt": "2026-09-19T17:49:24.826Z"
+  },
+  {
+    "id": "REQ-FH-072748-473",
+    "userId": null,
+    "requesterName": "Anita Sharma",
+    "phone": "+91 99887 76655",
+    "email": "anita.guest@example.com",
+    "city": "Pune",
+    "category": "Education Support",
+    "description": "Need school uniform and books for two orphan children.",
+    "urgency": "High",
+    "status": "APPROVED",
+    "adminNotes": "Approved by field lead Anita Rao",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Anita Sharma (Guest User)",
+        "timestamp": "2026-09-19T17:47:52.748Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-19T17:47:52.756Z",
+        "note": "Approved by field lead Anita Rao"
+      }
+    ],
+    "createdAt": "2026-09-19T17:47:52.748Z",
+    "updatedAt": "2026-09-19T17:47:52.756Z"
+  },
+  {
+    "id": "REQ-FH-2026-001",
+    "userId": "USR-BEN-01",
+    "requesterName": "Laxmi Devi",
+    "phone": "+91 98765 43210",
+    "email": "laxmi.devi@example.com",
+    "city": "Mumbai",
+    "category": "Education Support",
+    "description": "Require study kit & digital tablet device for 8th grade student daughter.",
+    "urgency": "Medium",
+    "status": "APPROVED",
+    "adminNotes": "Verified with Mumbai Slum Innovation Lab (Dharavi). Device allocated.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi",
+        "timestamp": "2026-09-08T10:00:00.000Z",
+        "note": "Request submitted online"
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Executive Administrator (admin@impactbridge.org)",
+        "timestamp": "2026-09-09T14:30:00.000Z",
+        "note": "Verified with Mumbai Slum Innovation Lab (Dharavi). Device allocated."
+      }
+    ],
+    "createdAt": "2026-09-08T10:00:00.000Z",
+    "updatedAt": "2026-09-09T14:30:00.000Z"
+  },
+  {
+    "id": "REQ-FH-2026-002",
+    "userId": null,
+    "requesterName": "Ramesh Patel",
+    "phone": "+91 91234 56789",
+    "email": "ramesh.patel.delhi@example.com",
+    "city": "New Delhi",
+    "category": "Food & Nutrition",
+    "description": "Emergency monthly nutrition ration pack for family of 4 affected by construction stoppage.",
+    "urgency": "Emergency",
+    "status": "PENDING",
+    "adminNotes": "",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Ramesh Patel (Public User)",
+        "timestamp": "2026-09-15T08:20:00.000Z",
+        "note": "Submitted via public Find Help portal"
+      }
+    ],
+    "createdAt": "2026-09-15T08:20:00.000Z",
+    "updatedAt": "2026-09-15T08:20:00.000Z"
+  },
+  {
+    "id": "REQ-FH-2026-003",
+    "userId": null,
+    "requesterName": "Geeta Soren",
+    "phone": "+91 94567 89012",
+    "email": "",
+    "city": "Ranchi",
+    "category": "Healthcare & Medicine",
+    "description": "Need assistance for post-surgery medication supplies and mobility walker.",
+    "urgency": "High",
+    "status": "NEEDS_INFO",
+    "adminNotes": "Kindly provide hospital discharge summary and prescription copy.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Geeta Soren (Public User)",
+        "timestamp": "2026-09-16T11:45:00.000Z",
+        "note": "Initial submission"
+      },
+      {
+        "action": "STATUS_CHANGE_TO_NEEDS_INFO",
+        "performedBy": "Executive Administrator (admin@impactbridge.org)",
+        "timestamp": "2026-09-17T09:15:00.000Z",
+        "note": "Requested hospital discharge slip"
+      }
+    ],
+    "createdAt": "2026-09-16T11:45:00.000Z",
+    "updatedAt": "2026-09-17T09:15:00.000Z"
+  }
+]

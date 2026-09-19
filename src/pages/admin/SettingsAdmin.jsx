@@ -185,7 +185,7 @@ export default function SettingsAdmin() {
               </thead>
               <tbody>
                 {[
-                  { name: 'Sunita Rao', email: 'sunita.rao@impactbridge.org', role: 'Executive Director', access: 'Super Admin (Full Access)', status: 'Active' },
+                  { name: 'Sunita Rao', email: 'director@impactbridge.org', role: 'Executive Director', access: 'Super Admin (Full Access)', status: 'Active' },
                   { name: 'Prof. Devendra Joshi', email: 'devendra.j@impactbridge.org', role: 'Trustee / Strategy', access: 'Auditor & Approver', status: 'Active' },
                   { name: 'Dr. Ananya Iyer', email: 'ananya.iyer@impactbridge.org', role: 'Director of Education', access: 'Programs & Volunteers', status: 'Active' },
                   { name: 'Vikramjit Singh', email: 'vikram.singh@impactbridge.org', role: 'Relief Logistics Lead', access: 'Field Ops & Radar', status: 'Active' }

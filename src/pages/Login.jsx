@@ -34,11 +34,11 @@ export default function Login() {
   const returnUrlRef = useRef(location.state?.from || null);
 
   // Form State
-  const [email, setEmail] = useState('sunita.rao@impactbridge.org');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-  const [selectedRole, setSelectedRole] = useState('admin');
+  const [selectedRole, setSelectedRole] = useState('donor');
 
   // Interactive UI State
   const [isLoading, setIsLoading] = useState(false);
@@ -100,11 +100,11 @@ export default function Login() {
           result.user.role === 'admin'
             ? '/admin/dashboard'
             : result.user.role === 'volunteer'
-            ? '/volunteer'
+            ? '/volunteer/dashboard'
             : result.user.role === 'beneficiary'
-            ? '/beneficiary'
+            ? '/beneficiary/dashboard'
             : result.user.role === 'donor'
-            ? '/donation'
+            ? '/donor/dashboard'
             : '/home'
         );
         navigate(targetRoute, { replace: true });
@@ -204,22 +204,25 @@ export default function Login() {
     }
   }, [location.state, location.pathname, addToast, navigate]);
 
-  // Demo accounts for 5 roles
+  // Demo accounts for 5 roles (Note: Admin password is never exposed in frontend code)
   const DEMO_ROLES = [
-    { id: 'admin', label: 'Admin', icon: ShieldCheck, email: 'sunita.rao@impactbridge.org', defaultPass: 'admin123' },
     { id: 'volunteer', label: 'Volunteer', icon: Users, email: 'aarav.sharma@example.com', defaultPass: 'volunteer123' },
-    { id: 'beneficiary', label: 'Beneficiary', icon: HandHeart, email: 'laxmi.devi@example.com', defaultPass: 'help123' },
     { id: 'donor', label: 'Donor', icon: Heart, email: 'aditya.singhania@corp.in', defaultPass: 'donor123' },
-    { id: 'guest', label: 'Public', icon: Globe, email: 'visitor@example.com', defaultPass: 'guest123' }
+    { id: 'beneficiary', label: 'Beneficiary', icon: HandHeart, email: 'laxmi.devi@example.com', defaultPass: 'help123' },
+    { id: 'guest', label: 'Public', icon: Globe, email: 'visitor@example.com', defaultPass: 'guest123' },
+    { id: 'admin', label: 'Admin', icon: ShieldCheck, email: 'admin@impactbridge.org', defaultPass: '' }
   ];
 
   const handleRoleSelect = (roleItem) => {
     setSelectedRole(roleItem.id);
     setEmail(roleItem.email);
-    setPassword(roleItem.defaultPass);
+    setPassword(roleItem.defaultPass || '');
     setEmailError('');
     setPasswordError('');
     setErrorMessage('');
+    if (roleItem.id === 'admin') {
+      addToast('Please enter your secure administrator password.', 'info');
+    }
   };
 
   const validateForm = () => {
@@ -290,11 +293,11 @@ export default function Login() {
         result.user.role === 'admin'
           ? '/admin/dashboard'
           : result.user.role === 'volunteer'
-          ? '/volunteer'
+          ? '/volunteer/dashboard'
           : result.user.role === 'beneficiary'
-          ? '/beneficiary'
+          ? '/beneficiary/dashboard'
           : result.user.role === 'donor'
-          ? '/donation'
+          ? '/donor/dashboard'
           : '/home'
       );
 

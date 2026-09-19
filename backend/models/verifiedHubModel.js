@@ -1,9 +1,20 @@
 /**
  * Verified Hub Data Model for Impact Bridge
  * Represents administrative and program hubs verified inside our application database.
+ * Backed by persistent JSON file storage with atomic read/writes.
  */
 
-const VERIFIED_HUBS_DATABASE = [
+const fs = require('fs');
+const path = require('path');
+
+const DATA_DIR = path.join(__dirname, '..', 'data');
+const VERIFIED_HUBS_FILE = path.join(DATA_DIR, 'verifiedHubs.json');
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+const INITIAL_VERIFIED_HUBS = [
   {
     id: 'LOC-01',
     name: 'Impact Bridge National HQ & Center',
@@ -186,31 +197,57 @@ const VERIFIED_HUBS_DATABASE = [
   }
 ];
 
+function initVerifiedHubsFile() {
+  try {
+    if (!fs.existsSync(VERIFIED_HUBS_FILE)) {
+      fs.writeFileSync(VERIFIED_HUBS_FILE, JSON.stringify(INITIAL_VERIFIED_HUBS, null, 2), 'utf-8');
+    }
+  } catch (err) {
+    console.error('[VerifiedHubModel] Error initializing verifiedHubs.json:', err.message);
+  }
+}
+
+initVerifiedHubsFile();
+
+function loadHubs() {
+  try {
+    if (!fs.existsSync(VERIFIED_HUBS_FILE)) {
+      return [...INITIAL_VERIFIED_HUBS];
+    }
+    const raw = fs.readFileSync(VERIFIED_HUBS_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('[VerifiedHubModel] Error loading verifiedHubs.json:', err.message);
+    return [...INITIAL_VERIFIED_HUBS];
+  }
+}
+
+function saveHubs(hubs) {
+  try {
+    fs.writeFileSync(VERIFIED_HUBS_FILE, JSON.stringify(hubs, null, 2), 'utf-8');
+    return true;
+  } catch (err) {
+    console.error('[VerifiedHubModel] Error saving verifiedHubs.json:', err.message);
+    return false;
+  }
+}
+
 /**
- * Retrieves verified hubs with optional filtering
- *
- * @param {Object} filters
- * @param {string} [filters.city]
- * @param {string} [filters.status]
- * @param {string} [filters.category]
- * @param {string} [filters.search]
- * @returns {Array} Filtered list of verified hubs
+ * Retrieves verified hubs with optional filtering (Used by public map)
  */
 function getVerifiedHubs(filters = {}) {
   const { city, status, category, search } = filters;
+  const hubs = loadHubs();
 
-  return VERIFIED_HUBS_DATABASE.filter((hub) => {
-    // Strictly require verification status
+  return hubs.filter((hub) => {
     if (hub.verificationStatus !== 'Verified' || !hub.isVerified) {
       return false;
     }
 
-    // City Filter
     if (city && city !== 'All' && hub.city.toLowerCase() !== city.toLowerCase()) {
       return false;
     }
 
-    // Status Filter (handles 'Active Hub', 'Completed Site', etc.)
     if (status && status !== 'All') {
       if (status === 'Active' && !hub.status.includes('Active')) return false;
       if (status === 'Completed' && !hub.status.includes('Completed')) return false;
@@ -219,12 +256,10 @@ function getVerifiedHubs(filters = {}) {
       }
     }
 
-    // Category Filter
     if (category && category !== 'All' && hub.category.toLowerCase() !== category.toLowerCase()) {
       return false;
     }
 
-    // Search Query (name, city, state, programName, address, category)
     if (search && search.trim()) {
       const q = search.toLowerCase().trim();
       const matches =
@@ -232,7 +267,7 @@ function getVerifiedHubs(filters = {}) {
         hub.city.toLowerCase().includes(q) ||
         hub.state.toLowerCase().includes(q) ||
         hub.address.toLowerCase().includes(q) ||
-        hub.programName.toLowerCase().includes(q) ||
+        (hub.programName && hub.programName.toLowerCase().includes(q)) ||
         hub.category.toLowerCase().includes(q);
 
       if (!matches) return false;
@@ -242,28 +277,161 @@ function getVerifiedHubs(filters = {}) {
   });
 }
 
-/**
- * Returns available filter options derived from verified data
- */
 function getFilterOptions() {
-  const verified = VERIFIED_HUBS_DATABASE.filter(h => h.verificationStatus === 'Verified');
-  const cities = ['All', ...Array.from(new Set(verified.map(h => h.city)))];
-  const categories = ['All', ...Array.from(new Set(verified.map(h => h.category)))];
-  const statuses = ['All', ...Array.from(new Set(verified.map(h => h.status)))];
+  const hubs = loadHubs();
+  const verified = hubs.filter((h) => h.verificationStatus === 'Verified');
+  const cities = ['All', ...Array.from(new Set(verified.map((h) => h.city)))];
+  const categories = ['All', ...Array.from(new Set(verified.map((h) => h.category)))];
+  const statuses = ['All', ...Array.from(new Set(verified.map((h) => h.status)))];
 
   return { cities, categories, statuses };
 }
 
-/**
- * Returns total count of all verified hubs in the database
- */
 function getTotalVerifiedCount() {
-  return VERIFIED_HUBS_DATABASE.filter(h => h.verificationStatus === 'Verified' && h.isVerified).length;
+  const hubs = loadHubs();
+  return hubs.filter((h) => h.verificationStatus === 'Verified' && h.isVerified).length;
+}
+
+// Admin CRUD Methods
+function findById(id) {
+  if (!id) return null;
+  const hubs = loadHubs();
+  return hubs.find((h) => h.id === id) || null;
+}
+
+function findAll(filters = {}) {
+  let hubs = loadHubs();
+  const { city, category, status, search, page = 1, limit = 50 } = filters;
+
+  if (city && city !== 'All') {
+    hubs = hubs.filter((h) => h.city.toLowerCase() === city.toLowerCase());
+  }
+
+  if (category && category !== 'All') {
+    hubs = hubs.filter((h) => h.category.toLowerCase() === category.toLowerCase());
+  }
+
+  if (status && status !== 'All') {
+    hubs = hubs.filter((h) => h.status.toLowerCase() === status.toLowerCase());
+  }
+
+  if (search && search.trim()) {
+    const q = search.toLowerCase().trim();
+    hubs = hubs.filter(
+      (h) =>
+        h.name.toLowerCase().includes(q) ||
+        h.city.toLowerCase().includes(q) ||
+        h.state.toLowerCase().includes(q) ||
+        h.address.toLowerCase().includes(q) ||
+        (h.programName && h.programName.toLowerCase().includes(q)) ||
+        h.category.toLowerCase().includes(q)
+    );
+  }
+
+  const total = hubs.length;
+  const startIndex = (page - 1) * limit;
+  const paginated = hubs.slice(startIndex, startIndex + Number(limit));
+
+  return {
+    hubs: paginated,
+    total,
+    page: Number(page),
+    limit: Number(limit),
+    totalPages: Math.ceil(total / Number(limit))
+  };
+}
+
+function createVerifiedHub(hubData) {
+  const hubs = loadHubs();
+  const timestamp = Date.now();
+  const newId = `LOC-${timestamp.toString().slice(-4)}`;
+
+  const lat = Number(hubData.latitude || (hubData.coordinates && hubData.coordinates[0]) || 20.5937);
+  const lng = Number(hubData.longitude || (hubData.coordinates && hubData.coordinates[1]) || 78.9629);
+
+  const newHub = {
+    id: newId,
+    name: String(hubData.name).trim(),
+    category: hubData.category || 'NGO Center',
+    city: String(hubData.city).trim(),
+    state: String(hubData.state || '').trim(),
+    address: String(hubData.address || '').trim(),
+    latitude: lat,
+    longitude: lng,
+    coordinates: [lat, lng],
+    programName: String(hubData.programName || '').trim(),
+    beneficiaries: Number(hubData.beneficiaries) || 0,
+    volunteers: Number(hubData.volunteers) || 0,
+    status: hubData.status || 'Active Hub',
+    verificationStatus: 'Verified',
+    isVerified: true,
+    phone: String(hubData.phone || '').trim(),
+    lead: String(hubData.lead || '').trim(),
+    source: 'Impact Bridge',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  hubs.unshift(newHub);
+  saveHubs(hubs);
+  return newHub;
+}
+
+function updateVerifiedHub(id, updates = {}) {
+  const hubs = loadHubs();
+  const index = hubs.findIndex((h) => h.id === id);
+  if (index === -1) return null;
+
+  const current = hubs[index];
+  const lat = updates.latitude !== undefined ? Number(updates.latitude) : current.latitude;
+  const lng = updates.longitude !== undefined ? Number(updates.longitude) : current.longitude;
+
+  const updatedHub = {
+    ...current,
+    ...updates,
+    id: current.id,
+    latitude: lat,
+    longitude: lng,
+    coordinates: [lat, lng],
+    isVerified: true,
+    verificationStatus: 'Verified',
+    updatedAt: new Date().toISOString()
+  };
+
+  hubs[index] = updatedHub;
+  saveHubs(hubs);
+  return updatedHub;
+}
+
+function deleteVerifiedHub(id) {
+  const hubs = loadHubs();
+  const index = hubs.findIndex((h) => h.id === id);
+  if (index === -1) return false;
+
+  const removed = hubs.splice(index, 1)[0];
+  saveHubs(hubs);
+  return removed;
+}
+
+function getStats() {
+  const hubs = loadHubs();
+  return {
+    total: hubs.length,
+    active: hubs.filter((h) => h.status.includes('Active')).length
+  };
 }
 
 module.exports = {
-  VERIFIED_HUBS_DATABASE,
+  get VERIFIED_HUBS_DATABASE() {
+    return loadHubs();
+  },
   getVerifiedHubs,
   getFilterOptions,
-  getTotalVerifiedCount
+  getTotalVerifiedCount,
+  findById,
+  findAll,
+  createVerifiedHub,
+  updateVerifiedHub,
+  deleteVerifiedHub,
+  getStats
 };

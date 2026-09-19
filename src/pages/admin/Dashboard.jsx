@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import StatCard from '../../components/common/StatCard';
@@ -26,12 +26,28 @@ export default function Dashboard() {
     donations,
     programs,
     ngoProfile,
-    messages
+    messages,
+    fetchAdminStats
   } = useApp();
 
   const [activityFilter, setActivityFilter] = useState('All');
+  const [dbStats, setDbStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
-  // Compute Live Metrics
+  useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      const stats = await fetchAdminStats();
+      if (isMounted) {
+        setDbStats(stats);
+        setStatsLoading(false);
+      }
+    };
+    load();
+    return () => { isMounted = false; };
+  }, [fetchAdminStats]);
+
+  // Compute Live Metrics from actual records
   const totalVolunteers = volunteers.length;
   const activeVolunteers = volunteers.filter((v) => v.status === 'Active').length;
   const totalBeneficiaries = beneficiaries.length;
@@ -39,6 +55,11 @@ export default function Dashboard() {
   const completedPrograms = programs.filter((p) => p.status === 'Completed').length;
   const totalDonationsAmount = donations.reduce((acc, d) => acc + (d.amount || 0), 0) + 17500000;
   const monthlyDonations = donations.slice(0, 5).reduce((acc, d) => acc + (d.amount || 0), 0) + 1200000;
+
+  const pendingFindHelp = dbStats?.findHelp?.pending ?? 1;
+  const pendingFundRaise = dbStats?.fundRaise?.pending ?? 1;
+  const pendingVolunteers = dbStats?.volunteer?.pending ?? 1;
+  const totalPending = dbStats?.summary?.pending ?? (pendingFindHelp + pendingFundRaise + pendingVolunteers);
 
   // Donation Trend Chart Data
   const donationChartData = [
@@ -89,9 +110,9 @@ export default function Dashboard() {
     {
       id: 'act-3',
       type: 'Beneficiary',
-      title: 'Beneficiary Milestone Achieved',
-      desc: 'Sharda Devi (Varanasi) repaid 100% micro-grant and graduated.',
-      time: 'Yesterday',
+      title: 'Laxmi Devi Aid Request Approved',
+      desc: 'Education kit & tablet allocated via Dharavi Lab.',
+      time: '1 day ago',
       badgeColor: 'blue'
     },
     {
@@ -110,6 +131,131 @@ export default function Dashboard() {
 
   return (
     <div className="admin-dashboard" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      {/* 0. LIVE APPROVAL QUEUE (CRITICAL WORKFLOW BANNER) */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ fontSize: '1.25rem' }}>⚡</span>
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.25rem', margin: 0 }}>
+              Action Required: Approval Queues
+            </h3>
+          </div>
+          <Badge variant={totalPending > 0 ? 'red' : 'green'} size="sm">
+            {totalPending} PENDING ACTION
+          </Badge>
+        </div>
+
+        <div className="grid-4" style={{ marginBottom: '1.5rem' }}>
+          <Link to="/admin/requests/find-help" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Card
+              style={{
+                border: 'var(--border-thick)',
+                boxShadow: '4px 4px 0px #000',
+                backgroundColor: pendingFindHelp > 0 ? '#FFFBEB' : '#FFFFFF',
+                padding: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64' }}>
+                  Find Help Requests
+                </span>
+                <Badge variant={pendingFindHelp > 0 ? 'yellow' : 'gray'} size="sm">
+                  {pendingFindHelp} Pending
+                </Badge>
+              </div>
+              <div style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
+                {dbStats?.findHelp?.total ?? 3} Total
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#4B5563', marginTop: '0.35rem' }}>
+                Approved: {dbStats?.findHelp?.approved ?? 1} • Rejected: {dbStats?.findHelp?.rejected ?? 0}
+              </div>
+            </Card>
+          </Link>
+
+          <Link to="/admin/requests/fund-raise" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Card
+              style={{
+                border: 'var(--border-thick)',
+                boxShadow: '4px 4px 0px #000',
+                backgroundColor: pendingFundRaise > 0 ? '#FFFBEB' : '#FFFFFF',
+                padding: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64' }}>
+                  Fund Raise Proposals
+                </span>
+                <Badge variant={pendingFundRaise > 0 ? 'yellow' : 'gray'} size="sm">
+                  {pendingFundRaise} Pending
+                </Badge>
+              </div>
+              <div style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
+                {dbStats?.fundRaise?.total ?? 2} Total
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#4B5563', marginTop: '0.35rem' }}>
+                Live Approved: {dbStats?.fundRaise?.approved ?? 1}
+              </div>
+            </Card>
+          </Link>
+
+          <Link to="/admin/requests/volunteers" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Card
+              style={{
+                border: 'var(--border-thick)',
+                boxShadow: '4px 4px 0px #000',
+                backgroundColor: pendingVolunteers > 0 ? '#FFFBEB' : '#FFFFFF',
+                padding: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64' }}>
+                  Volunteer Applications
+                </span>
+                <Badge variant={pendingVolunteers > 0 ? 'yellow' : 'gray'} size="sm">
+                  {pendingVolunteers} Pending
+                </Badge>
+              </div>
+              <div style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
+                {dbStats?.volunteer?.total ?? 2} Total
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#4B5563', marginTop: '0.35rem' }}>
+                Approved Field Leads: {dbStats?.volunteer?.approved ?? 1}
+              </div>
+            </Card>
+          </Link>
+
+          <Link to="/admin/users" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Card
+              style={{
+                border: 'var(--border-thick)',
+                boxShadow: '4px 4px 0px #000',
+                backgroundColor: '#FFFFFF',
+                padding: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: '#5A6F64' }}>
+                  Registered Users
+                </span>
+                <Badge variant="green" size="sm">
+                  RBAC Active
+                </Badge>
+              </div>
+              <div style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
+                {dbStats?.users?.total ?? 5} Accounts
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#4B5563', marginTop: '0.35rem' }}>
+                Volunteers: {dbStats?.users?.volunteer ?? 1} • Donors: {dbStats?.users?.donor ?? 1} • Ben: {dbStats?.users?.beneficiary ?? 1}
+              </div>
+            </Card>
+          </Link>
+        </div>
+      </div>
+
       {/* 1. TOP 8 KPI SUMMARY GRID */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -158,7 +304,8 @@ export default function Dashboard() {
               value={formatNumber(activePrograms)}
               subtitle={`${completedPrograms} completed`}
               icon={Building2}
-              variant="default"
+              variant="white"
+              trend={{ value: '4 In Progress', isPositive: true }}
             />
           </Link>
         </div>

@@ -5,6 +5,7 @@ import BrandLogo from '../common/BrandLogo';
 import {
   LayoutDashboard,
   Users,
+  Heart,
   HeartHandshake,
   CreditCard,
   CalendarCheck,
@@ -14,18 +15,47 @@ import {
   Settings,
   Globe,
   LogOut,
+  FileText,
+  HandHeart,
+  UserCheck,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Building2
 } from 'lucide-react';
 
 export default function AdminSidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen }) {
-  const { messages, logoutUser } = useApp();
+  const { messages, logoutUser, fetchAdminStats, fetchAdminNgos } = useApp();
+  const [stats, setStats] = React.useState(null);
+  const [pendingNgosCount, setPendingNgosCount] = React.useState(0);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      const data = await fetchAdminStats();
+      if (isMounted) setStats(data);
+      try {
+        const ngoRes = await fetchAdminNgos('PENDING');
+        if (isMounted && ngoRes?.success) {
+          setPendingNgosCount(ngoRes.ngos?.length || 0);
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+    load();
+    return () => { isMounted = false; };
+  }, [fetchAdminStats, fetchAdminNgos]);
 
   const unreadMessagesCount = messages.filter((m) => !m.read).length;
 
   const menuItems = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/volunteers', label: 'Volunteers', icon: Users },
+    { path: '/admin/requests/find-help', label: 'Find Help Requests', icon: HandHeart, count: stats?.findHelp?.pending ?? 0 },
+    { path: '/admin/requests/fund-raise', label: 'Fund Raise Requests', icon: Heart, count: stats?.fundRaise?.pending ?? 0 },
+    { path: '/admin/requests/volunteers', label: 'Volunteer Apps', icon: UserCheck, count: stats?.volunteer?.pending ?? 0 },
+    { path: '/admin/ngo-registrations', label: 'NGO Registrations', icon: Building2, count: pendingNgosCount },
+    { path: '/admin/users', label: 'Users & Roles', icon: Users },
+    { path: '/admin/volunteers', label: 'Volunteers Directory', icon: Users },
     { path: '/admin/beneficiaries', label: 'Beneficiaries', icon: HeartHandshake },
     { path: '/admin/donations', label: 'Donations', icon: CreditCard },
     { path: '/admin/programs', label: 'Programs', icon: CalendarCheck },
