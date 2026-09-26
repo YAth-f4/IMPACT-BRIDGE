@@ -1,5 +1,279 @@
 [
   {
+    "id": "NGO-1790417512427-405",
+    "organizationName": "ngo for gay peopele",
+    "description": "its imp to help gay people",
+    "ngoType": "Trust",
+    "founder": "oppooo",
+    "authorizedRepresentative": "Aarav Sharma",
+    "contactEmail": "aarav.sharma@example.com",
+    "phone": "7899408949",
+    "website": "",
+    "address": "Yamuna Sadan Oppsite MSEB Collony Palghar Boisar Road West",
+    "city": "Palghar",
+    "state": "Maharashtra",
+    "pincode": "401404",
+    "registrationNumber": "MH/2018/104797",
+    "registrationCertificate": "/uploads/ngos/cert-1790417512423-4544.jpg",
+    "logo": "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80",
+    "photos": [],
+    "causes": [
+      "Education & Literacy"
+    ],
+    "areasOfWork": [
+      "Classroom Infrastructure",
+      "Remedial Tutoring",
+      "Digital Literacy"
+    ],
+    "programs": [
+      "Mobile Science Lab",
+      "Evening Study Centers"
+    ],
+    "yearsOfOperation": 5,
+    "ownerUserId": "USR-VOL-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Sunita Rao (USR-ADMIN-01)",
+      "reviewedAt": "2026-09-26T10:20:51.954Z",
+      "status": "APPROVED",
+      "note": "",
+      "notes": "",
+      "reviewNotes": ""
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aarav Sharma (aarav.sharma@example.com)",
+        "timestamp": "2026-09-26T10:11:52.427Z",
+        "note": "New NGO registration application submitted for administrator verification."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:14:55.943Z",
+        "note": "Testing approve"
+      },
+      {
+        "action": "STATUS_CHANGE_TO_NEEDS_INFO",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:15:30.133Z",
+        "note": "Testing needs info"
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:18:37.187Z",
+        "note": "All statutory certificates verified. Approved partner."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_NEEDS_INFO",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:18:37.203Z",
+        "note": "Please provide certified copy of FCRA registration."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_REJECTED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:18:37.213Z",
+        "note": "Documentation does not meet minimum statutory criteria."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:18:37.237Z",
+        "note": "Final clearance granted."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:20:51.950Z",
+        "note": "Status transitioned from APPROVED to APPROVED"
+      }
+    ],
+    "createdAt": "2026-09-26T10:11:52.427Z",
+    "updatedAt": "2026-09-26T10:20:51.950Z"
+  },
+  {
+    "id": "NGO-1790417257384-579",
+    "organizationName": "Vikas Rural Welfare Foundation",
+    "description": "Committed to empowering agrarian communities with solar microgrids, watershed management, and women self-help collectives.",
+    "ngoType": "Society",
+    "founder": "Aarav Sharma",
+    "authorizedRepresentative": "Aarav Sharma",
+    "contactEmail": "contact@vikaswelfare.org",
+    "phone": "+91 98230 11223",
+    "website": "https://vikaswelfare.org",
+    "address": "Survey No. 88, Green Valley Rd",
+    "city": "Nashik",
+    "state": "Maharashtra",
+    "pincode": "422001",
+    "registrationNumber": "MAH/NSK/1790417257370",
+    "registrationCertificate": "/uploads/ngos/cert-1790417257382-6806.pdf",
+    "logo": "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80",
+    "photos": [],
+    "causes": [
+      "Rural Development & Infrastructure",
+      "Environmental Conservation"
+    ],
+    "areasOfWork": [
+      "Solar Pumps",
+      "Watershed Management"
+    ],
+    "programs": [
+      "Project Surya Jal"
+    ],
+    "yearsOfOperation": 7,
+    "ownerUserId": "USR-VOL-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Sunita Rao (USR-ADMIN-01)",
+      "reviewedAt": "2026-09-26T10:20:58.687Z",
+      "status": "APPROVED",
+      "note": "",
+      "notes": "",
+      "reviewNotes": ""
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aarav Sharma (aarav.sharma@example.com)",
+        "timestamp": "2026-09-26T10:07:37.384Z",
+        "note": "New NGO registration application submitted for administrator verification."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T10:20:58.685Z",
+        "note": "Status transitioned from PENDING to APPROVED"
+      }
+    ],
+    "createdAt": "2026-09-26T10:07:37.384Z",
+    "updatedAt": "2026-09-26T10:20:58.685Z"
+  },
+  {
+    "id": "NGO-1790416996183-864",
+    "organizationName": "Pratham Hope Foundation",
+    "description": "Empowering children across rural communities with quality educational resources and digital literacy.",
+    "ngoType": "Trust",
+    "founder": "Aarav Sharma",
+    "authorizedRepresentative": "Aarav Sharma",
+    "contactEmail": "contact@prathamhope.org",
+    "phone": "+91 98765 43210",
+    "website": "https://prathamhope.org",
+    "address": "42 Lotus Park, MG Road",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "pincode": "411001",
+    "registrationNumber": "MAH/PUN/2024/9999",
+    "registrationCertificate": "/uploads/ngos/cert-1790416996182-5327.png",
+    "logo": "/uploads/ngos/logo-1790416996182-7825.png",
+    "photos": [
+      "/uploads/ngos/photo-0-1790416996183-2905.png"
+    ],
+    "causes": [
+      "Education & Literacy"
+    ],
+    "areasOfWork": [
+      "Classroom Infrastructure",
+      "Digital Literacy"
+    ],
+    "programs": [
+      "Mobile Science Lab"
+    ],
+    "yearsOfOperation": 5,
+    "ownerUserId": "USR-VOL-01",
+    "status": "PENDING",
+    "isVerified": false,
+    "adminReview": {
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "notes": "",
+      "rejectionReason": ""
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Aarav Sharma (aarav.sharma@example.com)",
+        "timestamp": "2026-09-26T10:03:16.183Z",
+        "note": "New NGO registration application submitted for administrator verification."
+      }
+    ],
+    "createdAt": "2026-09-26T10:03:16.183Z",
+    "updatedAt": "2026-09-26T10:03:16.183Z"
+  },
+  {
+    "id": "NGO-1790415368833-908",
+    "organizationName": "Pratibha Education Society",
+    "description": "Empowering tribal girl children with educational scholarships and mentoring.",
+    "ngoType": "Society",
+    "founder": "Shalini Pradhan",
+    "authorizedRepresentative": "Shalini Pradhan",
+    "contactEmail": "pratibha.1790415368832@example.org",
+    "phone": "+91 99887 76655",
+    "website": "",
+    "address": "Plot 10, Civil Lines",
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "pincode": "440001",
+    "registrationNumber": "MH/1790415368832/TEST",
+    "registrationCertificate": "/images/cert-sample.pdf",
+    "logo": "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80",
+    "photos": [],
+    "causes": [
+      "Education",
+      "Girl Child"
+    ],
+    "areasOfWork": [
+      "Scholarships",
+      "Mentorship"
+    ],
+    "programs": [
+      "Shiksha Jyoti"
+    ],
+    "yearsOfOperation": 5,
+    "ownerUserId": "USR-BEN-01",
+    "status": "APPROVED",
+    "isVerified": true,
+    "adminReview": {
+      "reviewedBy": "Sunita Rao (USR-ADMIN-01)",
+      "reviewedAt": "2026-09-26T09:36:08.850Z",
+      "status": "APPROVED",
+      "note": "Exemplary credentials verified. Approved as Impact Bridge Partner.",
+      "notes": "Exemplary credentials verified. Approved as Impact Bridge Partner.",
+      "reviewNotes": "Exemplary credentials verified. Approved as Impact Bridge Partner."
+    },
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi (laxmi.devi@example.com)",
+        "timestamp": "2026-09-26T09:36:08.833Z",
+        "note": "New NGO registration application submitted for administrator verification."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_NEEDS_INFO",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T09:36:08.839Z",
+        "note": "Please provide certified audit statement copy."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_REJECTED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T09:36:08.844Z",
+        "note": "Non-compliant documentation submitted."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_APPROVED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T09:36:08.849Z",
+        "note": "Exemplary credentials verified. Approved as Impact Bridge Partner."
+      }
+    ],
+    "createdAt": "2026-09-26T09:36:08.833Z",
+    "updatedAt": "2026-09-26T09:36:08.849Z"
+  },
+  {
     "id": "NGO-1789843781096-454",
     "organizationName": "Rural Health & Literacy Mission",
     "description": "Dedicated to providing primary healthcare clinics and evening schools in tribal belts.",
@@ -28,15 +302,15 @@
     ],
     "yearsOfOperation": 6,
     "ownerUserId": "USR-1789843781020-776",
-    "status": "APPROVED",
-    "isVerified": true,
+    "status": "REJECTED",
+    "isVerified": false,
     "adminReview": {
       "reviewedBy": "Sunita Rao (USR-ADMIN-01)",
-      "reviewedAt": "2026-09-19T18:49:41.130Z",
-      "status": "APPROVED",
-      "note": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge.",
-      "notes": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge.",
-      "reviewNotes": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge."
+      "reviewedAt": "2026-09-26T11:06:37.146Z",
+      "status": "REJECTED",
+      "note": ",,",
+      "notes": ",,",
+      "reviewNotes": ",,"
     },
     "auditLog": [
       {
@@ -62,10 +336,16 @@
         "performedBy": "Sunita Rao (Admin)",
         "timestamp": "2026-09-19T18:49:41.130Z",
         "note": "All legal documents and FCRA/12A clearances validated. Welcome to Impact Bridge."
+      },
+      {
+        "action": "STATUS_CHANGE_TO_REJECTED",
+        "performedBy": "Sunita Rao (Admin)",
+        "timestamp": "2026-09-26T11:06:37.141Z",
+        "note": ",,"
       }
     ],
     "createdAt": "2026-09-19T18:49:41.096Z",
-    "updatedAt": "2026-09-19T18:49:41.130Z"
+    "updatedAt": "2026-09-26T11:06:37.141Z"
   },
   {
     "id": "NGO-1789843753390-410",

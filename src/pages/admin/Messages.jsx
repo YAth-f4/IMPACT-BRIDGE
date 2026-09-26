@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
+import { Skeleton } from '../../components/common/Skeleton';
 import { Input, Textarea } from '../../components/common/Input';
 import { formatRelativeTime, formatDate } from '../../utils/formatters';
 import {
@@ -16,42 +17,99 @@ import {
   Send,
   Users,
   Heart,
-  MessageSquare
+  MessageSquare,
+  CheckCircle,
+  RefreshCw,
+  X
 } from 'lucide-react';
 
 export default function Messages() {
   const {
-    messages,
+    messages: fallbackMessages,
     replyMessage,
     toggleStarMessage,
     markMessageRead,
-    deleteMessage
+    deleteMessage,
+    fetchAdminMessages,
+    updateAdminMessageStatus,
+    deleteAdminMessage
   } = useApp();
 
+  const [liveMessages, setLiveMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeFolder, setActiveFolder] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMessage, setSelectedMessage] = useState(messages[0] || null);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [submittingReply, setSubmittingReply] = useState(false);
+
+  const loadMessages = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchAdminMessages();
+      if (res && res.messages && res.messages.length > 0) {
+        setLiveMessages(res.messages);
+        setSelectedMessage((prev) => {
+          if (prev) {
+            const found = res.messages.find((m) => m.id === prev.id);
+            return found || res.messages[0];
+          }
+          return res.messages[0];
+        });
+      } else if (fallbackMessages && fallbackMessages.length > 0) {
+        setLiveMessages(fallbackMessages);
+        if (!selectedMessage) setSelectedMessage(fallbackMessages[0]);
+      } else {
+        setLiveMessages([]);
+        setSelectedMessage(null);
+      }
+    } catch {
+      setLiveMessages(fallbackMessages || []);
+      if (!selectedMessage && fallbackMessages?.length > 0) {
+        setSelectedMessage(fallbackMessages[0]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMessages();
+  }, []);
+
+  const effectiveMessages = liveMessages.length > 0 ? liveMessages : (fallbackMessages || []);
 
   const folders = [
-    { id: 'All', label: 'All Inquiries', icon: Inbox, count: messages.length },
-    { id: 'Volunteers', label: 'Volunteers', icon: Users, count: messages.filter((m) => m.category === 'Volunteers').length },
-    { id: 'Donors', label: 'Donors & CSR', icon: Heart, count: messages.filter((m) => m.category === 'Donors').length },
-    { id: 'Contact Form', label: 'Contact Submissions', icon: MessageSquare, count: messages.filter((m) => m.category === 'Contact Form').length },
-    { id: 'Starred', label: 'Starred Items', icon: Star, count: messages.filter((m) => m.starred).length }
+    { id: 'All', label: 'All Inquiries', icon: Inbox, count: effectiveMessages.length },
+    { id: 'UNREAD', label: 'Unread', icon: Mail, count: effectiveMessages.filter((m) => m.status === 'UNREAD' || (!m.read && m.status !== 'READ' && m.status !== 'RESOLVED')).length },
+    { id: 'Volunteers', label: 'Volunteers', icon: Users, count: effectiveMessages.filter((m) => m.category === 'Volunteers').length },
+    { id: 'Donors', label: 'Donors & CSR', icon: Heart, count: effectiveMessages.filter((m) => m.category === 'Donors').length },
+    { id: 'Contact Form', label: 'Contact Submissions', icon: MessageSquare, count: effectiveMessages.filter((m) => m.category === 'Contact Form').length },
+    { id: 'RESOLVED', label: 'Resolved', icon: CheckCircle, count: effectiveMessages.filter((m) => m.status === 'RESOLVED').length },
+    { id: 'Starred', label: 'Starred Items', icon: Star, count: effectiveMessages.filter((m) => m.starred).length }
   ];
 
-  const filteredMessages = messages.filter((m) => {
+  const filteredMessages = effectiveMessages.filter((m) => {
+    const sender = m.senderName || m.name || '';
+    const subject = m.subject || '';
+    const content = m.content || m.message || '';
+
     const matchesSearch =
-      m.senderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.content.toLowerCase().includes(searchQuery.toLowerCase());
+      sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      content.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const isUnread = m.status === 'UNREAD' || (!m.read && m.status !== 'READ' && m.status !== 'RESOLVED');
 
     const matchesFolder =
       activeFolder === 'All'
         ? true
+        : activeFolder === 'UNREAD'
+        ? isUnread
+        : activeFolder === 'RESOLVED'
+        ? m.status === 'RESOLVED'
         : activeFolder === 'Starred'
         ? m.starred
         : m.category === activeFolder;
@@ -59,21 +117,98 @@ export default function Messages() {
     return matchesSearch && matchesFolder;
   });
 
-  const handleSelectMessage = (msg) => {
+  const handleSelectMessage = async (msg) => {
     setSelectedMessage(msg);
-    if (!msg.read) {
-      markMessageRead(msg.id, true);
+    const isUnread = msg.status === 'UNREAD' || (!msg.read && msg.status !== 'READ' && msg.status !== 'RESOLVED');
+    if (isUnread) {
+      try {
+        await updateAdminMessageStatus(msg.id, 'READ');
+        setLiveMessages((prev) =>
+          prev.map((m) => (m.id === msg.id ? { ...m, status: 'READ', read: true } : m))
+        );
+      } catch {
+        markMessageRead(msg.id, true);
+      }
     }
   };
 
-  const handleSendReply = (e) => {
+  const handleSendReply = async (e) => {
     e.preventDefault();
     if (!replyText || !selectedMessage) return;
 
-    replyMessage(selectedMessage.id, replyText);
-    setReplyText('');
-    setReplyModalOpen(false);
+    setSubmittingReply(true);
+    try {
+      await updateAdminMessageStatus(selectedMessage.id, 'RESOLVED', replyText);
+      const newReply = {
+        date: new Date().toISOString(),
+        author: 'Impact Bridge Administrator',
+        text: replyText
+      };
+      setLiveMessages((prev) =>
+        prev.map((m) =>
+          m.id === selectedMessage.id
+            ? {
+                ...m,
+                status: 'RESOLVED',
+                read: true,
+                replyHistory: [...(m.replyHistory || []), newReply]
+              }
+            : m
+        )
+      );
+      setSelectedMessage((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: 'RESOLVED',
+              read: true,
+              replyHistory: [...(prev.replyHistory || []), newReply]
+            }
+          : null
+      );
+      setReplyText('');
+      setReplyModalOpen(false);
+    } catch {
+      replyMessage(selectedMessage.id, replyText);
+      setReplyText('');
+      setReplyModalOpen(false);
+    } finally {
+      setSubmittingReply(false);
+    }
   };
+
+  const handleResolveDirectly = async (msgId) => {
+    try {
+      await updateAdminMessageStatus(msgId, 'RESOLVED');
+      setLiveMessages((prev) =>
+        prev.map((m) => (m.id === msgId ? { ...m, status: 'RESOLVED', read: true } : m))
+      );
+      if (selectedMessage?.id === msgId) {
+        setSelectedMessage((prev) => (prev ? { ...prev, status: 'RESOLVED', read: true } : null));
+      }
+    } catch {
+      // handled
+    }
+  };
+
+  const handleDelete = async (msgId) => {
+    try {
+      await deleteAdminMessage(msgId);
+      setLiveMessages((prev) => prev.filter((m) => m.id !== msgId));
+      if (selectedMessage?.id === msgId) {
+        setSelectedMessage(null);
+      }
+    } catch {
+      deleteMessage(msgId);
+      if (selectedMessage?.id === msgId) {
+        setSelectedMessage(null);
+      }
+    }
+  };
+
+  const unreadCount = effectiveMessages.filter(
+    (m) => m.status === 'UNREAD' || (!m.read && m.status !== 'READ' && m.status !== 'RESOLVED')
+  ).length;
 
   return (
     <div className="admin-messages" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -81,12 +216,16 @@ export default function Messages() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.35rem' }}>
-            Inquiries & Communication Hub ({messages.filter((m) => !m.read).length} Unread)
+            Inquiries & Communication Hub ({unreadCount} Unread)
           </h3>
           <p style={{ fontSize: '0.82rem', color: '#5A6F64', fontWeight: 600 }}>
-            Unified inbox for volunteer applications, donor inquiries, and public support requests.
+            Unified real-time inbox for donor inquiries, volunteer questions, and public submissions.
           </p>
         </div>
+
+        <Button variant="white" size="sm" icon={RefreshCw} onClick={loadMessages}>
+          Refresh
+        </Button>
       </div>
 
       {/* 2. INBOX MAIN LAYOUT */}
@@ -168,13 +307,28 @@ export default function Messages() {
           />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto', maxHeight: '520px' }}>
-            {filteredMessages.length === 0 ? (
+            {loading ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                <div style={{ padding: '0.75rem', border: '1.5px solid #000', borderRadius: '4px', background: '#FFF' }}>
+                  <Skeleton width="60%" height="14px" style={{ marginBottom: '6px' }} />
+                  <Skeleton width="85%" height="12px" style={{ marginBottom: '6px' }} />
+                  <Skeleton width="40%" height="10px" />
+                </div>
+                <div style={{ padding: '0.75rem', border: '1.5px solid #000', borderRadius: '4px', background: '#FFF' }}>
+                  <Skeleton width="50%" height="14px" style={{ marginBottom: '6px' }} />
+                  <Skeleton width="75%" height="12px" style={{ marginBottom: '6px' }} />
+                  <Skeleton width="30%" height="10px" />
+                </div>
+              </div>
+            ) : filteredMessages.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '2rem 1rem', fontSize: '0.85rem', color: '#5A6F64' }}>
                 No messages in this folder.
               </div>
             ) : (
               filteredMessages.map((msg) => {
                 const isSelected = selectedMessage?.id === msg.id;
+                const isUnread = msg.status === 'UNREAD' || (!msg.read && msg.status !== 'READ' && msg.status !== 'RESOLVED');
+                const isResolved = msg.status === 'RESOLVED';
                 return (
                   <div
                     key={msg.id}
@@ -183,18 +337,18 @@ export default function Messages() {
                       padding: '0.75rem',
                       border: '1.5px solid #000',
                       borderRadius: '4px',
-                      backgroundColor: isSelected ? 'var(--brand-light-green)' : msg.read ? '#FFFFFF' : '#FFF9DB',
+                      backgroundColor: isSelected ? 'var(--brand-light-green)' : isUnread ? '#FFF9DB' : '#FFFFFF',
                       boxShadow: isSelected ? '3px 3px 0 #000' : '1px 1px 0 #000',
                       cursor: 'pointer',
                       transition: 'all 0.1s ease'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                      <span style={{ fontWeight: msg.read ? 700 : 900, fontSize: '0.85rem' }}>
-                        {msg.senderName}
+                      <span style={{ fontWeight: isUnread ? 900 : 700, fontSize: '0.85rem' }}>
+                        {msg.senderName || msg.name}
                       </span>
                       <span style={{ fontSize: '0.7rem', color: '#5A6F64', fontWeight: 600 }}>
-                        {formatRelativeTime(msg.date)}
+                        {formatRelativeTime(msg.createdAt || msg.date)}
                       </span>
                     </div>
 
@@ -202,9 +356,16 @@ export default function Messages() {
                       {msg.subject}
                     </div>
 
-                    <p style={{ fontSize: '0.75rem', color: '#5A6F64', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {msg.content}
-                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <p style={{ fontSize: '0.75rem', color: '#5A6F64', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0, maxWidth: '200px' }}>
+                        {msg.content || msg.message}
+                      </p>
+                      {isResolved && (
+                        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--brand-dark-green)', backgroundColor: '#E2ECE6', padding: '1px 4px', borderRadius: '3px' }}>
+                          ✓ Done
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })
@@ -218,17 +379,21 @@ export default function Messages() {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '1rem', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                    <Badge variant="yellow" size="sm">{selectedMessage.category}</Badge>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px', flexWrap: 'wrap' }}>
+                    <Badge variant="yellow" size="sm">{selectedMessage.category || 'General'}</Badge>
+                    <Badge variant={selectedMessage.status === 'RESOLVED' ? 'green' : selectedMessage.status === 'UNREAD' ? 'yellow' : 'white'} size="sm">
+                      {selectedMessage.status || 'READ'}
+                    </Badge>
                     <span style={{ fontSize: '0.75rem', color: '#5A6F64', fontWeight: 600 }}>
-                      Received: {formatDate(selectedMessage.date)}
+                      Received: {formatDate(selectedMessage.createdAt || selectedMessage.date)}
                     </span>
                   </div>
                   <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.3rem' }}>
                     {selectedMessage.subject}
                   </h3>
                   <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)', marginTop: '2px' }}>
-                    From: {selectedMessage.senderName} ({selectedMessage.email})
+                    From: {selectedMessage.senderName || selectedMessage.name} ({selectedMessage.email})
+                    {selectedMessage.phone && <span> • 📞 {selectedMessage.phone}</span>}
                   </div>
                 </div>
 
@@ -242,10 +407,7 @@ export default function Messages() {
                     <Star size={16} strokeWidth={2.5} />
                   </button>
                   <button
-                    onClick={() => {
-                      deleteMessage(selectedMessage.id);
-                      setSelectedMessage(null);
-                    }}
+                    onClick={() => handleDelete(selectedMessage.id)}
                     className="nb-btn nb-btn-danger nb-btn-sm"
                     style={{ padding: '6px' }}
                     title="Delete Message"
@@ -256,15 +418,15 @@ export default function Messages() {
               </div>
 
               {/* Message Body */}
-              <div style={{ fontSize: '0.95rem', lineHeight: 1.6, color: '#26332D', marginBottom: '1.5rem', whiteSpace: 'pre-wrap' }}>
-                {selectedMessage.content}
+              <div style={{ fontSize: '0.95rem', lineHeight: 1.6, color: '#26332D', marginBottom: '1.5rem', whiteSpace: 'pre-wrap', backgroundColor: '#F7FAF8', border: '1.5px solid #000', borderRadius: '4px', padding: '1rem' }}>
+                {selectedMessage.content || selectedMessage.message}
               </div>
 
               {/* Reply History */}
               {selectedMessage.replyHistory?.length > 0 && (
                 <div style={{ borderTop: '2px solid #E2ECE6', paddingTop: '1rem', marginBottom: '1.5rem' }}>
-                  <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: '#5A6F64', marginBottom: '0.5rem' }}>
-                    Sent Replies
+                  <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: '#5A6F64', marginBottom: '0.5rem', fontWeight: 800 }}>
+                    Official Dispatch History
                   </h4>
                   {selectedMessage.replyHistory.map((rep, idx) => (
                     <div key={idx} style={{ padding: '0.75rem', backgroundColor: '#F0F7F2', border: '1.5px solid #000', borderRadius: '4px', marginBottom: '0.5rem' }}>
@@ -272,15 +434,22 @@ export default function Messages() {
                         <span>{rep.author}</span>
                         <span>{formatRelativeTime(rep.date)}</span>
                       </div>
-                      <p style={{ fontSize: '0.85rem', color: '#26332D' }}>{rep.text}</p>
+                      <p style={{ fontSize: '0.85rem', color: '#26332D', margin: 0 }}>{rep.text}</p>
                     </div>
                   ))}
                 </div>
               )}
 
-              <Button variant="yellow" icon={Reply} onClick={() => setReplyModalOpen(true)}>
-                Compose Official Reply
-              </Button>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <Button variant="yellow" icon={Reply} onClick={() => setReplyModalOpen(true)}>
+                  Compose Official Reply
+                </Button>
+                {selectedMessage.status !== 'RESOLVED' && (
+                  <Button variant="white" icon={CheckCircle} onClick={() => handleResolveDirectly(selectedMessage.id)}>
+                    Mark Resolved
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#5A6F64' }}>
@@ -295,12 +464,14 @@ export default function Messages() {
         <Modal
           isOpen={replyModalOpen}
           onClose={() => setReplyModalOpen(false)}
-          title={`Reply to: ${selectedMessage.senderName}`}
+          title={`Reply to: ${selectedMessage.senderName || selectedMessage.name}`}
           maxWidth="580px"
           footer={
             <>
-              <Button variant="white" onClick={() => setReplyModalOpen(false)}>Cancel</Button>
-              <Button variant="yellow" icon={Send} onClick={handleSendReply}>Dispatch Email Reply</Button>
+              <Button variant="white" icon={X} onClick={() => setReplyModalOpen(false)}>Cancel</Button>
+              <Button variant="yellow" icon={Send} disabled={submittingReply} onClick={handleSendReply}>
+                {submittingReply ? 'Dispatching...' : 'Dispatch Official Reply'}
+              </Button>
             </>
           }
         >

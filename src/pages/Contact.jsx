@@ -28,14 +28,14 @@ export default function Contact() {
 
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.senderName || !formData.email || !formData.content) {
       addToast('Please fill out all required fields', 'error');
       return;
     }
 
-    sendMessage(formData);
+    await sendMessage(formData);
     setFormData({
       senderName: '',
       email: '',
@@ -168,12 +168,20 @@ export default function Contact() {
                 24/7 Emergency Flood & Medical Helpline
               </h4>
               <p style={{ fontSize: '0.85rem', fontWeight: 700, color: '#26332D' }}>
-                For disaster rescue in flood zones or urgent tribal medical van dispatches: Call toll-free <strong>1800-419-8800</strong>
+                For disaster rescue in flood zones or urgent tribal medical van dispatches: Call toll-free{' '}
+                <a href="tel:18004198800" style={{ color: 'inherit', textDecoration: 'underline' }}>
+                  <strong>1800-419-8800</strong>
+                </a>
               </p>
             </div>
           </div>
 
-          <Button variant="green" size="md" icon={Phone}>
+          <Button
+            variant="green"
+            size="md"
+            icon={Phone}
+            onClick={() => { window.location.href = 'tel:18004198800'; }}
+          >
             Call Emergency Desk
           </Button>
         </div>
@@ -272,9 +280,25 @@ export default function Contact() {
                 <p style={{ fontSize: '0.82rem', color: '#3A4E44', marginBottom: '0.6rem', lineHeight: 1.4 }}>
                   📍 {office.address}
                 </p>
-                <div style={{ fontSize: '0.78rem', fontWeight: 700, display: 'flex', flexDirection: 'column', gap: '2px', color: 'var(--text-dark)' }}>
-                  <span>📞 {office.phone}</span>
-                  <span>✉️ {office.email}</span>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--text-dark)' }}>
+                  <span>
+                    📞{' '}
+                    <a
+                      href={`tel:${office.phone.replace(/[^+\d]/g, '')}`}
+                      style={{ color: 'inherit', textDecoration: 'underline' }}
+                    >
+                      {office.phone}
+                    </a>
+                  </span>
+                  <span>
+                    ✉️{' '}
+                    <a
+                      href={`mailto:${office.email}`}
+                      style={{ color: 'inherit', textDecoration: 'underline' }}
+                    >
+                      {office.email}
+                    </a>
+                  </span>
                   <span style={{ color: 'var(--brand-dark-green)', marginTop: '4px' }}>Lead: {office.lead}</span>
                 </div>
               </Card>

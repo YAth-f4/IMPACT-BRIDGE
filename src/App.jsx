@@ -50,10 +50,12 @@ import AdminImpactMap from './pages/admin/ImpactMap';
 import AdminReports from './pages/admin/Reports';
 import AdminMessages from './pages/admin/Messages';
 import AdminSettings from './pages/admin/Settings';
+import PageMetaWatcher from './components/common/PageMetaWatcher';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <PageMetaWatcher />
       <Routes>
         {/* PUBLIC WEBSITE ROUTES */}
         <Route element={<PublicLayout />}>
@@ -141,6 +143,7 @@ export default function App() {
           <Route path="requests/volunteers" element={<AdminVolunteerRequests />} />
           <Route path="ngo-registrations" element={<AdminNgoRegistrations />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="users-and-roles" element={<AdminUsers />} />
           <Route path="volunteers" element={<AdminVolunteers />} />
           <Route path="beneficiaries" element={<AdminBeneficiaries />} />
           <Route path="donations" element={<AdminDonations />} />

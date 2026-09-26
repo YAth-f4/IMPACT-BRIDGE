@@ -1239,6 +1239,36 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   will-change: opacity, transform;
 }
 
+/* ===================================================
+   NEO-BRUTALIST SKELETON LOADERS
+   =================================================== */
+@keyframes nb-shimmer {
+  0% {
+    background-color: #E6EFEA;
+    opacity: 0.65;
+  }
+  50% {
+    background-color: #D3E4DB;
+    opacity: 1;
+  }
+  100% {
+    background-color: #E6EFEA;
+    opacity: 0.65;
+  }
+}
 
+.nb-skeleton {
+  display: block;
+  background-color: #E6EFEA;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  box-shadow: 1.5px 1.5px 0px #000000;
+  animation: nb-shimmer 1.4s ease-in-out infinite;
+}
 
-
+@media (prefers-reduced-motion: reduce) {
+  .nb-skeleton {
+    animation: none !important;
+    opacity: 0.85;
+  }
+}

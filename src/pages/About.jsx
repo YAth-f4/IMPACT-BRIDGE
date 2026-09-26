@@ -14,7 +14,8 @@ import {
   RefreshCw,
   Loader2,
   Search,
-  X
+  X,
+  Eye
 } from 'lucide-react';
 
 // Verified Baseline Datasets (Ensures instant, reliable rendering while API loads)
@@ -603,6 +604,7 @@ export default function About() {
               <Button
                 variant="yellow"
                 size="sm"
+                icon={RefreshCw}
                 style={{ marginTop: '1.25rem' }}
                 onClick={() => {
                   setSearchQuery('');
@@ -791,7 +793,8 @@ export default function About() {
                         }}
                         id={`view-profile-${slug}`}
                       >
-                        VIEW FULL PROFILE
+                        <Eye size={15} strokeWidth={2.5} style={{ marginRight: '6px' }} />
+                        <span>VIEW FULL PROFILE</span>
                       </a>
                     </div>
                   </div>

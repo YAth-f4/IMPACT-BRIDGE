@@ -84,6 +84,17 @@ export default function RegisterNgo() {
   const [errorMsg, setErrorMsg] = useState('');
   const [submittedNgo, setSubmittedNgo] = useState(null);
 
+  // Sync currentUser once auth resolves
+  React.useEffect(() => {
+    if (currentUser) {
+      setFormData((prev) => ({
+        ...prev,
+        authorizedRepresentative: prev.authorizedRepresentative || currentUser.name || '',
+        contactEmail: prev.contactEmail || currentUser.email || ''
+      }));
+    }
+  }, [currentUser]);
+
   // Helper to convert File to Base64 Data URL
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {

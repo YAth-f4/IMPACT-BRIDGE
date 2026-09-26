@@ -224,11 +224,25 @@ export default function Footer() {
               </div>
               <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
                 <Phone size={18} color="var(--brand-light-green)" style={{ flexShrink: 0 }} />
-                <span>{ngoProfile.phone}</span>
+                <a
+                  href={`tel:${(ngoProfile.phone || '').replace(/[^\d+]/g, '')}`}
+                  style={{ color: '#D2DDD7', textDecoration: 'none', fontWeight: 600 }}
+                  onMouseEnter={(e) => (e.target.style.color = 'var(--accent-yellow)')}
+                  onMouseLeave={(e) => (e.target.style.color = '#D2DDD7')}
+                >
+                  {ngoProfile.phone}
+                </a>
               </div>
               <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
                 <Mail size={18} color="var(--brand-light-green)" style={{ flexShrink: 0 }} />
-                <span>{ngoProfile.email}</span>
+                <a
+                  href={`mailto:${ngoProfile.email}`}
+                  style={{ color: '#D2DDD7', textDecoration: 'none', fontWeight: 600 }}
+                  onMouseEnter={(e) => (e.target.style.color = 'var(--accent-yellow)')}
+                  onMouseLeave={(e) => (e.target.style.color = '#D2DDD7')}
+                >
+                  {ngoProfile.email}
+                </a>
               </div>
             </div>
           </div>
@@ -344,7 +358,7 @@ export default function Footer() {
                     </div>
                   )}
                 </div>
-                <Button type="submit" variant="yellow" size="sm" fullWidth disabled={isSubmitting}>
+                <Button type="submit" variant="yellow" size="sm" icon={ArrowRight} fullWidth disabled={isSubmitting}>
                   {isSubmitting ? 'Subscribing...' : 'Subscribe to Dispatch'}
                 </Button>
               </form>

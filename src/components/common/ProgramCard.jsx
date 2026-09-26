@@ -28,7 +28,14 @@ export default function ProgramCard({ prog, viewMode = 'grid' }) {
         `}</style>
 
         <div style={{ height: '140px', width: '100%', border: '2px solid #000', borderRadius: '4px', overflow: 'hidden' }}>
-          <img src={prog.image} alt={prog.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img
+            src={prog.image}
+            alt={prog.title}
+            onError={(e) => {
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&auto=format&fit=crop&q=80';
+            }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         </div>
 
         <div>
@@ -91,6 +98,9 @@ export default function ProgramCard({ prog, viewMode = 'grid' }) {
         <img
           src={prog.image}
           alt={prog.title}
+          onError={(e) => {
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&auto=format&fit=crop&q=80';
+          }}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
         <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px' }}>

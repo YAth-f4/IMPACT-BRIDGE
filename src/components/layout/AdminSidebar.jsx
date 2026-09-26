@@ -20,7 +20,8 @@ import {
   UserCheck,
   ChevronLeft,
   ChevronRight,
-  Building2
+  Building2,
+  X
 } from 'lucide-react';
 
 export default function AdminSidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen }) {
@@ -168,6 +169,28 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, mobileOpen, 
               title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {isCollapsed ? <ChevronRight size={16} strokeWidth={2.5} /> : <ChevronLeft size={16} strokeWidth={2.5} />}
+            </button>
+
+            {/* Mobile Close Button */}
+            <button
+              onClick={() => setMobileOpen(false)}
+              style={{
+                background: '#FFFFFF',
+                border: '1.5px solid #000',
+                borderRadius: '4px',
+                padding: '4px 6px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#000000',
+                boxShadow: '1.5px 1.5px 0px #000'
+              }}
+              className="lg-hidden"
+              aria-label="Close sidebar menu"
+              title="Close sidebar"
+            >
+              <X size={18} strokeWidth={2.5} />
             </button>
           </div>
 

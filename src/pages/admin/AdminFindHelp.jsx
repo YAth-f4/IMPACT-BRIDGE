@@ -4,6 +4,7 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
+import { SkeletonTableRow } from '../../components/common/Skeleton';
 import {
   HandHeart,
   Search,
@@ -18,7 +19,9 @@ import {
   Phone,
   Mail,
   RefreshCw,
-  MessageSquare
+  MessageSquare,
+  X,
+  Check
 } from 'lucide-react';
 
 export default function AdminFindHelp() {
@@ -189,11 +192,12 @@ export default function AdminFindHelp() {
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan={8} style={{ padding: '2.5rem', textAlign: 'center' }}>
-                    Loading Find Help requests...
-                  </td>
-                </tr>
+                <>
+                  <SkeletonTableRow columns={8} />
+                  <SkeletonTableRow columns={8} />
+                  <SkeletonTableRow columns={8} />
+                  <SkeletonTableRow columns={8} />
+                </>
               ) : requests.length === 0 ? (
                 <tr>
                   <td colSpan={8} style={{ padding: '2.5rem', textAlign: 'center', color: '#6B7280' }}>
@@ -374,12 +378,13 @@ export default function AdminFindHelp() {
             </div>
 
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-              <Button variant="white" size="sm" onClick={() => setActionModalOpen(false)}>
+              <Button variant="white" size="sm" icon={X} onClick={() => setActionModalOpen(false)}>
                 Cancel
               </Button>
               <Button
                 variant={targetAction === 'APPROVED' ? 'yellow' : 'white'}
                 size="sm"
+                icon={Check}
                 onClick={handleConfirmAction}
                 disabled={isUpdating}
               >

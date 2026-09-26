@@ -345,6 +345,7 @@ export default function FindHelp() {
                     <Button
                       variant="yellow"
                       size="sm"
+                      icon={HandHeart}
                       onClick={() => {
                         setFormData((prev) => ({ ...prev, category: svc.category, city: svc.city }));
                         setActiveTab('apply');

@@ -3,6 +3,7 @@ const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 const findHelpModel = require('../models/findHelpRequestModel');
 const fundRaiseModel = require('../models/fundRaiseRequestModel');
 const volunteerAppModel = require('../models/volunteerApplicationModel');
+const donationModel = require('../models/donationModel');
 
 const donorRouter = express.Router();
 const volunteerRouter = express.Router();
@@ -19,13 +20,19 @@ const usersRouter = express.Router();
 donorRouter.get('/donations', requireAuth, requireRole('donor'), (req, res) => {
   try {
     const campaigns = fundRaiseModel.findByUserId(req.user.id);
+    const allDonations = donationModel.loadDonations ? donationModel.loadDonations() : [];
+    const userEmail = (req.user.email || '').toLowerCase().trim();
+    const donorDonations = allDonations
+      .filter((d) => (d.email && d.email.toLowerCase().trim() === userEmail) || d.userId === req.user.id)
+      .map((d) => donationModel.toSafeDonation(d));
+
     return res.status(200).json({
       success: true,
       role: 'donor',
       userId: req.user.id,
-      donations: [],
+      donations: donorDonations,
       campaigns,
-      count: campaigns.length
+      count: donorDonations.length
     });
   } catch (err) {
     console.error('[roleRoutes.donor.donations] Error:', err.message);

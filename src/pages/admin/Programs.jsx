@@ -15,7 +15,9 @@ import {
   Trash2,
   Users,
   LayoutGrid,
-  Columns3
+  Columns3,
+  X,
+  Check
 } from 'lucide-react';
 
 export default function Programs() {
@@ -133,28 +135,51 @@ export default function Programs() {
     setDeleteModalOpen(true);
   };
 
-  const handleSaveCreate = (e) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSaveCreate = async (e) => {
     e.preventDefault();
     if (!formData.title) return;
-    addProgram(formData);
-    setCreateModalOpen(false);
+    setSubmitting(true);
+    try {
+      await addProgram(formData);
+      setCreateModalOpen(false);
+    } catch {
+      // handled in context
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleSaveEdit = (e) => {
+  const handleSaveEdit = async (e) => {
     e.preventDefault();
     if (!formData.title || !selectedProgram) return;
-    updateProgram(selectedProgram.id, {
-      ...formData,
-      objectives: formData.objectives.split('\n').filter(Boolean),
-      tags: formData.tags.split(',').map((s) => s.trim()).filter(Boolean)
-    });
-    setEditModalOpen(false);
+    setSubmitting(true);
+    try {
+      await updateProgram(selectedProgram.id, {
+        ...formData,
+        objectives: typeof formData.objectives === 'string' ? formData.objectives.split('\n').filter(Boolean) : formData.objectives,
+        tags: typeof formData.tags === 'string' ? formData.tags.split(',').map((s) => s.trim()).filter(Boolean) : formData.tags
+      });
+      setEditModalOpen(false);
+    } catch {
+      // handled in context
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedProgram) {
-      deleteProgram(selectedProgram.id);
-      setDeleteModalOpen(false);
+      setSubmitting(true);
+      try {
+        await deleteProgram(selectedProgram.id);
+        setDeleteModalOpen(false);
+      } catch {
+        // handled in context
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -216,8 +241,23 @@ export default function Programs() {
         </div>
       </Card>
 
-      {/* 3. GRID VIEW */}
-      {viewMode === 'grid' && (
+      {/* 3. GRID & EMPTY STATE VIEW */}
+      {filteredPrograms.length === 0 ? (
+        <Card style={{ padding: '3.5rem 1.5rem', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📋</div>
+          <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.2rem', marginBottom: '0.5rem' }}>
+            No Field Initiatives Found
+          </h4>
+          <p style={{ color: '#5A6F64', fontSize: '0.88rem', fontWeight: 600, maxWidth: '420px', margin: '0 auto 1.25rem' }}>
+            {searchQuery || categoryFilter !== 'All'
+              ? 'No programs matched your search query or filter. Try clearing the filters.'
+              : 'No field initiatives have been launched yet. Create your first initiative to start tracking volunteers and impact.'}
+          </p>
+          <Button variant="yellow" size="sm" icon={Plus} onClick={handleOpenCreate}>
+            Create New Program
+          </Button>
+        </Card>
+      ) : viewMode === 'grid' ? (
         <div className="grid-3">
           {filteredPrograms.map((prog) => (
             <Card key={prog.id} hover={true} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.25rem' }}>
@@ -257,10 +297,22 @@ export default function Programs() {
                   Roster
                 </Button>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                  <button onClick={() => handleOpenEdit(prog)} className="nb-btn nb-btn-white nb-btn-sm" style={{ padding: '5px' }}>
+                  <button
+                    onClick={() => handleOpenEdit(prog)}
+                    className="nb-btn nb-btn-white nb-btn-sm"
+                    style={{ padding: '5px' }}
+                    title="Edit Program"
+                    aria-label={`Edit program ${prog.title}`}
+                  >
                     <Edit2 size={14} strokeWidth={2.5} />
                   </button>
-                  <button onClick={() => handleOpenDelete(prog)} className="nb-btn nb-btn-danger nb-btn-sm" style={{ padding: '5px' }}>
+                  <button
+                    onClick={() => handleOpenDelete(prog)}
+                    className="nb-btn nb-btn-danger nb-btn-sm"
+                    style={{ padding: '5px' }}
+                    title="Delete Program"
+                    aria-label={`Delete program ${prog.title}`}
+                  >
                     <Trash2 size={14} strokeWidth={2.5} />
                   </button>
                 </div>
@@ -268,10 +320,10 @@ export default function Programs() {
             </Card>
           ))}
         </div>
-      )}
+      ) : null}
 
       {/* 4. KANBAN STATUS BOARD VIEW */}
-      {viewMode === 'kanban' && (
+      {viewMode === 'kanban' && filteredPrograms.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }} className="kanban-grid">
           <style>{`
             @media (max-width: 1024px) {
@@ -331,7 +383,7 @@ export default function Programs() {
         maxWidth="680px"
         footer={
           <>
-            <Button variant="white" onClick={() => setCreateModalOpen(false)}>Cancel</Button>
+            <Button variant="white" icon={X} onClick={() => setCreateModalOpen(false)}>Cancel</Button>
             <Button variant="yellow" icon={Plus} onClick={handleSaveCreate}>Launch Initiative</Button>
           </>
         }
@@ -408,7 +460,7 @@ export default function Programs() {
         maxWidth="680px"
         footer={
           <>
-            <Button variant="white" onClick={() => setEditModalOpen(false)}>Cancel</Button>
+            <Button variant="white" icon={X} onClick={() => setEditModalOpen(false)}>Cancel</Button>
             <Button variant="yellow" icon={CalendarCheck} onClick={handleSaveEdit}>Update Initiative</Button>
           </>
         }
@@ -448,7 +500,7 @@ export default function Programs() {
           title={`Assigned Volunteers: ${selectedProgram.title}`}
           maxWidth="600px"
           footer={
-            <Button variant="yellow" onClick={() => setRosterModalOpen(false)}>
+            <Button variant="yellow" icon={Check} onClick={() => setRosterModalOpen(false)}>
               Save Roster
             </Button>
           }

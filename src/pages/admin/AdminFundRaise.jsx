@@ -4,6 +4,7 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
+import { SkeletonTableRow } from '../../components/common/Skeleton';
 import {
   Heart,
   Search,
@@ -12,7 +13,9 @@ import {
   Eye,
   RefreshCw,
   TrendingUp,
-  FileText
+  FileText,
+  X,
+  Check
 } from 'lucide-react';
 
 export default function AdminFundRaise() {
@@ -149,9 +152,12 @@ export default function AdminFundRaise() {
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center' }}>Loading campaigns...</td>
-                </tr>
+                <>
+                  <SkeletonTableRow columns={7} />
+                  <SkeletonTableRow columns={7} />
+                  <SkeletonTableRow columns={7} />
+                  <SkeletonTableRow columns={7} />
+                </>
               ) : campaigns.length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center', color: '#6B7280' }}>
@@ -284,8 +290,8 @@ export default function AdminFundRaise() {
               style={{ width: '100%', padding: '0.6rem', border: '2px solid #000', borderRadius: '4px', boxSizing: 'border-box' }}
             />
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-              <Button variant="white" size="sm" onClick={() => setActionModalOpen(false)}>Cancel</Button>
-              <Button variant="yellow" size="sm" onClick={handleConfirmAction} disabled={isUpdating}>
+              <Button variant="white" size="sm" icon={X} onClick={() => setActionModalOpen(false)}>Cancel</Button>
+              <Button variant="yellow" size="sm" icon={Check} onClick={handleConfirmAction} disabled={isUpdating}>
                 {isUpdating ? 'Saving...' : 'Confirm'}
               </Button>
             </div>

@@ -51,6 +51,7 @@ router.patch('/fund-raise/:id/status', adminController.updateFundRaiseStatus);
 
 // 6. Donations Management
 router.get('/donations', adminController.getDonations);
+router.post('/donations', adminController.createDonation);
 
 // 7. Program Management
 router.get('/programs', adminController.getPrograms);
@@ -63,6 +64,7 @@ router.delete('/programs/:id', adminController.deleteProgram);
 router.get('/messages', adminController.getMessages);
 router.get('/messages/:id', adminController.getMessageById);
 router.patch('/messages/:id/status', adminController.updateMessageStatus);
+router.delete('/messages/:id', adminController.deleteMessage);
 
 // 9. Verified Hub Management
 router.get('/verified-hubs', adminController.getVerifiedHubs);

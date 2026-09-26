@@ -93,6 +93,29 @@ const getDashboardSummary = async (req, res) => {
         submittedAt: f.createdAt
       }));
 
+    // Volunteer Applications metrics and pending queue
+    const allVolunteerApps = volunteerAppModel.loadApplications ? volunteerAppModel.loadApplications() : [];
+    const volunteerStats = {
+      total: allVolunteerApps.length,
+      pending: allVolunteerApps.filter((a) => a.status === 'PENDING').length,
+      approved: allVolunteerApps.filter((a) => a.status === 'APPROVED').length,
+      rejected: allVolunteerApps.filter((a) => a.status === 'REJECTED').length
+    };
+
+    const pendingVolunteers = allVolunteerApps
+      .filter((v) => v.status === 'PENDING')
+      .slice(0, 5)
+      .map((v) => ({
+        id: v.id,
+        name: v.name,
+        city: v.city,
+        skills: v.skills,
+        submittedAt: v.createdAt
+      }));
+
+    // Messages metrics
+    const messageStats = messageModel.getStats();
+
     const data = {
       users: userMetrics,
       ngos: ngoStats,
@@ -100,26 +123,31 @@ const getDashboardSummary = async (req, res) => {
       fundRaises: fundRaiseStats,
       donations: donationStats,
       programs: programStats,
+      messages: messageStats,
+      volunteers: volunteerStats,
       recentActivity,
       pendingQueue: {
         ngos: pendingNgos,
         helpRequests: pendingHelpRequests,
-        fundRaises: pendingFundRaises
+        fundRaises: pendingFundRaises,
+        volunteers: pendingVolunteers
       }
     };
 
     // Backward-compatibility stats object for existing frontend/test consumers
     const legacyStats = {
       summary: {
-        pending: helpRequestStats.pending + fundRaiseStats.pending + ngoStats.pending,
-        approved: helpRequestStats.approved + fundRaiseStats.approved + ngoStats.approved,
-        rejected: helpRequestStats.rejected + fundRaiseStats.rejected + ngoStats.rejected,
-        total: helpRequestStats.total + fundRaiseStats.total + ngoStats.total
+        pending: helpRequestStats.pending + fundRaiseStats.pending + ngoStats.pending + volunteerStats.pending,
+        approved: helpRequestStats.approved + fundRaiseStats.approved + ngoStats.approved + volunteerStats.approved,
+        rejected: helpRequestStats.rejected + fundRaiseStats.rejected + ngoStats.rejected + volunteerStats.rejected,
+        total: helpRequestStats.total + fundRaiseStats.total + ngoStats.total + volunteerStats.total
       },
       findHelp: helpRequestStats,
       fundRaise: fundRaiseStats,
       ngos: ngoStats,
-      users: userMetrics
+      users: userMetrics,
+      volunteer: volunteerStats,
+      messages: messageStats
     };
 
     return res.status(200).json({
@@ -273,7 +301,7 @@ const getNgos = async (req, res) => {
     const { status, search, city, cause, page = 1, limit = 50 } = req.query;
     let ngos = ngoModel.loadNgos();
 
-    if (status && status !== 'ALL') {
+    if (status && status !== 'ALL' && status !== 'null' && status !== 'undefined') {
       ngos = ngos.filter((n) => n.status.toUpperCase() === status.toUpperCase());
     }
 
@@ -359,15 +387,20 @@ const updateNgoStatus = async (req, res) => {
     const reviewNote = note || notes || reviewNotes || '';
 
     if (!status) {
-      return res.status(400).json({ success: false, message: 'Status is required.' });
+      return res.status(400).json({ success: false, message: 'Status is required.', error: 'Status is required.' });
     }
 
-    const cleanStatus = String(status).toUpperCase();
+    let cleanStatus = String(status).toUpperCase().trim();
+    if (cleanStatus === 'APPROVE') cleanStatus = 'APPROVED';
+    if (cleanStatus === 'REJECT') cleanStatus = 'REJECTED';
+    if (cleanStatus === 'NEED_INFO' || cleanStatus === 'NEEDSINFO') cleanStatus = 'NEEDS_INFO';
+
     const validStatuses = ['PENDING', 'APPROVED', 'REJECTED', 'NEEDS_INFO'];
     if (!validStatuses.includes(cleanStatus)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+        error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
       });
     }
 
@@ -666,6 +699,49 @@ const getDonations = async (req, res) => {
   }
 };
 
+const createDonation = async (req, res) => {
+  try {
+    const { donorName, email, phone, amount, purpose, paymentMethod, donorType, panNumber, message, programId } = req.body;
+    if (!donorName || !String(donorName).trim()) {
+      return res.status(400).json({ success: false, message: 'Donor name is required.' });
+    }
+    const parsedAmount = Number(amount);
+    if (!parsedAmount || isNaN(parsedAmount) || parsedAmount < 1) {
+      return res.status(400).json({ success: false, message: 'Valid donation amount is required.' });
+    }
+    const created = donationModel.create({
+      donorName,
+      email: email || 'offline@impactbridge.org',
+      phone,
+      amount: parsedAmount,
+      purpose: purpose || 'General Impact Fund',
+      paymentMethod: paymentMethod || 'Cheque / Offline Wire',
+      donorType: donorType || 'Individual Philanthropist',
+      panNumber,
+      message,
+      programId
+    });
+
+    auditLogModel.log({
+      adminUser: req.user,
+      action: 'DONATION_RECORDED_OFFLINE',
+      targetType: 'DONATION',
+      targetId: created.id,
+      note: `Recorded offline donation of ₹${parsedAmount} from ${created.donorName}`
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Offline donation recorded successfully.',
+      donation: created,
+      data: created
+    });
+  } catch (err) {
+    console.error('[adminController.createDonation] Error:', err.message);
+    return res.status(500).json({ success: false, message: 'Failed to record donation.' });
+  }
+};
+
 /**
  * =========================================================================
  * 7. PROGRAM MANAGEMENT
@@ -915,6 +991,35 @@ const updateMessageStatus = async (req, res) => {
   } catch (err) {
     console.error('[adminController.updateMessageStatus] Error:', err.message);
     return res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+const deleteMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = messageModel.findById(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Message not found.' });
+    }
+
+    const deleted = messageModel.delete(id);
+
+    auditLogModel.log({
+      adminUser: req.user,
+      action: 'MESSAGE_DELETED',
+      targetType: 'MESSAGE',
+      targetId: id,
+      note: `Deleted message from ${existing.senderName}`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Message deleted successfully.',
+      data: deleted
+    });
+  } catch (err) {
+    console.error('[adminController.deleteMessage] Error:', err.message);
+    return res.status(500).json({ success: false, message: 'Failed to delete message.' });
   }
 };
 
@@ -1184,6 +1289,7 @@ module.exports = {
   getFundRaiseById,
   updateFundRaiseStatus,
   getDonations,
+  createDonation,
   getPrograms,
   getProgramById,
   createProgram,
@@ -1192,6 +1298,7 @@ module.exports = {
   getMessages,
   getMessageById,
   updateMessageStatus,
+  deleteMessage,
   getVerifiedHubs,
   getVerifiedHubById,
   createVerifiedHub,

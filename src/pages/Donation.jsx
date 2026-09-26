@@ -17,7 +17,8 @@ import {
   Phone,
   Mail,
   Lock,
-  Printer
+  Printer,
+  X
 } from 'lucide-react';
 
 export default function Donation() {
@@ -62,8 +63,8 @@ export default function Donation() {
     setPaymentModalOpen(true);
   };
 
-  const handleCompletePayment = () => {
-    const donationRecord = addDonation({
+  const handleCompletePayment = async () => {
+    const donationRecord = await addDonation({
       donorName,
       email,
       phone,
@@ -445,7 +446,7 @@ export default function Donation() {
         maxWidth="520px"
         footer={
           <>
-            <Button variant="white" onClick={() => setPaymentModalOpen(false)}>
+            <Button variant="white" icon={X} onClick={() => setPaymentModalOpen(false)}>
               Cancel
             </Button>
             <Button variant="yellow" icon={Lock} onClick={handleCompletePayment}>

@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ImpactMapModule from '../components/map/ImpactMap';
 import Badge from '../components/common/Badge';
+import { Building2, PlusCircle, ArrowRight } from 'lucide-react';
 
 export default function ImpactMap() {
   return (
@@ -78,8 +80,8 @@ export default function ImpactMap() {
             </div>
 
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <a
-                href="/ngos"
+              <Link
+                to="/ngos"
                 style={{
                   textDecoration: 'none',
                   backgroundColor: '#FFFFFF',
@@ -92,13 +94,14 @@ export default function ImpactMap() {
                   boxShadow: '3px 3px 0px #000000',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.35rem'
+                  gap: '0.45rem'
                 }}
               >
-                Browse Verified Directory
-              </a>
-              <a
-                href="/register-ngo"
+                <Building2 size={16} strokeWidth={2.5} />
+                <span>Browse Verified Directory</span>
+              </Link>
+              <Link
+                to="/register-ngo"
                 style={{
                   textDecoration: 'none',
                   backgroundColor: 'var(--accent-yellow)',
@@ -111,11 +114,13 @@ export default function ImpactMap() {
                   boxShadow: '3px 3px 0px #000000',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.35rem'
+                  gap: '0.45rem'
                 }}
               >
-                Register Your NGO →
-              </a>
+                <PlusCircle size={16} strokeWidth={2.5} />
+                <span>Register Your NGO</span>
+                <ArrowRight size={14} strokeWidth={2.5} />
+              </Link>
             </div>
           </div>
         </div>

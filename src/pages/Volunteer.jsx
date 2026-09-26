@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   Send,
   Plus,
-  BookOpen
+  BookOpen,
+  UserPlus
 } from 'lucide-react';
 
 export default function Volunteer() {
@@ -30,7 +31,8 @@ export default function Volunteer() {
     volunteerTasks,
     toggleVolunteerTask,
     addVolunteerTask,
-    logVolunteerHours
+    logVolunteerHours,
+    submitVolunteerApplication
   } = useApp();
 
   const [activeTab, setActiveTab] = useState(userRole === 'volunteer' ? 'dashboard' : 'join');
@@ -65,18 +67,26 @@ export default function Volunteer() {
   const [newLogHours, setNewLogHours] = useState('');
   const [newLogActivity, setNewLogActivity] = useState('');
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email) {
       addToast('Please fill in required fields', 'error');
       return;
     }
 
-    const created = addVolunteer({
+    const payload = {
       ...formData,
       skills: formData.skills.split(',').map((s) => s.trim()),
       interests: [formData.interests]
-    });
+    };
+
+    try {
+      await submitVolunteerApplication(payload);
+    } catch (err) {
+      console.warn('Backend volunteer application warning:', err);
+    }
+
+    const created = addVolunteer(payload);
 
     try {
       confetti({
@@ -84,7 +94,7 @@ export default function Volunteer() {
         spread: 70,
         origin: { y: 0.6 }
       });
-    } catch (err) { }
+    } catch { }
 
     setMockVolunteer({
       name: created.name,
@@ -99,7 +109,6 @@ export default function Volunteer() {
     });
 
     setActiveTab('dashboard');
-    addToast('Welcome to the Impact Bridge volunteer community!', 'success');
   };
 
   const handleLogHours = (e) => {
@@ -395,7 +404,7 @@ export default function Volunteer() {
 
                   <div style={{ borderTop: '1.5px solid #E2ECE6', paddingTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>⏳ {opp.commitment}</span>
-                    <Button variant="green" size="sm" onClick={() => setActiveTab('join')}>
+                    <Button variant="green" size="sm" icon={UserPlus} onClick={() => setActiveTab('join')}>
                       Apply Now
                     </Button>
                   </div>
@@ -552,7 +561,12 @@ export default function Volunteer() {
                           <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{evt.title}</div>
                           <div style={{ fontSize: '0.75rem', color: '#5A6F64', fontWeight: 600 }}>📍 {evt.loc}</div>
                         </div>
-                        <Button variant="yellow" size="sm">
+                        <Button
+                          variant="yellow"
+                          size="sm"
+                          icon={CheckCircle2}
+                          onClick={() => addToast(`Confirmed roster schedule for ${evt.title}!`, 'success')}
+                        >
                           Confirm Roster
                         </Button>
                       </div>

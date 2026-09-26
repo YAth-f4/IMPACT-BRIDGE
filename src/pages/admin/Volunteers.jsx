@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import { SkeletonTableRow } from '../../components/common/Skeleton';
 import { Input, Select, Textarea } from '../../components/common/Input';
 import { formatDate } from '../../utils/formatters';
 import {
@@ -19,7 +20,9 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Award
+  Award,
+  RefreshCw,
+  X
 } from 'lucide-react';
 
 export default function Volunteers() {
@@ -29,8 +32,16 @@ export default function Volunteers() {
     updateVolunteer,
     deleteVolunteer,
     toggleVolunteerStatus,
-    addToast
+    addToast,
+    fetchAdminVolunteers,
+    updateAdminVolunteerStatus
   } = useApp();
+
+  const [activeTab, setActiveTab] = useState('roster'); // 'roster' | 'applications'
+  const [applications, setApplications] = useState([]);
+  const [loadingApps, setLoadingApps] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [appModalOpen, setAppModalOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [cityFilter, setCityFilter] = useState('All');
@@ -56,6 +67,54 @@ export default function Volunteers() {
     status: 'Active',
     hoursLogged: 0
   });
+
+  const loadApplications = async () => {
+    setLoadingApps(true);
+    try {
+      const res = await fetchAdminVolunteers();
+      if (res && res.applications) {
+        setApplications(res.applications);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingApps(false);
+    }
+  };
+
+  useEffect(() => {
+    loadApplications();
+  }, []);
+
+  const handleUpdateAppStatus = async (appId, newStatus) => {
+    try {
+      const res = await updateAdminVolunteerStatus(appId, newStatus);
+      if (res && res.success) {
+        setApplications((prev) =>
+          prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
+        );
+        if (newStatus === 'APPROVED') {
+          const app = applications.find((a) => a.id === appId);
+          if (app) {
+            addVolunteer({
+              name: app.name,
+              email: app.email,
+              phone: app.phone,
+              city: app.city,
+              skills: Array.isArray(app.skills) ? app.skills : [app.skills],
+              interests: Array.isArray(app.interests) ? app.interests : [app.interests],
+              availability: app.availability || 'Weekends',
+              emergencyContact: app.emergencyContact || '',
+              status: 'Active',
+              hoursLogged: 0
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const cities = ['All', ...Array.from(new Set(volunteers.map((v) => v.city)))];
 
@@ -167,14 +226,17 @@ export default function Volunteers() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.35rem' }}>
-            Volunteer Management ({volunteers.length} Total)
+            Volunteer Operations Hub ({volunteers.length} Active • {applications.filter((a) => a.status === 'PENDING').length} Pending Review)
           </h3>
           <p style={{ fontSize: '0.82rem', color: '#5A6F64', fontWeight: 600 }}>
-            Manage volunteer applications, assigned rosters, logged hours, and certificates.
+            Manage active field volunteer deployments and screen incoming community applications.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Button variant="white" size="sm" icon={RefreshCw} onClick={loadApplications}>
+            Refresh
+          </Button>
           <Button variant="white" size="sm" icon={Download} onClick={handleExportCSV}>
             Export CSV
           </Button>
@@ -184,149 +246,288 @@ export default function Volunteers() {
         </div>
       </div>
 
-      {/* 2. FILTER TOOLBAR */}
-      <Card style={{ padding: '1rem', backgroundColor: 'var(--white)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-          <Input
-            placeholder="Search by name, skill, email..."
-            icon={Search}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ marginBottom: 0 }}
-          />
+      {/* TABS */}
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <button
+          onClick={() => setActiveTab('roster')}
+          className={`nb-btn ${activeTab === 'roster' ? 'nb-btn-yellow' : 'nb-btn-white'} nb-btn-sm`}
+        >
+          <Users size={16} strokeWidth={2.5} />
+          <span>Active Roster ({volunteers.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('applications')}
+          className={`nb-btn ${activeTab === 'applications' ? 'nb-btn-yellow' : 'nb-btn-white'} nb-btn-sm`}
+        >
+          <Clock size={16} strokeWidth={2.5} />
+          <span>Review Applications ({applications.length})</span>
+          {applications.filter((a) => a.status === 'PENDING').length > 0 && (
+            <Badge variant="green" size="sm" style={{ marginLeft: '4px' }}>
+              {applications.filter((a) => a.status === 'PENDING').length}
+            </Badge>
+          )}
+        </button>
+      </div>
 
-          <Select
-            label=""
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-            options={cities.map((c) => ({ value: c, label: `City: ${c}` }))}
-            style={{ marginBottom: 0 }}
-          />
+      {activeTab === 'roster' ? (
+        <>
+          {/* 2. FILTER TOOLBAR */}
+          <Card style={{ padding: '1rem', backgroundColor: 'var(--white)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              <Input
+                placeholder="Search by name, skill, email..."
+                icon={Search}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ marginBottom: 0 }}
+              />
 
-          <Select
-            label=""
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            options={[
-              { value: 'All', label: 'Status: All Statuses' },
-              { value: 'Active', label: 'Status: Active Only' },
-              { value: 'On-Leave', label: 'Status: On-Leave' }
-            ]}
-            style={{ marginBottom: 0 }}
-          />
-        </div>
-      </Card>
+              <Select
+                label=""
+                value={cityFilter}
+                onChange={(e) => setCityFilter(e.target.value)}
+                options={cities.map((c) => ({ value: c, label: `City: ${c}` }))}
+                style={{ marginBottom: 0 }}
+              />
 
-      {/* 3. DATA TABLE */}
-      <Card style={{ padding: '0', overflow: 'hidden', backgroundColor: 'var(--white)' }}>
-        <div className="nb-table-container">
-          <table className="nb-table">
-            <thead>
-              <tr>
-                <th>Volunteer</th>
-                <th>Location</th>
-                <th>Skills</th>
-                <th>Hours Logged</th>
-                <th>Status</th>
-                <th>Joined Date</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredVolunteers.length === 0 ? (
+              <Select
+                label=""
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                options={[
+                  { value: 'All', label: 'Status: All Statuses' },
+                  { value: 'Active', label: 'Status: Active Only' },
+                  { value: 'On-Leave', label: 'Status: On-Leave' }
+                ]}
+                style={{ marginBottom: 0 }}
+              />
+            </div>
+          </Card>
+
+          {/* 3. DATA TABLE */}
+          <Card style={{ padding: '0', overflow: 'hidden', backgroundColor: 'var(--white)' }}>
+            <div className="nb-table-container">
+              <table className="nb-table">
+                <thead>
+                  <tr>
+                    <th>Volunteer</th>
+                    <th>Location</th>
+                    <th>Skills</th>
+                    <th>Hours Logged</th>
+                    <th>Status</th>
+                    <th>Joined Date</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredVolunteers.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '3rem 1rem', color: '#5A6F64' }}>
+                        No volunteer records match the selected filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredVolunteers.map((vol) => (
+                      <tr key={vol.id}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <img
+                              src={vol.avatar}
+                              alt={vol.name}
+                              onError={(e) => {
+                                e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                              }}
+                              style={{ width: '36px', height: '36px', borderRadius: '4px', border: '1.5px solid #000', objectFit: 'cover' }}
+                            />
+                            <div>
+                              <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{vol.name}</div>
+                              <div style={{ fontSize: '0.72rem', color: '#5A6F64', fontWeight: 600 }}>{vol.email}</div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td>
+                          <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{vol.city}</span>
+                        </td>
+
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', maxWidth: '200px' }}>
+                            {vol.skills?.slice(0, 2).map((s, idx) => (
+                              <Badge key={idx} variant="white" size="sm">{s}</Badge>
+                            ))}
+                          </div>
+                        </td>
+
+                        <td>
+                          <span style={{ fontWeight: 900, color: 'var(--brand-dark-green)', fontSize: '0.95rem' }}>
+                            {vol.hoursLogged} hrs
+                          </span>
+                        </td>
+
+                        <td>
+                          <button
+                            onClick={() => toggleVolunteerStatus(vol.id)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                            title="Click to toggle status"
+                          >
+                            <Badge variant={vol.status === 'Active' ? 'green' : 'yellow'} size="sm">
+                              {vol.status === 'Active' ? '● Active' : '○ On-Leave'}
+                            </Badge>
+                          </button>
+                        </td>
+
+                        <td>
+                          <span style={{ fontSize: '0.78rem', color: '#5A6F64', fontWeight: 600 }}>
+                            {formatDate(vol.joinedDate)}
+                          </span>
+                        </td>
+
+                        <td style={{ textAlign: 'right' }}>
+                          <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+                            <button
+                              onClick={() => handleOpenProfile(vol)}
+                              className="nb-btn nb-btn-lightgreen nb-btn-sm"
+                              style={{ padding: '5px' }}
+                              title="View Volunteer Dossier"
+                              aria-label={`View dossier for ${vol.name}`}
+                            >
+                              <Eye size={15} strokeWidth={2.5} />
+                            </button>
+                            <button
+                              onClick={() => handleOpenEdit(vol)}
+                              className="nb-btn nb-btn-white nb-btn-sm"
+                              style={{ padding: '5px' }}
+                              title="Edit Volunteer"
+                              aria-label={`Edit ${vol.name}`}
+                            >
+                              <Edit2 size={15} strokeWidth={2.5} />
+                            </button>
+                            <button
+                              onClick={() => handleOpenDelete(vol)}
+                              className="nb-btn nb-btn-danger nb-btn-sm"
+                              style={{ padding: '5px' }}
+                              title="Delete Volunteer"
+                              aria-label={`Delete ${vol.name}`}
+                            >
+                              <Trash2 size={15} strokeWidth={2.5} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </>
+      ) : (
+        /* APPLICATIONS TABLE */
+        <Card style={{ padding: '0', overflow: 'hidden', backgroundColor: 'var(--white)' }}>
+          <div className="nb-table-container">
+            <table className="nb-table">
+              <thead>
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '3rem 1rem', color: '#5A6F64' }}>
-                    No volunteer records match the selected filters.
-                  </td>
+                  <th>Applicant</th>
+                  <th>City</th>
+                  <th>Skills / Interests</th>
+                  <th>Availability</th>
+                  <th>Status</th>
+                  <th>Submitted</th>
+                  <th style={{ textAlign: 'right' }}>Review Actions</th>
                 </tr>
-              ) : (
-                filteredVolunteers.map((vol) => (
-                  <tr key={vol.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <img
-                          src={vol.avatar}
-                          alt={vol.name}
-                          style={{ width: '36px', height: '36px', borderRadius: '4px', border: '1.5px solid #000', objectFit: 'cover' }}
-                        />
-                        <div>
-                          <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{vol.name}</div>
-                          <div style={{ fontSize: '0.72rem', color: '#5A6F64', fontWeight: 600 }}>{vol.email}</div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td>
-                      <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{vol.city}</span>
-                    </td>
-
-                    <td>
-                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', maxWidth: '200px' }}>
-                        {vol.skills?.slice(0, 2).map((s, idx) => (
-                          <Badge key={idx} variant="white" size="sm">{s}</Badge>
-                        ))}
-                      </div>
-                    </td>
-
-                    <td>
-                      <span style={{ fontWeight: 900, color: 'var(--brand-dark-green)', fontSize: '0.95rem' }}>
-                        {vol.hoursLogged} hrs
-                      </span>
-                    </td>
-
-                    <td>
-                      <button
-                        onClick={() => toggleVolunteerStatus(vol.id)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                        title="Click to toggle status"
-                      >
-                        <Badge variant={vol.status === 'Active' ? 'green' : 'yellow'} size="sm">
-                          {vol.status === 'Active' ? '● Active' : '○ On-Leave'}
-                        </Badge>
-                      </button>
-                    </td>
-
-                    <td>
-                      <span style={{ fontSize: '0.78rem', color: '#5A6F64', fontWeight: 600 }}>
-                        {formatDate(vol.joinedDate)}
-                      </span>
-                    </td>
-
-                    <td style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                        <button
-                          onClick={() => handleOpenProfile(vol)}
-                          className="nb-btn nb-btn-lightgreen nb-btn-sm"
-                          style={{ padding: '5px' }}
-                          title="View Volunteer Dossier"
-                        >
-                          <Eye size={15} strokeWidth={2.5} />
-                        </button>
-                        <button
-                          onClick={() => handleOpenEdit(vol)}
-                          className="nb-btn nb-btn-white nb-btn-sm"
-                          style={{ padding: '5px' }}
-                          title="Edit Volunteer"
-                        >
-                          <Edit2 size={15} strokeWidth={2.5} />
-                        </button>
-                        <button
-                          onClick={() => handleOpenDelete(vol)}
-                          className="nb-btn nb-btn-danger nb-btn-sm"
-                          style={{ padding: '5px' }}
-                          title="Delete Volunteer"
-                        >
-                          <Trash2 size={15} strokeWidth={2.5} />
-                        </button>
-                      </div>
+              </thead>
+              <tbody>
+                {loadingApps ? (
+                  <>
+                    <SkeletonTableRow columns={7} />
+                    <SkeletonTableRow columns={7} />
+                    <SkeletonTableRow columns={7} />
+                    <SkeletonTableRow columns={7} />
+                  </>
+                ) : applications.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: 'center', padding: '3rem 1rem', color: '#5A6F64' }}>
+                      No volunteer applications submitted yet.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+                ) : (
+                  applications.map((app) => (
+                    <tr key={app.id}>
+                      <td>
+                        <div>
+                          <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{app.name}</div>
+                          <div style={{ fontSize: '0.72rem', color: '#5A6F64', fontWeight: 600 }}>{app.email} • {app.phone}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{app.city}</span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', maxWidth: '220px' }}>
+                          {Array.isArray(app.skills) ? app.skills.map((s, idx) => (
+                            <Badge key={idx} variant="white" size="sm">{s}</Badge>
+                          )) : (
+                            <Badge variant="white" size="sm">{app.skills}</Badge>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{app.availability}</span>
+                      </td>
+                      <td>
+                        <Badge
+                          variant={app.status === 'APPROVED' ? 'green' : app.status === 'REJECTED' ? 'red' : 'yellow'}
+                          size="sm"
+                        >
+                          {app.status || 'PENDING'}
+                        </Badge>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: '0.78rem', color: '#5A6F64' }}>{formatDate(app.createdAt)}</span>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+                          <button
+                            onClick={() => { setSelectedApp(app); setAppModalOpen(true); }}
+                            className="nb-btn nb-btn-lightgreen nb-btn-sm"
+                            style={{ padding: '5px' }}
+                            title="Inspect Dossier"
+                          >
+                            <Eye size={15} strokeWidth={2.5} />
+                          </button>
+                          {app.status !== 'APPROVED' && (
+                            <button
+                              onClick={() => handleUpdateAppStatus(app.id, 'APPROVED')}
+                              className="nb-btn nb-btn-green nb-btn-sm"
+                              style={{ padding: '5px' }}
+                              title="Approve Volunteer"
+                              aria-label={`Approve application for ${app.name}`}
+                            >
+                              <CheckCircle size={15} strokeWidth={2.5} />
+                            </button>
+                          )}
+                          {app.status !== 'REJECTED' && (
+                            <button
+                              onClick={() => handleUpdateAppStatus(app.id, 'REJECTED')}
+                              className="nb-btn nb-btn-danger nb-btn-sm"
+                              style={{ padding: '5px' }}
+                              title="Reject Application"
+                              aria-label={`Reject application for ${app.name}`}
+                            >
+                              <XCircle size={15} strokeWidth={2.5} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       {/* ADD VOLUNTEER MODAL */}
       <Modal
@@ -336,7 +537,7 @@ export default function Volunteers() {
         maxWidth="600px"
         footer={
           <>
-            <Button variant="white" onClick={() => setAddModalOpen(false)}>Cancel</Button>
+            <Button variant="white" icon={X} onClick={() => setAddModalOpen(false)}>Cancel</Button>
             <Button variant="yellow" icon={Plus} onClick={handleSaveAdd}>Save Volunteer</Button>
           </>
         }
@@ -405,7 +606,7 @@ export default function Volunteers() {
         maxWidth="600px"
         footer={
           <>
-            <Button variant="white" onClick={() => setEditModalOpen(false)}>Cancel</Button>
+            <Button variant="white" icon={X} onClick={() => setEditModalOpen(false)}>Cancel</Button>
             <Button variant="yellow" icon={CheckCircle} onClick={handleSaveEdit}>Update Profile</Button>
           </>
         }
@@ -477,6 +678,9 @@ export default function Volunteers() {
             <img
               src={selectedVolunteer.avatar}
               alt={selectedVolunteer.name}
+              onError={(e) => {
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+              }}
               style={{ width: '70px', height: '70px', borderRadius: '6px', border: '2px solid #000', objectFit: 'cover' }}
             />
             <div>
@@ -538,6 +742,93 @@ export default function Volunteers() {
               </div>
             </div>
           )}
+        </Modal>
+      )}
+
+      {/* APPLICATION DOSSIER MODAL */}
+      {selectedApp && (
+        <Modal
+          isOpen={appModalOpen}
+          onClose={() => setAppModalOpen(false)}
+          title={`Volunteer Application: ${selectedApp.name}`}
+          maxWidth="600px"
+          footer={
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <Button variant="white" onClick={() => setAppModalOpen(false)}>Close</Button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {selectedApp.status !== 'REJECTED' && (
+                  <Button
+                    variant="danger"
+                    icon={XCircle}
+                    onClick={() => {
+                      handleUpdateAppStatus(selectedApp.id, 'REJECTED');
+                      setAppModalOpen(false);
+                    }}
+                  >
+                    Reject
+                  </Button>
+                )}
+                {selectedApp.status !== 'APPROVED' && (
+                  <Button
+                    variant="yellow"
+                    icon={CheckCircle}
+                    onClick={() => {
+                      handleUpdateAppStatus(selectedApp.id, 'APPROVED');
+                      setAppModalOpen(false);
+                    }}
+                  >
+                    Approve Application
+                  </Button>
+                )}
+              </div>
+            </div>
+          }
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #000', paddingBottom: '0.75rem' }}>
+              <div>
+                <h4 style={{ fontWeight: 800, fontSize: '1.15rem', margin: 0 }}>{selectedApp.name}</h4>
+                <p style={{ margin: '2px 0 0', color: '#5A6F64', fontSize: '0.82rem' }}>
+                  {selectedApp.email} • {selectedApp.phone}
+                </p>
+              </div>
+              <Badge variant={selectedApp.status === 'APPROVED' ? 'green' : selectedApp.status === 'REJECTED' ? 'red' : 'yellow'}>
+                {selectedApp.status || 'PENDING'}
+              </Badge>
+            </div>
+
+            <div className="grid-2">
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#5A6F64' }}>CITY / LOCATION</span>
+                <div style={{ fontWeight: 700 }}>{selectedApp.city || 'Not specified'}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#5A6F64' }}>AVAILABILITY</span>
+                <div style={{ fontWeight: 700 }}>{selectedApp.availability || 'Weekends'}</div>
+              </div>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#5A6F64' }}>DECLARED SKILLS</span>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
+                {Array.isArray(selectedApp.skills) ? selectedApp.skills.map((s, idx) => (
+                  <Badge key={idx} variant="yellow" size="sm">{s}</Badge>
+                )) : <Badge variant="yellow" size="sm">{selectedApp.skills}</Badge>}
+              </div>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#5A6F64' }}>EMERGENCY CONTACT</span>
+              <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{selectedApp.emergencyContact || 'None provided'}</div>
+            </div>
+
+            {selectedApp.adminNotes && (
+              <div style={{ backgroundColor: '#F0F7F2', border: '1.5px solid #000', borderRadius: '4px', padding: '0.75rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--brand-dark-green)' }}>ADMIN REVIEW NOTES</span>
+                <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{selectedApp.adminNotes}</p>
+              </div>
+            )}
+          </div>
         </Modal>
       )}
 

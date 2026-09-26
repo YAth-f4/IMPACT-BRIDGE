@@ -1,5 +1,92 @@
 [
   {
+    "id": "REQ-FH-377169-614",
+    "userId": "USR-BEN-01",
+    "requesterName": "Laxmi Devi",
+    "phone": "9876543210",
+    "email": "",
+    "city": "Mumbai",
+    "category": "Education Support",
+    "description": "Textbooks and study material",
+    "urgency": "HIGH",
+    "status": "APPROVED",
+    "adminNotes": "Approved by Dr. Ananya Iyer for digital tablet dispatch.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi (Registered User)",
+        "timestamp": "2026-09-26T09:36:17.169Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-26T09:36:17.354Z",
+        "note": "Approved by Dr. Ananya Iyer for digital tablet dispatch."
+      }
+    ],
+    "createdAt": "2026-09-26T09:36:17.169Z",
+    "updatedAt": "2026-09-26T09:36:17.354Z"
+  },
+  {
+    "id": "REQ-FH-368855-182",
+    "userId": "USR-BEN-01",
+    "requesterName": "Kishore Kumar",
+    "phone": "+91 98765 43219",
+    "email": "",
+    "city": "Pune",
+    "category": "Healthcare Support",
+    "description": "Require post-surgery medication assistance for elder parent.",
+    "urgency": "High",
+    "status": "APPROVED",
+    "adminNotes": "Verified with local dispensary in Pune.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Kishore Kumar (Registered User)",
+        "timestamp": "2026-09-26T09:36:08.855Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-26T09:36:08.859Z",
+        "note": "Verified with local dispensary in Pune."
+      }
+    ],
+    "createdAt": "2026-09-26T09:36:08.855Z",
+    "updatedAt": "2026-09-26T09:36:08.859Z"
+  },
+  {
+    "id": "REQ-FH-317955-606",
+    "userId": null,
+    "requesterName": "mjj",
+    "phone": "+919356827528",
+    "email": "",
+    "city": "New Delhi",
+    "category": "Food & Nutrition",
+    "description": "kjhtt",
+    "urgency": "High",
+    "status": "REJECTED",
+    "adminNotes": "Unable to process due to outside operating zone.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "mjj (Guest User)",
+        "timestamp": "2026-09-23T09:21:57.955Z",
+        "note": "Request submitted successfully and placed in Admin review queue"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_REJECTED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-23T09:22:24.769Z",
+        "note": "Unable to process due to outside operating zone."
+      }
+    ],
+    "createdAt": "2026-09-23T09:21:57.955Z",
+    "updatedAt": "2026-09-23T09:22:24.769Z"
+  },
+  {
     "id": "REQ-FH-776877-473",
     "userId": "USR-BEN-01",
     "requesterName": "Laxmi Devi",

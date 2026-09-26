@@ -21,7 +21,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   HelpCircle,
-  Phone
+  Phone,
+  LogIn
 } from 'lucide-react';
 
 export default function Login() {
@@ -643,6 +644,7 @@ export default function Login() {
                 fullWidth
                 disabled={isLoading || isGoogleLoading || isSuccess}
                 className="nb-btn-tactile"
+                icon={!isLoading && !isSuccess ? LogIn : null}
                 iconRight={!isLoading && !isSuccess ? ArrowRight : null}
               >
                 {isLoading ? (

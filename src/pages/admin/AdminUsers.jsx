@@ -4,13 +4,16 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
+import { SkeletonTableRow } from '../../components/common/Skeleton';
 import {
   Users,
   Search,
   Shield,
   ShieldCheck,
   RefreshCw,
-  Edit2
+  Edit2,
+  X,
+  Check
 } from 'lucide-react';
 
 export default function AdminUsers() {
@@ -147,9 +150,12 @@ export default function AdminUsers() {
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center' }}>Loading user directory...</td>
-                </tr>
+                <>
+                  <SkeletonTableRow columns={7} />
+                  <SkeletonTableRow columns={7} />
+                  <SkeletonTableRow columns={7} />
+                  <SkeletonTableRow columns={7} />
+                </>
               ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center', color: '#6B7280' }}>
@@ -228,10 +234,10 @@ export default function AdminUsers() {
             </div>
 
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-              <Button variant="white" size="sm" type="button" onClick={() => setRoleModalOpen(false)}>
+              <Button variant="white" size="sm" type="button" icon={X} onClick={() => setRoleModalOpen(false)}>
                 Cancel
               </Button>
-              <Button variant="yellow" size="sm" type="submit" disabled={isUpdating}>
+              <Button variant="yellow" size="sm" type="submit" icon={Check} disabled={isUpdating}>
                 {isUpdating ? 'Saving...' : 'Confirm Role Change'}
               </Button>
             </div>

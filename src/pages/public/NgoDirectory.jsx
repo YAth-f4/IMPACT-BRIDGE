@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import BridgeLoader from '../../components/common/BridgeLoader';
+import { SkeletonNgoCard } from '../../components/common/Skeleton';
 import { EmptyState } from '../../components/common/EmptyState';
 import {
   Building2,
@@ -48,10 +49,12 @@ export default function NgoDirectory() {
     setError(null);
     try {
       const res = await fetchPublicNgos();
-      if (res && res.success) {
+      if (Array.isArray(res)) {
+        setNgos(res);
+      } else if (res && res.success) {
         setNgos(res.ngos || []);
       } else {
-        setError(res?.error || 'Unable to load verified NGOs. Please try again.');
+        setError(res?.message || res?.error || 'Unable to load verified NGOs. Please try again.');
       }
     } catch (err) {
       console.error('Failed to load NGOs:', err);
@@ -71,10 +74,28 @@ export default function NgoDirectory() {
       ngo.description?.toLowerCase().includes(q) ||
       ngo.city?.toLowerCase().includes(q) ||
       ngo.state?.toLowerCase().includes(q) ||
-      ngo.causes?.some((c) => c.toLowerCase().includes(q));
+      (Array.isArray(ngo.causes) && ngo.causes.some((c) => c.toLowerCase().includes(q)));
 
     const matchesCause =
-      selectedCause === 'All' || (ngo.causes && ngo.causes.includes(selectedCause));
+      selectedCause === 'All' ||
+      (Array.isArray(ngo.causes) &&
+        ngo.causes.some((c) => {
+          const cLower = c.toLowerCase();
+          const selLower = selectedCause.toLowerCase();
+          return (
+            cLower === selLower ||
+            cLower.includes(selLower) ||
+            selLower.includes(cLower) ||
+            (selLower.includes('education') && cLower.includes('education')) ||
+            (selLower.includes('health') && (cLower.includes('health') || cLower.includes('medical'))) ||
+            (selLower.includes('hunger') && (cLower.includes('hunger') || cLower.includes('nutrition') || cLower.includes('food'))) ||
+            (selLower.includes('women') && cLower.includes('women')) ||
+            (selLower.includes('child') && cLower.includes('child')) ||
+            (selLower.includes('environment') && (cLower.includes('environment') || cLower.includes('conservation') || cLower.includes('wash'))) ||
+            (selLower.includes('disaster') && cLower.includes('disaster')) ||
+            (selLower.includes('livelihood') && (cLower.includes('livelihood') || cLower.includes('skill')))
+          );
+        }));
 
     const matchesCity =
       selectedCity === 'All' || ngo.city?.toLowerCase() === selectedCity.toLowerCase();
@@ -443,18 +464,15 @@ export default function NgoDirectory() {
           </span>
         </div>
 
-        {/* LOADING STATE */}
+        {/* SKELETON LOADING STATE */}
         {loading ? (
-          <div
-            style={{
-              minHeight: '350px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '3rem 1rem'
-            }}
-          >
-            <BridgeLoader size="lg" label="Loading verified non-profit directory..." />
+          <div className="grid-3" role="status" aria-label="Loading verified NGOs">
+            <SkeletonNgoCard />
+            <SkeletonNgoCard />
+            <SkeletonNgoCard />
+            <SkeletonNgoCard />
+            <SkeletonNgoCard />
+            <SkeletonNgoCard />
           </div>
         ) : error ? (
           /* ERROR STATE */
@@ -571,6 +589,9 @@ export default function NgoDirectory() {
                           <img
                             src={ngo.logo}
                             alt={ngo.organizationName}
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                         ) : (

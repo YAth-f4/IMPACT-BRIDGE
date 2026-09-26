@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import Card from '../components/common/Card';
@@ -23,7 +23,34 @@ export default function ProgramDetails() {
   const navigate = useNavigate();
   const { programs, addToast } = useApp();
 
-  const prog = programs.find((p) => p.id === id);
+  const [fetchedProg, setFetchedProg] = useState(null);
+  const [loadingDirect, setLoadingDirect] = useState(false);
+
+  const prog = programs.find((p) => p.id === id) || fetchedProg;
+
+  useEffect(() => {
+    if (!programs.find((p) => p.id === id) && id) {
+      setLoadingDirect(true);
+      fetch(`/api/programs/${id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.success && data.program) {
+            setFetchedProg(data.program);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoadingDirect(false));
+    }
+  }, [id, programs]);
+
+  if (loadingDirect) {
+    return (
+      <div className="nb-container" style={{ padding: '6rem 1rem', textAlign: 'center' }}>
+        <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+        <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800 }}>Loading Program Details...</h3>
+      </div>
+    );
+  }
 
   if (!prog) {
     return (
@@ -96,6 +123,9 @@ export default function ProgramDetails() {
               <img
                 src={prog.image}
                 alt={prog.title}
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&auto=format&fit=crop&q=80';
+                }}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
               <div style={{ position: 'absolute', top: '16px', left: '16px', display: 'flex', gap: '8px' }}>

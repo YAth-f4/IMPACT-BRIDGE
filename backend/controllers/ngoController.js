@@ -425,22 +425,38 @@ const adminUpdateStatus = async (req, res) => {
     const { status, note, reviewNotes } = req.body;
     const noteText = note || reviewNotes || '';
 
-    if (!status || !['APPROVED', 'REJECTED', 'NEEDS_INFO'].includes(status.toUpperCase())) {
+    if (!status) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid status decision. Allowed choices: APPROVE, REJECT, or NEEDS_INFO.'
+        message: 'Status parameter is required.',
+        error: 'Status parameter is required.'
       });
     }
 
-    const updated = ngoModel.updateStatus(id, status.toUpperCase(), req.user, noteText);
+    let cleanStatus = String(status).toUpperCase().trim();
+    if (cleanStatus === 'APPROVE') cleanStatus = 'APPROVED';
+    if (cleanStatus === 'REJECT') cleanStatus = 'REJECTED';
+    if (cleanStatus === 'NEED_INFO' || cleanStatus === 'NEEDSINFO') cleanStatus = 'NEEDS_INFO';
+
+    const validStatuses = ['PENDING', 'APPROVED', 'REJECTED', 'NEEDS_INFO'];
+    if (!validStatuses.includes(cleanStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status decision. Allowed choices: ${validStatuses.join(', ')}.`,
+        error: `Invalid status decision. Allowed choices: ${validStatuses.join(', ')}.`
+      });
+    }
+
+    const updated = ngoModel.updateStatus(id, cleanStatus, req.user, noteText);
     if (!updated) {
-      return res.status(404).json({ success: false, message: 'NGO registration not found.' });
+      return res.status(404).json({ success: false, message: 'NGO registration not found.', error: 'NGO registration not found.' });
     }
 
     return res.status(200).json({
       success: true,
-      message: `NGO registration ${id} status successfully transitioned to ${status.toUpperCase()}.`,
-      ngo: updated
+      message: `NGO registration ${id} status successfully transitioned to ${cleanStatus}.`,
+      ngo: updated,
+      data: updated
     });
   } catch (err) {
     console.error('[ngoController.adminUpdateStatus] Error:', err.message);

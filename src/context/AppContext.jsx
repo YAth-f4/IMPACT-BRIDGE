@@ -83,6 +83,35 @@ export function AppProvider({ children }) {
     return saved ? JSON.parse(saved) : INITIAL_DONATIONS;
   });
 
+  // Fetch real programs and donations from persistent backend on mount
+  useEffect(() => {
+    let isMounted = true;
+    const loadBackendData = async () => {
+      try {
+        const [progRes, donRes] = await Promise.allSettled([
+          fetch('/api/programs'),
+          fetch('/api/donations')
+        ]);
+        if (isMounted && progRes.status === 'fulfilled') {
+          const progData = await progRes.value.json();
+          if (progData.success && Array.isArray(progData.programs) && progData.programs.length > 0) {
+            setPrograms(progData.programs);
+          }
+        }
+        if (isMounted && donRes.status === 'fulfilled') {
+          const donData = await donRes.value.json();
+          if (donData.success && Array.isArray(donData.recentDonations) && donData.recentDonations.length > 0) {
+            setDonations(donData.recentDonations);
+          }
+        }
+      } catch (err) {
+        // preserve local cache fallback
+      }
+    };
+    loadBackendData();
+    return () => { isMounted = false; };
+  }, []);
+
   const [locations, setLocations] = useState(() => {
     const saved = localStorage.getItem('ib_locations');
     return saved ? JSON.parse(saved) : INITIAL_LOCATIONS;
@@ -258,8 +287,38 @@ export function AppProvider({ children }) {
     });
   }, [removeToast]);
 
-  // PROGRAM CRUD
-  const addProgram = (programData) => {
+  // PROGRAM CRUD (Connected to Backend API with safe local fallback)
+  const fetchPrograms = async (query = '') => {
+    try {
+      const res = await fetch(`/api/programs?${query}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.programs)) {
+        setPrograms(data.programs);
+        return data.programs;
+      }
+    } catch (err) {
+      console.warn('[AppContext] fetchPrograms fallback:', err.message);
+    }
+    return programs;
+  };
+
+  const addProgram = async (programData) => {
+    try {
+      const res = await fetch('/api/admin/programs', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(programData)
+      });
+      const data = await res.json();
+      if (data.success && data.program) {
+        setPrograms((prev) => [data.program, ...prev]);
+        addToast(`Program "${data.program.title}" created successfully!`, 'success');
+        return data.program;
+      }
+    } catch (err) {
+      console.warn('[AppContext] addProgram API fallback:', err.message);
+    }
+
     const newProg = {
       ...programData,
       id: generateId('PRG'),
@@ -270,7 +329,7 @@ export function AppProvider({ children }) {
       actualBeneficiaries: Number(programData.actualBeneficiaries || 0),
       status: programData.status || 'Upcoming',
       objectives: Array.isArray(programData.objectives) ? programData.objectives : (programData.objectives || '').split('\n').filter(Boolean),
-      tags: Array.isArray(programData.tags) ? programData.tags : (programData.tags || '').split(',').map(s => s.trim()).filter(Boolean),
+      tags: Array.isArray(programData.tags) ? programData.tags : (programData.tags || '').split(',').map((s) => s.trim()).filter(Boolean),
       image: programData.image || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80'
     };
     setPrograms([newProg, ...programs]);
@@ -278,7 +337,23 @@ export function AppProvider({ children }) {
     return newProg;
   };
 
-  const updateProgram = (id, updatedFields) => {
+  const updateProgram = async (id, updatedFields) => {
+    try {
+      const res = await fetch(`/api/admin/programs/${id}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updatedFields)
+      });
+      const data = await res.json();
+      if (data.success && data.program) {
+        setPrograms((prev) => prev.map((p) => (p.id === id ? data.program : p)));
+        addToast('Program updated successfully!', 'success');
+        return data.program;
+      }
+    } catch (err) {
+      console.warn('[AppContext] updateProgram API fallback:', err.message);
+    }
+
     setPrograms((prev) =>
       prev.map((prog) => {
         if (prog.id === id) {
@@ -294,7 +369,22 @@ export function AppProvider({ children }) {
     addToast('Program updated successfully!', 'success');
   };
 
-  const deleteProgram = (id) => {
+  const deleteProgram = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/programs/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPrograms((prev) => prev.filter((p) => p.id !== id));
+        addToast('Program deleted from system.', 'info');
+        return;
+      }
+    } catch (err) {
+      console.warn('[AppContext] deleteProgram API fallback:', err.message);
+    }
+
     setPrograms((prev) => prev.filter((p) => p.id !== id));
     addToast('Program deleted from system.', 'info');
   };
@@ -374,8 +464,24 @@ export function AppProvider({ children }) {
     addToast('Beneficiary record deleted.', 'info');
   };
 
-  // DONATIONS
-  const addDonation = (donationData) => {
+  // DONATIONS (Connected to Backend API with safe local fallback)
+  const addDonation = async (donationData) => {
+    try {
+      const res = await fetch('/api/donations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(donationData)
+      });
+      const data = await res.json();
+      if (data.success && data.donation) {
+        setDonations((prev) => [data.donation, ...prev]);
+        addToast(`Thank you! ₹${Number(donationData.amount).toLocaleString('en-IN')} donation recorded. 80G Receipt generated.`, 'success');
+        return data.donation;
+      }
+    } catch (err) {
+      console.warn('[AppContext] addDonation API fallback:', err.message);
+    }
+
     const newDonation = {
       ...donationData,
       id: generateId('DON'),
@@ -423,8 +529,24 @@ export function AppProvider({ children }) {
     addToast('Location updated.', 'success');
   };
 
-  // MESSAGES
-  const sendMessage = (msgData) => {
+  // MESSAGES (Connected to Backend API with safe local fallback)
+  const sendMessage = async (msgData) => {
+    try {
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(msgData)
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setMessages((prev) => [data.data, ...prev]);
+        addToast('Your message has been sent to the Impact Bridge team!', 'success');
+        return data.data;
+      }
+    } catch (err) {
+      console.warn('[AppContext] sendMessage API fallback:', err.message);
+    }
+
     const newMsg = {
       ...msgData,
       id: generateId('MSG'),
@@ -779,11 +901,22 @@ export function AppProvider({ children }) {
   };
 
   // Admin Operations
+  const fetchAdminDashboard = async () => {
+    try {
+      const res = await fetch('/api/admin/dashboard', { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : null;
+    } catch (err) {
+      console.error('[API] fetchAdminDashboard error:', err.message);
+      return null;
+    }
+  };
+
   const fetchAdminStats = async () => {
     try {
-      const res = await fetch('/api/admin/stats', { headers: authHeaders() });
+      const res = await fetch('/api/admin/dashboard', { headers: authHeaders() });
       const data = await res.json();
-      return data.success ? data.stats : null;
+      return data.success ? (data.data || data.stats) : null;
     } catch (err) {
       return null;
     }
@@ -897,6 +1030,141 @@ export function AppProvider({ children }) {
     }
   };
 
+  // Admin Donations API
+  const fetchAdminDonations = async (query = '') => {
+    try {
+      const res = await fetch(`/api/admin/donations?${query}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : { donations: [], total: 0, totalAmount: 0 };
+    } catch (err) {
+      return { donations: [], total: 0, totalAmount: 0 };
+    }
+  };
+
+  const createAdminDonation = async (donationData) => {
+    try {
+      const res = await fetch('/api/admin/donations', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(donationData)
+      });
+      const data = await res.json();
+      if (data.success && data.donation) {
+        setDonations((prev) => [data.donation, ...prev]);
+        addToast(`Donation of ₹${Number(data.donation.amount).toLocaleString('en-IN')} recorded successfully.`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Failed to record donation.' };
+    }
+  };
+
+  // Admin Messages API
+  const fetchAdminMessages = async (query = '') => {
+    try {
+      const res = await fetch(`/api/admin/messages?${query}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : { messages: [], total: 0, stats: {} };
+    } catch (err) {
+      return { messages: [], total: 0, stats: {} };
+    }
+  };
+
+  const updateAdminMessageStatus = async (id, status, note = '') => {
+    try {
+      const res = await fetch(`/api/admin/messages/${id}/status`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ status, note })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`Message status set to ${status}.`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Status update failed.' };
+    }
+  };
+
+  const deleteAdminMessage = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/messages/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+        addToast('Message deleted.', 'info');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Delete failed.' };
+    }
+  };
+
+  // Admin Verified Hubs API
+  const fetchAdminVerifiedHubs = async (query = '') => {
+    try {
+      const res = await fetch(`/api/admin/verified-hubs?${query}`, { headers: authHeaders() });
+      const data = await res.json();
+      return data.success ? data : { results: [], count: 0 };
+    } catch (err) {
+      return { results: [], count: 0 };
+    }
+  };
+
+  const createAdminVerifiedHub = async (hubData) => {
+    try {
+      const res = await fetch('/api/admin/verified-hubs', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(hubData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`Verified Hub "${hubData.name}" created!`, 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Failed to create hub.' };
+    }
+  };
+
+  const updateAdminVerifiedHub = async (id, updates) => {
+    try {
+      const res = await fetch(`/api/admin/verified-hubs/${id}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updates)
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast('Verified Hub details updated.', 'success');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Failed to update hub.' };
+    }
+  };
+
+  const deleteAdminVerifiedHub = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/verified-hubs/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast('Verified Hub deleted.', 'info');
+      }
+      return data;
+    } catch (err) {
+      return { success: false, message: 'Failed to delete hub.' };
+    }
+  };
+
   // NGO Registration & Directory API
   const submitNgoRegistration = async (formData) => {
     try {
@@ -907,7 +1175,7 @@ export function AppProvider({ children }) {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        return { success: false, message: data.message || 'Registration submission failed.' };
+        return { success: false, message: data.message || data.error || 'Registration submission failed.' };
       }
       addToast('NGO registration submitted successfully! Awaiting administrator verification.', 'success');
       return { success: true, ...data };
@@ -919,12 +1187,16 @@ export function AppProvider({ children }) {
 
   const fetchPublicNgos = async (query = '') => {
     try {
-      const res = await fetch(`/api/ngos?${query}`);
+      const queryString = query ? (query.startsWith('?') ? query : `?${query}`) : '';
+      const res = await fetch(`/api/ngos${queryString}`);
       const data = await res.json();
-      return data.success ? data.ngos : [];
+      if (res.ok && data.success) {
+        return { success: true, count: data.count || data.ngos?.length || 0, ngos: data.ngos || [] };
+      }
+      return { success: false, ngos: [], error: data.message || 'Unable to load verified NGOs.' };
     } catch (err) {
       console.error('[API] fetchPublicNgos error:', err.message);
-      return [];
+      return { success: false, ngos: [], error: 'A connection error occurred while retrieving verified organizations.' };
     }
   };
 
@@ -986,7 +1258,9 @@ export function AppProvider({ children }) {
 
   const fetchAdminNgos = async (status = 'ALL') => {
     try {
-      const res = await fetch(`/api/admin/ngos?status=${status}`, { headers: authHeaders() });
+      const cleanStatus = status && status !== 'ALL' && status !== 'null' ? status : '';
+      const query = cleanStatus ? `?status=${encodeURIComponent(cleanStatus)}` : '';
+      const res = await fetch(`/api/admin/ngos${query}`, { headers: authHeaders() });
       const data = await res.json();
       return data.success ? data : { ngos: [], total: 0, counts: {} };
     } catch (err) {
@@ -1006,18 +1280,22 @@ export function AppProvider({ children }) {
 
   const updateAdminNgoStatus = async (id, status, note = '') => {
     try {
+      let targetStatus = String(status || '').toUpperCase().trim();
+      if (targetStatus === 'APPROVE') targetStatus = 'APPROVED';
+      if (targetStatus === 'REJECT') targetStatus = 'REJECTED';
+
       const res = await fetch(`/api/admin/ngos/${id}/status`, {
         method: 'PATCH',
         headers: authHeaders(),
-        body: JSON.stringify({ status, note })
+        body: JSON.stringify({ status: targetStatus, note })
       });
       const data = await res.json();
       if (data.success) {
-        addToast(`NGO ${id} status transitioned to ${status}.`, 'success');
+        addToast(`NGO status updated to ${targetStatus}.`, 'success');
       }
       return data;
     } catch (err) {
-      return { success: false, message: 'Status update failed.' };
+      return { success: false, message: 'Status update failed.', error: 'Status update failed.' };
     }
   };
 
@@ -1093,6 +1371,7 @@ export function AppProvider({ children }) {
         fetchMyVolunteerApplications,
         submitVolunteerHours,
         fetchAdminStats,
+        fetchAdminDashboard,
         fetchAdminFindHelp,
         updateAdminFindHelpStatus,
         fetchAdminFundRaise,
@@ -1101,6 +1380,16 @@ export function AppProvider({ children }) {
         updateAdminVolunteerStatus,
         fetchAdminUsers,
         updateAdminUserRole,
+        fetchAdminDonations,
+        createAdminDonation,
+        fetchAdminMessages,
+        updateAdminMessageStatus,
+        deleteAdminMessage,
+        fetchAdminVerifiedHubs,
+        createAdminVerifiedHub,
+        updateAdminVerifiedHub,
+        deleteAdminVerifiedHub,
+        fetchPrograms,
         // NGO Registration & Directory Methods
         submitNgoRegistration,
         fetchPublicNgos,

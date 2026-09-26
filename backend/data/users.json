@@ -3,7 +3,7 @@
     "id": "USR-ADMIN-01",
     "name": "Sunita Rao",
     "email": "admin@impactbridge.org",
-    "passwordHash": "$2b$10$RddwWAAJQmjdQShn2T34ruUdZ4TNIeDWa236Dy8uk19UG/YkRLYFO",
+    "passwordHash": "$2b$10$.IU/5lFS5DNr3v1OTwKkpeS4SIqLiU5uIIe6d/ZO3xdOEzM9KI0ti",
     "role": "admin",
     "createdAt": "2026-01-15T09:00:00.000Z",
     "isPrimaryAdmin": true
@@ -210,5 +210,21 @@
     "passwordHash": "$2b$10$HI/o5HyOQfxRk9.TpQKBAuSKYOQBT88eIxdSR7PyraAniRfVB5S9G",
     "role": "donor",
     "createdAt": "2026-09-19T18:49:41.020Z"
+  },
+  {
+    "id": "USR-1790415376982-891",
+    "name": "Rohan Donor",
+    "email": "test.donor.1790415376919@example.com",
+    "passwordHash": "$2b$10$3F1fkCQWeweGsRbejOJswuwGR2TGr8xDMqA8KJSI4jvEs2JNOrJ7q",
+    "role": "donor",
+    "createdAt": "2026-09-26T09:36:16.983Z"
+  },
+  {
+    "id": "USR-1790415377226-219",
+    "name": "Kavita Beneficiary",
+    "email": "test.ben2.1790415377171@example.com",
+    "passwordHash": "$2b$10$qDyJgu2lzLmoe05t5jAw4.Yg9GH5YxjhvDuVNBsU2k2CmusSOQpIO",
+    "role": "beneficiary",
+    "createdAt": "2026-09-26T09:36:17.226Z"
   }
 ]

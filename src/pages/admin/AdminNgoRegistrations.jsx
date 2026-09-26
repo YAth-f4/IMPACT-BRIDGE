@@ -4,6 +4,7 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import BridgeLoader from '../../components/common/BridgeLoader';
+import { SkeletonCard } from '../../components/common/Skeleton';
 import { EmptyState } from '../../components/common/EmptyState';
 import { 
   Building2, 
@@ -17,7 +18,8 @@ import {
   ExternalLink, 
   Eye, 
   RefreshCw,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react';
 
 export default function AdminNgoRegistrations() {
@@ -37,7 +39,7 @@ export default function AdminNgoRegistrations() {
   const loadNgos = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetchAdminNgos(statusFilter === 'ALL' ? null : statusFilter);
+      const res = await fetchAdminNgos(statusFilter);
       if (res && res.success) {
         setNgos(res.ngos || []);
       }
@@ -51,6 +53,19 @@ export default function AdminNgoRegistrations() {
   useEffect(() => {
     loadNgos();
   }, [loadNgos]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && selectedNgo) {
+        setSelectedNgo(null);
+        setActionType(null);
+      }
+    };
+    if (selectedNgo) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedNgo]);
 
   const handleOpenReview = (ngo, action) => {
     setSelectedNgo(ngo);
@@ -68,19 +83,20 @@ export default function AdminNgoRegistrations() {
 
     setSubmitting(true);
     try {
-      const res = await updateAdminNgoStatus(selectedNgo.id, actionType, reviewNotes);
+      const targetStatus = actionType === 'APPROVE' ? 'APPROVED' : actionType === 'REJECT' ? 'REJECTED' : actionType;
+      const res = await updateAdminNgoStatus(selectedNgo.id, targetStatus, reviewNotes);
       if (res && res.success) {
-        setMessage(`NGO status successfully updated to ${actionType}!`);
+        setMessage(`NGO status successfully updated to ${targetStatus}!`);
         setTimeout(() => {
           setSelectedNgo(null);
           setActionType(null);
           loadNgos();
         }, 1200);
       } else {
-        alert(res?.error || 'Failed to update status.');
+        alert(res?.message || res?.error || 'Failed to update status.');
       }
     } catch (err) {
-      alert('Error updating status.');
+      alert(err.message || 'Error updating status.');
     } finally {
       setSubmitting(false);
     }
@@ -288,8 +304,10 @@ export default function AdminNgoRegistrations() {
 
       {/* Main List Content */}
       {loading ? (
-        <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <BridgeLoader size="lg" label="Loading registration queue..." />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <SkeletonCard lines={2} height="130px" />
+          <SkeletonCard lines={2} height="130px" />
+          <SkeletonCard lines={2} height="130px" />
         </div>
       ) : filteredNgos.length === 0 ? (
         <EmptyState
@@ -340,7 +358,14 @@ export default function AdminNgoRegistrations() {
                     }}
                   >
                     {ngo.logo ? (
-                      <img src={ngo.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img
+                        src={ngo.logo}
+                        alt={ngo.organizationName}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     ) : (
                       <span>{ngo.organizationName?.substring(0, 2).toUpperCase() || 'NB'}</span>
                     )}
@@ -419,8 +444,15 @@ export default function AdminNgoRegistrations() {
 
       {/* INSPECT & REVIEW MODAL */}
       {selectedNgo && (
-        <div className="nb-modal-backdrop">
-          <div className="nb-modal-content" style={{ maxWidth: '720px' }}>
+        <div
+          className="nb-modal-backdrop"
+          onClick={() => { setSelectedNgo(null); setActionType(null); }}
+        >
+          <div
+            className="nb-modal-content"
+            style={{ maxWidth: '720px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="nb-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Building2 size={20} strokeWidth={2.5} />
@@ -429,7 +461,8 @@ export default function AdminNgoRegistrations() {
               <button
                 type="button"
                 onClick={() => { setSelectedNgo(null); setActionType(null); }}
-                style={{ background: 'transparent', border: 'none', color: '#FFF', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: '#FFF', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close review dialog"
               >
                 <X size={20} strokeWidth={2.5} />
               </button>
@@ -490,6 +523,7 @@ export default function AdminNgoRegistrations() {
                       type="button"
                       variant="white"
                       size="sm"
+                      icon={ArrowLeft}
                       onClick={() => setActionType(null)}
                       disabled={submitting}
                     >
@@ -499,6 +533,7 @@ export default function AdminNgoRegistrations() {
                       type="submit"
                       variant={actionType === 'APPROVE' ? 'green' : actionType === 'REJECT' ? 'danger' : 'yellow'}
                       size="sm"
+                      icon={actionType === 'APPROVE' ? CheckCircle2 : actionType === 'REJECT' ? XCircle : AlertTriangle}
                       disabled={submitting}
                     >
                       {submitting ? 'Updating...' : `Confirm ${actionType}`}
@@ -566,14 +601,14 @@ export default function AdminNgoRegistrations() {
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', borderTop: '1.5px solid #E2ECE6', paddingTop: '1rem' }}>
-                    <Button variant="green" size="sm" onClick={() => handleOpenReview(selectedNgo, 'APPROVE')}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', borderTop: '1.5px solid #E2ECE6', paddingTop: '1rem', flexWrap: 'wrap' }}>
+                    <Button variant="green" size="sm" icon={CheckCircle2} onClick={() => handleOpenReview(selectedNgo, 'APPROVE')}>
                       Approve
                     </Button>
-                    <Button variant="yellow" size="sm" onClick={() => handleOpenReview(selectedNgo, 'NEEDS_INFO')}>
+                    <Button variant="yellow" size="sm" icon={AlertTriangle} onClick={() => handleOpenReview(selectedNgo, 'NEEDS_INFO')}>
                       Request Info
                     </Button>
-                    <Button variant="danger" size="sm" onClick={() => handleOpenReview(selectedNgo, 'REJECT')}>
+                    <Button variant="danger" size="sm" icon={XCircle} onClick={() => handleOpenReview(selectedNgo, 'REJECT')}>
                       Reject
                     </Button>
                   </div>

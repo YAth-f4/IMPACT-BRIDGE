@@ -1,5 +1,37 @@
 [
   {
+    "id": "REQ-FR-368863-678",
+    "userId": "USR-BEN-01",
+    "organizerName": "Laxmi Devi",
+    "email": "laxmi.devi@example.com",
+    "phone": "+91 94310 12345",
+    "title": "Flood Relief Shelter Staging",
+    "category": "Disaster Relief",
+    "targetAmount": 500000,
+    "raisedAmount": 0,
+    "description": "Pre-positioning essential survival food kits for flood affected families.",
+    "beneficiaryStory": "Direct aid to displaced rural families.",
+    "location": "Patna, Bihar",
+    "status": "APPROVED",
+    "adminNotes": "Approved for active fundraising portal listing.",
+    "auditLog": [
+      {
+        "action": "SUBMITTED",
+        "performedBy": "Laxmi Devi",
+        "timestamp": "2026-09-26T09:36:08.863Z",
+        "note": "Fundraising proposal submitted and awaiting admin approval"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-26T09:36:08.867Z",
+        "note": "Approved for active fundraising portal listing."
+      }
+    ],
+    "createdAt": "2026-09-26T09:36:08.863Z",
+    "updatedAt": "2026-09-26T09:36:08.867Z"
+  },
+  {
     "id": "REQ-FR-753416-641",
     "userId": "USR-BEN-01",
     "organizerName": "Laxmi Devi",
@@ -204,17 +236,23 @@
     "description": "Procuring 800 thermal blankets, woollen sweaters, and socks for pavement dwellers and migrant families before peak north Indian winter.",
     "beneficiaryStory": "Winter nighttime temperatures dip to 3°C on Yamuna banks; thermal kits prevent cold shock in newborns and seniors.",
     "location": "Yamuna Floodplains & Okhla, New Delhi",
-    "status": "PENDING",
-    "adminNotes": "",
+    "status": "APPROVED",
+    "adminNotes": "Verified project feasibility and certified for 80G public listing.",
     "auditLog": [
       {
         "action": "SUBMITTED",
         "performedBy": "Aarav Sharma",
         "timestamp": "2026-09-12T15:30:00.000Z",
         "note": "Submitted for upcoming winter cycle"
+      },
+      {
+        "action": "STATUS_CHANGED_PENDING_TO_APPROVED",
+        "performedBy": "Sunita Rao (admin@impactbridge.org)",
+        "timestamp": "2026-09-20T14:11:40.456Z",
+        "note": "Verified project feasibility and certified for 80G public listing."
       }
     ],
     "createdAt": "2026-09-12T15:30:00.000Z",
-    "updatedAt": "2026-09-12T15:30:00.000Z"
+    "updatedAt": "2026-09-20T14:11:40.456Z"
   }
 ]

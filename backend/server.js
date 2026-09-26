@@ -10,6 +10,9 @@ const adminRequestRoutes = require('./routes/adminRequestRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const { donorRouter, volunteerRouter, beneficiaryRouter, usersRouter } = require('./routes/roleRoutes');
 const { ngoRouter, adminNgoRouter } = require('./routes/ngoRoutes');
+const donationRoutes = require('./routes/donationRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const programRoutes = require('./routes/programRoutes');
 
 const path = require('path');
 const fs = require('fs');
@@ -50,7 +53,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -80,6 +84,16 @@ app.use('/api/admin/about', adminAboutRoutes);
 
 // Newsletter subscription routes
 app.use('/api/newsletter', newsletterRoutes);
+
+// Public Programs routes
+app.use('/api/programs', programRoutes);
+
+// Public Donation routes
+app.use('/api/donations', donationRoutes);
+
+// Public Message / Contact routes
+app.use('/api/messages', messageRoutes);
+app.use('/api/contact', messageRoutes);
 
 // Public & User Request routes (Find Help, Fund Raise, Volunteer)
 app.use('/api/requests', requestRoutes);
@@ -115,10 +129,20 @@ app.use((err, req, res, _next) => {
     });
   }
 
+  // Handle payload too large (413)
+  if (err.type === 'entity.too.large' || err.status === 413) {
+    return res.status(413).json({
+      success: false,
+      message: 'Uploaded payload or document exceeds maximum allowed size (25MB).',
+      error: 'request entity too large'
+    });
+  }
+
   console.error('[Server Error]', err.stack || err.message);
   const statusCode = err.statusCode || err.status || 500;
   res.status(statusCode).json({
     success: false,
+    message: err.message || (statusCode === 500 ? 'Internal Server Error' : 'An error occurred'),
     error: statusCode === 500 ? 'Internal Server Error' : err.message
   });
 });

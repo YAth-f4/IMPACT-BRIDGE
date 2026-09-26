@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 
 function ToastItem({ toast, onDismiss }) {
   const [isExiting, setIsExiting] = useState(false);
@@ -14,10 +14,11 @@ function ToastItem({ toast, onDismiss }) {
 
   const isSuccess = toast.type === 'success';
   const isError = toast.type === 'error';
+  const isWarning = toast.type === 'warning';
   const isInfo = toast.type === 'info';
 
-  const bgColor = isSuccess ? '#A8D5BA' : isError ? '#FFCCD5' : '#F4B942';
-  const iconColor = isSuccess ? '#1E523A' : isError ? '#E63946' : '#26332D';
+  const bgColor = isSuccess ? '#A8D5BA' : isError ? '#FFCCD5' : isWarning ? '#FDE68A' : '#F4B942';
+  const iconColor = isSuccess ? '#1E523A' : isError ? '#E63946' : isWarning ? '#B45309' : '#26332D';
 
   return (
     <div
@@ -32,6 +33,7 @@ function ToastItem({ toast, onDismiss }) {
         <div style={{ color: iconColor, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
           {isSuccess && <CheckCircle2 size={20} strokeWidth={2.5} />}
           {isError && <AlertCircle size={20} strokeWidth={2.5} />}
+          {isWarning && <AlertTriangle size={20} strokeWidth={2.5} />}
           {isInfo && <Info size={20} strokeWidth={2.5} />}
         </div>
         <span style={{ flex: 1, minWidth: 0 }}>{toast.message}</span>

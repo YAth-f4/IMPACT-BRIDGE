@@ -18,7 +18,8 @@ import {
   Globe,
   Eye,
   EyeOff,
-  AlertTriangle
+  AlertTriangle,
+  UserPlus
 } from 'lucide-react';
 
 export default function Register() {
@@ -488,6 +489,7 @@ export default function Register() {
                 fullWidth
                 disabled={isLoading}
                 className="nb-btn-tactile"
+                icon={!isLoading ? UserPlus : null}
                 iconRight={!isLoading ? ArrowRight : null}
               >
                 {isLoading ? (

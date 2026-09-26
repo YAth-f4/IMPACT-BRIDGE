@@ -211,6 +211,16 @@ class MessageModel {
     return msg;
   }
 
+  delete(id) {
+    const messages = this.loadMessages();
+    const index = messages.findIndex((m) => m.id === id);
+    if (index === -1) return false;
+
+    const removed = messages.splice(index, 1)[0];
+    this.saveMessages(messages);
+    return removed;
+  }
+
   getStats() {
     const messages = this.loadMessages();
     return {
